@@ -1,0 +1,224 @@
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+h1 {
+  font-size: 2.5em; /* Adjusted size */
+  line-height: 1.1;
+  margin-bottom: 1.5rem;
+}
+
+#app {
+  max-width: 900px; /* Adjusted width */
+  margin: 2rem auto;
+  padding: 2rem;
+  text-align: center;
+  background-color: #2f2f2f; /* Slightly lighter background for the app area */
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.vanilla:hover {
+  filter: drop-shadow(0 0 2em #f7df1eaa);
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+
+.controls {
+  margin-bottom: 2rem;
+  display: flex;
+  flex-wrap: wrap; /* Allow wrapping on smaller screens */
+  gap: 1rem; /* Spacing between elements */
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background-color: #3a3a3a;
+  border-radius: 8px;
+}
+
+.controls label {
+  margin-right: 0.5rem;
+}
+
+.controls input[type="file"],
+.controls input[type="text"] {
+  padding: 0.5rem;
+  border: 1px solid #555;
+  border-radius: 4px;
+  background-color: #444;
+  color: #eee;
+  flex-grow: 1; /* Allow text input to grow */
+  min-width: 150px; /* Minimum width */
+}
+
+.controls input[type="file"] {
+  flex-grow: 0; /* Don't let file input grow too much */
+}
+
+.controls span {
+  font-style: italic;
+  color: #aaa;
+}
+
+.player-container {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+#videoPlayer {
+  flex-grow: 3; /* Video takes more space */
+  width: 70%; /* Responsive width */
+  aspect-ratio: 16 / 9; /* Maintain aspect ratio */
+  background-color: #000;
+  border-radius: 4px;
+}
+
+#playlistContainer {
+  flex-grow: 1;
+  width: 30%; /* Responsive width */
+  max-height: 400px; /* Limit height and make scrollable */
+  overflow-y: auto;
+  background-color: #3a3a3a;
+  padding: 1rem;
+  border-radius: 4px;
+  text-align: left;
+}
+
+.playlist-item {
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  background-color: #444;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.playlist-item:hover {
+  background-color: #535bf2;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s, background-color 0.2s;
+}
+button:hover {
+  border-color: #646cff;
+  background-color: #333;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+/* Basic responsiveness */
+@media (max-width: 768px) {
+  .player-container {
+    flex-direction: column;
+  }
+  #videoPlayer,
+  #playlistContainer {
+    width: 100%;
+    max-height: 300px; /* Adjust height for smaller screens */
+  }
+  .controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  #app {
+    background-color: #f9f9f9;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+  .controls {
+    background-color: #eee;
+  }
+  .controls input[type="file"],
+  .controls input[type="text"] {
+    background-color: #fff;
+    border-color: #ccc;
+    color: #333;
+  }
+  .controls span {
+    color: #555;
+  }
+  #playlistContainer {
+    background-color: #eee;
+  }
+  .playlist-item {
+    background-color: #fff;
+  }
+  .playlist-item:hover {
+    background-color: #e0e0ff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f0f0f0;
+    color: #213547;
+  }
+  button:hover {
+    border-color: #747bff;
+    background-color: #e8e8e8;
+  }
+}
