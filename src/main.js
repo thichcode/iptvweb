@@ -3,7 +3,7 @@ import Hls from 'hls.js'; // Import hls.js
 
 // Danh sách kênh M3U mặc định
 const defaultM3ULinks = {
-    "Vietnamese TV": "https://iptv-org.github.io/iptv/countries/vn.m3u",
+    "Vietnamese TV": "https://raw.githubusercontent.com/thichcode/thichcode/refs/heads/main/fptplay.m3u",
     "International TV": "https://iptv-org.github.io/iptv/index.m3u"
 };
 
