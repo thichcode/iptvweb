@@ -9,17 +9,52 @@
   <body>
     <div id="app">
       <h1>Simple IPTV Player</h1>
-      <div class="controls">
-        <label for="m3uFileInput">Load M3U File:</label>
-        <input type="file" id="m3uFileInput" accept=".m3u,.m3u8" />
-        <span>OR</span>
-        <label for="m3uUrlInput">Load M3U from URL:</label>
-        <input type="text" id="m3uUrlInput" placeholder="Enter M3U URL" />
-        <button id="loadUrlButton">Load URL</button>
+      
+      <div class="mode-toggle">
+        <button id="toggleTVModeBtn" class="mobile-btn">Bật/Tắt Chế độ TV</button>
       </div>
-      <div class="player-container">
-        <video id="videoPlayer" controls></video>
-        <div id="playlistContainer"></div>
+      
+      <div class="mobile-player-wrapper">
+        <div class="video-container">
+          <video id="videoPlayer" controls playsinline></video>
+          <div class="control-hints">
+            <div>Điều khiển: Phím mũi tên để di chuyển, Enter để chọn</div>
+            <div>Space: Phát/Tạm dừng, F: Toàn màn hình</div>
+          </div>
+        </div>
+        
+        <div class="channel-selector">
+          <button id="showChannelsBtn" class="mobile-btn">Xem danh sách kênh</button>
+          <div class="preset-channels">
+            <button id="loadPresetBtn" class="mobile-btn">Tải kênh mặc định</button>
+          </div>
+        </div>
+        
+        <div class="advanced-controls">
+          <button id="toggleAdvancedBtn" class="mobile-btn">Tùy chọn nâng cao</button>
+          <div id="advancedOptions" class="hidden">
+            <div class="controls">
+              <label for="m3uFileInput">Load M3U File:</label>
+              <input type="file" id="m3uFileInput" accept=".m3u,.m3u8" />
+              <span>OR</span>
+              <div class="url-input-group">
+                <label for="m3uUrlInput">Load M3U from URL:</label>
+                <input type="text" id="m3uUrlInput" placeholder="Enter M3U URL" />
+                <button id="loadUrlButton">Load</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div id="channelOverlay" class="overlay hidden">
+        <div class="overlay-content">
+          <div class="overlay-header">
+            <h2>Danh sách kênh</h2>
+            <button id="closeChannelsBtn" class="close-btn">&times;</button>
+          </div>
+          <div id="playlistContainer"></div>
+        </div>
       </div>
     </div>
     <script type="module" src="/src/main.js"></script>
