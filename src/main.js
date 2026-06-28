@@ -197,12 +197,21 @@ function handleClick(e) {
   }
 }
 
+function autoFullscreen() {
+  const el = document.documentElement
+  const fn = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen
+  if (fn) {
+    fn.call(el).catch(() => {})
+  }
+}
+
 function init() {
   buildShell()
   renderHome()
   setHeader('WebPhim', '↑↓ Chọn | Enter vào')
   document.addEventListener('keydown', handleKey)
   document.addEventListener('click', handleClick)
+  setTimeout(autoFullscreen, 10000)
 }
 
 init()
