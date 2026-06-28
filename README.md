@@ -20,7 +20,7 @@ Xem phim online trực tuyến, giao diện tối giản, phát HLS mượt mà.
 - [Vite](https://vitejs.dev/) — build tool
 - [hls.js](https://github.com/video-dev/hls.js/) — HLS playback
 - Vanilla JavaScript — không framework
-- [phimapi.com](https://phimapi.com) — API phim
+
 
 ## Phát triển
 
