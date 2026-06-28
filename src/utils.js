@@ -1,3 +1,6 @@
+export { imgSrc } from './api.js'
+export { store } from './store.js'
+
 export function $(sel, ctx = document) { return ctx.querySelector(sel) }
 export function $$(sel, ctx = document) { return [...ctx.querySelectorAll(sel)] }
 

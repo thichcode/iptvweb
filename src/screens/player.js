@@ -70,7 +70,7 @@ export function exitPlayer() {
 export function togglePlay() {
   const player = $('#player')
   if (!player) return
-  if (player.paused) player.play() else player.pause()
+  if (player.paused) { player.play() } else { player.pause() }
   showOverlay()
 }
 
