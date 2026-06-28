@@ -170,6 +170,7 @@ function handleKey(e) {
 function handleClick(e) {
   if ($('#player-wrap').classList.contains('active')) {
     if (e.target.closest('#p-seekbar')) { seekTo(e); return }
+    if (e.target === $('#player')) togglePlay()
     const ui = $('#player-ui')
     if (ui) {
       ui.classList.add('show')
@@ -205,6 +206,29 @@ function handleClick(e) {
   }
 }
 
+let lastTap = 0
+let lastTapX = 0
+
+function handleTouch(e) {
+  if (!store.currentMovie) return
+  if (!e.target.closest('#player-wrap')) return
+  if (e.target.closest('#p-seekbar, #player-overlay, .p-controls')) return
+  const touch = e.changedTouches[0]
+  const now = Date.now()
+  const dt = now - lastTap
+  const dx = Math.abs(touch.clientX - lastTapX)
+  lastTap = now
+  lastTapX = touch.clientX
+  if (dt < 300 && dx < 40) {
+    e.preventDefault()
+    if (touch.clientX < window.innerWidth / 2) {
+      seek(-10)
+    } else {
+      seek(10)
+    }
+  }
+}
+
 function autoFullscreen() {
   const el = document.documentElement
   const fn = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen
@@ -219,6 +243,7 @@ function init() {
   setHeader('WebPhim', '↑↓ Chọn | Enter vào')
   document.addEventListener('keydown', handleKey)
   document.addEventListener('click', handleClick)
+  document.addEventListener('touchend', handleTouch)
   setTimeout(autoFullscreen, 10000)
 }
 
