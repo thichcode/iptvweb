@@ -22,14 +22,16 @@ function buildShell() {
     <div id="screen-detail" class="screen"></div>
     <div id="player-wrap">
       <video id="player" playsinline></video>
-      <div class="p-controls">
-        <span class="p-time" id="p-current">0:00</span>
-        <div class="p-seekbar" id="p-seekbar"><div class="p-progress" id="p-progress"></div></div>
-        <span class="p-time" id="p-duration">0:00</span>
-      </div>
-      <div id="player-overlay">
-        <div class="p-title" id="p-title"></div>
-        <div class="p-hint">← → Click seek  |  Space Play/Pause  |  Esc thoát</div>
+      <div id="player-ui">
+        <div id="player-overlay">
+          <div class="p-title" id="p-title"></div>
+          <div class="p-hint">← → Click seek  |  Space Play/Pause  |  Esc thoát</div>
+        </div>
+        <div class="p-controls">
+          <span class="p-time" id="p-current">0:00</span>
+          <div class="p-seekbar" id="p-seekbar"><div class="p-progress" id="p-progress"></div></div>
+          <span class="p-time" id="p-duration">0:00</span>
+        </div>
       </div>
     </div>`
 }
@@ -168,11 +170,11 @@ function handleKey(e) {
 function handleClick(e) {
   if ($('#player-wrap').classList.contains('active')) {
     if (e.target.closest('#p-seekbar')) { seekTo(e); return }
-    const overlay = $('#player-overlay')
-    if (overlay) {
-      overlay.classList.add('show')
+    const ui = $('#player-ui')
+    if (ui) {
+      ui.classList.add('show')
       if (overlayTimer) clearTimeout(overlayTimer)
-      overlayTimer = setTimeout(() => overlay.classList.remove('show'), 4000)
+      overlayTimer = setTimeout(() => ui.classList.remove('show'), 4000)
     }
     return
   }

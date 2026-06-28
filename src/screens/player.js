@@ -112,13 +112,13 @@ export function seek(delta) {
 }
 
 function showOverlay() {
-  const overlay = $('#player-overlay')
-  if (!overlay) return
-  overlay.classList.add('show')
+  const ui = $('#player-ui')
+  if (!ui) return
+  ui.classList.add('show')
   if (overlayTimer) clearTimeout(overlayTimer)
   const player = $('#player')
   if (player && !player.paused) {
-    overlayTimer = setTimeout(() => overlay.classList.remove('show'), 4000)
+    overlayTimer = setTimeout(() => ui.classList.remove('show'), 4000)
   }
 }
 
