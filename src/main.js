@@ -55,8 +55,8 @@ function selectHomeItem(idx) {
     case 'categories': loadCategories(); setHeader('Thể Loại', ''); break
     case 'countries': loadCountries(); setHeader('Quốc Gia', ''); break
     case 'search': store.searchMode = true; renderSearchInput(store.currentKeyword); switchScreen('list'); setHeader('Tìm Kiếm', 'Enter để tìm'); break
-    case 'favorites': loadFavorites(); setHeader('♥ Yêu Thích', ''); break
-    case 'history': loadHistory(); setHeader('Đã Xem', ''); break
+    case 'favorites': loadFavorites(); switchScreen('list'); setHeader('♥ Yêu Thích', ''); break
+    case 'history': loadHistory(); switchScreen('list'); setHeader('Đã Xem', ''); break
     default:
       loadMovieList(item.id, 1, '', '', '')
       setHeader(item.label, '↑↓ Chọn | Enter xem')
