@@ -2,8 +2,6 @@
 
 Xem phim online trực tuyến, giao diện tối giản, phát HLS mượt mà.
 
-Dữ liệu phim được lấy từ [KKPhim](https://www.rophim.me/) thông qua API `phimapi.com`.
-
 ## Tính năng
 
 - **Danh mục phim**: Phim Mới, Phim Bộ, Phim Lẻ, TV Shows, Hoạt Hình
