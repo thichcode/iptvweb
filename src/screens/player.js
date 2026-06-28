@@ -4,6 +4,7 @@ import Hls from 'hls.js'
 
 let hlsInstance = null
 let overlayTimer = null
+let progressTimer = null
 
 export function playEpisode(serverIdx, epIdx) {
   if (!store.episodes || !store.episodes[serverIdx]) return
@@ -38,6 +39,7 @@ export function playEpisode(serverIdx, epIdx) {
 
   showOverlay()
   player.onended = () => autoNext()
+  player.ontimeupdate = updateProgress
   if (movie) saveHist(movie.slug, movie, data[epIdx].name || 'Tập ' + (epIdx + 1), serverIdx, epIdx)
 }
 
@@ -54,11 +56,39 @@ function autoNext() {
   showOverlay()
 }
 
+function formatTime(t) {
+  if (isNaN(t) || !isFinite(t)) return '0:00'
+  const m = Math.floor(t / 60)
+  const s = Math.floor(t % 60)
+  return m + ':' + (s < 10 ? '0' : '') + s
+}
+
+function updateProgress() {
+  const player = $('#player')
+  if (!player) return
+  const current = $('#p-current')
+  const dur = $('#p-duration')
+  const bar = $('#p-progress')
+  if (current) current.textContent = formatTime(player.currentTime)
+  if (dur) dur.textContent = formatTime(player.duration)
+  if (bar && player.duration) bar.style.width = (player.currentTime / player.duration * 100) + '%'
+}
+
+export function seekTo(e) {
+  const bar = $('#p-seekbar')
+  const player = $('#player')
+  if (!bar || !player) return
+  const rect = bar.getBoundingClientRect()
+  const x = (e.clientX - rect.left) / rect.width
+  player.currentTime = x * player.duration
+  showOverlay()
+}
+
 export function exitPlayer() {
   const player = $('#player')
   const wrap = $('#player-wrap')
   if (hlsInstance) { hlsInstance.destroy(); hlsInstance = null }
-  if (player) { player.pause(); player.onended = null; player.removeAttribute('src'); player.load() }
+  if (player) { player.pause(); player.onended = null; player.ontimeupdate = null; player.removeAttribute('src'); player.load() }
   wrap.classList.remove('active')
   if (overlayTimer) { clearTimeout(overlayTimer); overlayTimer = null }
   $$('.screen').forEach(s => s.classList.remove('active'))
