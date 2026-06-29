@@ -1,0 +1,60 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build web
+        run: npm run build
+
+      - name: Add Capacitor Android platform
+        run: npx cap add android
+
+      - name: Sync web to Android
+        run: npx cap sync
+
+      - name: Patch AndroidManifest for Android TV
+        run: |
+          MANIFEST="android/app/src/main/AndroidManifest.xml"
+          # Add leanback feature
+          sed -i 's|</manifest>|  <uses-feature android:name="android.software.leanback" android:required="false" />\n  <uses-feature android:name="android.hardware.touchscreen" android:required="false" />\n</manifest>|' "$MANIFEST"
+          # Add TV banner to main activity
+          sed -i 's|<activity android:name=".MainActivity"|<activity android:name=".MainActivity" android:banner="@mipmap/ic_launcher" android:screenOrientation="landscape"|' "$MANIFEST"
+          cat "$MANIFEST"
+
+      - name: Build Debug APK
+        working-directory: android
+        run: ./gradlew assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: webphim-debug.apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
