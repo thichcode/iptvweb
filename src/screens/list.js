@@ -109,7 +109,8 @@ export async function loadMovieList(type, page, keyword, category, country) {
     const items = data.items || (data.data && data.data.items) || []
     const pagination = data.pagination || (data.data && data.data.params && data.data.params.pagination) || {}
     renderMovieList(items, pagination.currentPage || page, pagination.totalPages || 1, type)
-  } catch {
+  } catch (err) {
+    console.error(err)
     container.innerHTML = `<div class="error-state">
       <div class="error-icon">📡</div>
       <div class="error-title">Không kết nối được</div>
@@ -127,7 +128,8 @@ export async function loadCategories() {
     const data = await fetchCategories()
     const items = Array.isArray(data) ? data : (data.data && Array.isArray(data.data) ? data.data : [])
     renderSubList(items, 'category')
-  } catch {
+  } catch (err) {
+    console.error(err)
     container.innerHTML = `<div class="error-state">
       <div class="error-icon">📡</div>
       <div class="error-title">Không thể tải</div>
@@ -144,7 +146,8 @@ export async function loadCountries() {
     const data = await fetchCountries()
     const items = Array.isArray(data) ? data : (data.data && Array.isArray(data.data) ? data.data : [])
     renderSubList(items, 'country')
-  } catch {
+  } catch (err) {
+    console.error(err)
     container.innerHTML = `<div class="error-state">
       <div class="error-icon">📡</div>
       <div class="error-title">Không thể tải</div>
