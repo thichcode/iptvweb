@@ -6,6 +6,7 @@ body { background: #0d0d0d; color: #fff; font-family: system-ui, -apple-system, 
 .header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #111; border-bottom: 1px solid #2a2a2a; position: sticky; top: 0; z-index: 10; }
 .header h1 { margin: 0; font-size: 22px; color: #ffd600; }
 .header .hint { color: #888; font-size: 13px; }
+.header-back { font-size: 24px; color: #ffd600; cursor: pointer; padding: 0 12px 0 0; user-select: none; }
 @media (max-width: 600px) { .header { padding: 10px 12px; } .header h1 { font-size: 18px; } .header .hint { font-size: 11px; } }
 
 /* Screens */

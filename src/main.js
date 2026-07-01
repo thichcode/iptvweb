@@ -14,6 +14,7 @@ let overlayTimer = null
 function buildShell() {
   document.getElementById('app').innerHTML = `
     <div class="header">
+      <span id="header-back" class="header-back" style="display:none">←</span>
       <h1 id="header-title">WebPhim</h1>
       <span class="hint" id="header-hint"></span>
     </div>
@@ -48,6 +49,22 @@ function switchScreen(id) {
   const el = $('#screen-' + id)
   if (el) el.classList.add('active')
   store.screen = id
+  const back = $('#header-back')
+  if (back) back.style.display = (id === 'home') ? 'none' : ''
+}
+
+function goBack() {
+  const screen = store.screen
+  if ($('#player-wrap').classList.contains('active')) {
+    exitPlayer()
+  } else if (screen === 'detail') {
+    switchScreen(store.prevScreen || 'home')
+    setHeader('WebPhim', '')
+  } else if (screen === 'list') {
+    renderHome()
+    switchScreen('home')
+    setHeader('WebPhim', '')
+  }
 }
 
 function selectHomeItem(idx) {
@@ -244,6 +261,7 @@ function init() {
   document.addEventListener('keydown', handleKey)
   document.addEventListener('click', handleClick)
   document.addEventListener('touchend', handleTouch)
+  $('#header-back').addEventListener('click', goBack)
   setTimeout(autoFullscreen, 10000)
 }
 
