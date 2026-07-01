@@ -44,10 +44,10 @@ export function playEpisode(serverIdx, epIdx) {
     hlsInstance = new Hls()
     hlsInstance.loadSource(src)
     hlsInstance.attachMedia(player)
-    hlsInstance.on(Hls.Events.MANIFEST_PARSED, () => player.play())
+    hlsInstance.on(Hls.Events.MANIFEST_PARSED, () => player.play().catch(() => {}))
   } else if (player.canPlayType('application/vnd.apple.mpegurl')) {
     player.src = src
-    player.addEventListener('loadedmetadata', () => player.play(), { once: true })
+    player.addEventListener('loadedmetadata', () => player.play().catch(() => {}), { once: true })
   }
 
   showOverlay()
@@ -142,8 +142,7 @@ function removeGestureHints() {
 }
 
 function showSeekFeedback(delta) {
-  const existing = document.querySelector('.seek-feedback')
-  if (existing) existing.remove()
+  document.querySelectorAll('.seek-feedback').forEach(e => e.remove())
 
   const el = document.createElement('div')
   el.className = 'seek-feedback ' + (delta > 0 ? 'right' : 'left')
