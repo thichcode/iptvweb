@@ -332,6 +332,9 @@ body { background: #0d0d0d; color: #fff; font-family: system-ui, -apple-system, 
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
+  outline: none;
+  transition: background 0.15s;
 }
 
 .retry-btn:hover { background: #ffea00; }
+.retry-btn:focus { border: 2px solid #ffd600; }
