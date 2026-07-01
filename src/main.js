@@ -1,4 +1,4 @@
-import { $, $$, HOME_MENU, KEY_MAP, store } from './utils.js'
+import { $, $$, HOME_MENU, KEY_MAP, store, switchScreen } from './utils.js'
 import { renderHome, handleHomeClick } from './screens/home.js'
 import {
   renderMovieList, renderSubList, renderSearchInput, renderLocalList,
@@ -44,11 +44,8 @@ function setHeader(title, hint) {
   if (hh) hh.textContent = hint || ''
 }
 
-function switchScreen(id) {
-  $$('.screen').forEach(s => s.classList.remove('active'))
-  const el = $('#screen-' + id)
-  if (el) el.classList.add('active')
-  store.screen = id
+function switchScreenLocal(id) {
+  switchScreen(id)
   const back = $('#header-back')
   if (back) back.style.display = (id === 'home') ? 'none' : ''
 }
@@ -58,11 +55,11 @@ function goBack() {
   if ($('#player-wrap').classList.contains('active')) {
     exitPlayer()
   } else if (screen === 'detail') {
-    switchScreen(store.prevScreen || 'home')
+    switchScreenLocal(store.prevScreen || 'home')
     setHeader('WebPhim', '')
   } else if (screen === 'list') {
     renderHome()
-    switchScreen('home')
+    switchScreenLocal('home')
     setHeader('WebPhim', '')
   }
 }
@@ -78,9 +75,9 @@ function selectHomeItem(idx) {
   switch (item.id) {
     case 'categories': loadCategories(); setHeader('Thể Loại', ''); break
     case 'countries': loadCountries(); setHeader('Quốc Gia', ''); break
-    case 'search': store.searchMode = true; renderSearchInput(store.currentKeyword); switchScreen('list'); setHeader('Tìm Kiếm', 'Enter để tìm'); break
-    case 'favorites': loadFavorites(); switchScreen('list'); setHeader('♥ Yêu Thích', ''); break
-    case 'history': loadHistory(); switchScreen('list'); setHeader('Đã Xem', ''); break
+    case 'search': store.searchMode = true; renderSearchInput(store.currentKeyword); switchScreenLocal('list'); setHeader('Tìm Kiếm', 'Enter để tìm'); break
+    case 'favorites': loadFavorites(); switchScreenLocal('list'); setHeader('♥ Yêu Thích', ''); break
+    case 'history': loadHistory(); switchScreenLocal('list'); setHeader('Đã Xem', ''); break
     default:
       loadMovieList(item.id, 1, '', '', '')
       setHeader(item.label, '↑↓ Chọn | Enter xem')
@@ -113,7 +110,7 @@ function handleKey(e) {
       if (inp && inp.value.trim()) { e.preventDefault(); store.searchMode = false; loadMovieList('search', 1, inp.value.trim(), '', ''); setHeader('Tìm: ' + inp.value.trim(), '') }
     }
     if (key === 'Escape') {
-      e.preventDefault(); store.searchMode = false; renderHome(); switchScreen('home'); setHeader('WebPhim', '')
+      e.preventDefault(); store.searchMode = false; renderHome(); switchScreenLocal('home'); setHeader('WebPhim', '')
     }
     return
   }
@@ -148,7 +145,7 @@ function handleKey(e) {
     if (key === 'ArrowUp') { idx--; if (idx < 0) idx = items.length - 1 }
     else if (key === 'ArrowDown') { idx++; if (idx >= items.length) idx = 0 }
     else if (key === 'Enter') { selectListItem(items, idx); return }
-    else if (key === 'Escape') { renderHome(); switchScreen('home'); setHeader('WebPhim', ''); return }
+    else if (key === 'Escape') { renderHome(); switchScreenLocal('home'); setHeader('WebPhim', ''); return }
     else return
     items.forEach(i => i.classList.remove('focused'))
     items[idx].classList.add('focused')
@@ -176,7 +173,7 @@ function handleKey(e) {
       }
       return
     }
-    else if (key === 'Escape') { switchScreen(store.prevScreen || 'home'); setHeader('WebPhim', ''); return }
+    else if (key === 'Escape') { switchScreenLocal(store.prevScreen || 'home'); setHeader('WebPhim', ''); return }
     else return
     items.forEach(i => i.classList.remove('focused'))
     items[idx].classList.add('focused')

@@ -6,6 +6,24 @@ export function $$(sel, ctx = document) { return [...ctx.querySelectorAll(sel)] 
 
 export function empty(el) { el.innerHTML = '' }
 
+export function sanitize(str) {
+  if (typeof str !== 'string') return ''
+  const div = document.createElement('div')
+  div.textContent = str
+  return div.innerHTML
+}
+
+export function sanitizeAttr(str) {
+  return sanitize(str).replace(/"/g, '&quot;').replace(/'/g, '&#39;')
+}
+
+export function switchScreen(id) {
+  $$('.screen').forEach(s => s.classList.remove('active'))
+  const el = $('#screen-' + id)
+  if (el) el.classList.add('active')
+  store.screen = id
+}
+
 export function scrollTo(el) {
   if (el) el.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
 }

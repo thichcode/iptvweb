@@ -1,9 +1,17 @@
-const BASE = 'https://phimapi.com'
+const BASE = __API_BASE__ || 'https://phimapi.com'
+const MAX_RETRIES = 2
 
-export async function apiGet(url) {
-  const res = await fetch(BASE + url)
-  if (!res.ok) throw new Error('HTTP ' + res.status)
-  return res.json()
+export async function apiGet(url, retries = MAX_RETRIES) {
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const res = await fetch(BASE + url)
+      if (!res.ok) throw new Error('HTTP ' + res.status)
+      return res.json()
+    } catch (err) {
+      if (attempt === retries) throw err
+      await new Promise(r => setTimeout(r, 500 * (attempt + 1)))
+    }
+  }
 }
 
 export function imgSrc(url) {
