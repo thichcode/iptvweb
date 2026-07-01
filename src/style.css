@@ -239,3 +239,99 @@ body { background: #0d0d0d; color: #fff; font-family: system-ui, -apple-system, 
 ::-webkit-scrollbar-track { background: #111; }
 ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #555; }
+
+/* Player UX */
+.gesture-hints {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: #fff;
+  font-size: 14px;
+  opacity: 0;
+  animation: hint-fade 3s ease-in-out forwards;
+  pointer-events: none;
+}
+
+@keyframes hint-fade {
+  0% { opacity: 0; }
+  15% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.gesture-hints .hint-row {
+  margin: 8px 0;
+  color: #ccc;
+}
+
+.gesture-hints .hint-key {
+  display: inline-block;
+  background: rgba(255,255,255,0.15);
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin: 0 4px;
+  font-family: monospace;
+}
+
+.seek-feedback {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 28px;
+  font-weight: bold;
+  color: #ffd600;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 110;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+}
+
+.seek-feedback.left { left: 20%; }
+.seek-feedback.right { right: 20%; }
+
+.seek-feedback.show {
+  animation: seek-anim 0.5s ease-out forwards;
+}
+
+@keyframes seek-anim {
+  0% { opacity: 1; transform: translateY(-50%) scale(1); }
+  100% { opacity: 0; transform: translateY(-50%) scale(1.5); }
+}
+
+/* Error States */
+.error-state {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.error-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.error-title {
+  font-size: 18px;
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+.error-hint {
+  font-size: 14px;
+  color: #888;
+  margin-bottom: 20px;
+}
+
+.retry-btn {
+  padding: 10px 24px;
+  background: #ffd600;
+  color: #000;
+  border: none;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.retry-btn:hover { background: #ffea00; }
