@@ -24,6 +24,19 @@ export function playEpisode(serverIdx, epIdx) {
   const movie = store.currentMovie
   pTitle.textContent = (movie ? movie.name : '') + ' - ' + (data[epIdx].name || 'Tập ' + (epIdx + 1))
 
+  removeGestureHints()
+  const hints = document.createElement('div')
+  hints.className = 'gesture-hints'
+  hints.id = 'gesture-hints'
+  hints.innerHTML = `
+    <div class="hint-row"><span class="hint-key">← →</span> Seek 10s</div>
+    <div class="hint-row"><span class="hint-key">Space</span> Play / Pause</div>
+    <div class="hint-row"><span class="hint-key">Esc</span> Thoát</div>
+    <div class="hint-row" style="color:#888;font-size:12px;margin-top:12px">Double-tap trái/phải để seek</div>
+  `
+  wrap.appendChild(hints)
+  setTimeout(removeGestureHints, 3000)
+
   if (hlsInstance) { hlsInstance.destroy(); hlsInstance = null }
   player.removeAttribute('src')
 
@@ -108,6 +121,7 @@ export function seek(delta) {
   const player = $('#player')
   if (!player) return
   player.currentTime = Math.max(0, player.currentTime + delta)
+  showSeekFeedback(delta)
   showOverlay()
 }
 
@@ -120,6 +134,24 @@ function showOverlay() {
   if (player && !player.paused) {
     overlayTimer = setTimeout(() => ui.classList.remove('show'), 4000)
   }
+}
+
+function removeGestureHints() {
+  const hints = $('#gesture-hints')
+  if (hints) hints.remove()
+}
+
+function showSeekFeedback(delta) {
+  const existing = document.querySelector('.seek-feedback')
+  if (existing) existing.remove()
+
+  const el = document.createElement('div')
+  el.className = 'seek-feedback ' + (delta > 0 ? 'right' : 'left')
+  el.textContent = (delta > 0 ? '+' : '') + delta + 's'
+  document.body.appendChild(el)
+
+  requestAnimationFrame(() => el.classList.add('show'))
+  setTimeout(() => el.remove(), 500)
 }
 
 export function handlePlayerClick(e) {
