@@ -58,7 +58,7 @@ function renderDetail(movie, episodes) {
   if (tags.some(Boolean)) {
     html += '<div class="tags">' + tags.filter(Boolean).map(t => `<span>${sanitize(t)}</span>`).join('') + '</div>'
   }
-  html += `<div class="desc">${movie.content || movie.description || 'Chưa có mô tả'}</div></div></div>`
+  html += `<div class="desc">${sanitize(movie.content || movie.description || 'Chưa có mô tả')}</div></div></div>`
 
   if (episodes.length) {
     html += '<div class="episode-section">'
