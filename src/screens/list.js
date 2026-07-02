@@ -1,5 +1,5 @@
 import { $, $$, imgSrc, switchScreen, sanitize, sanitizeAttr } from '../utils.js'
-import { fetchMovies, fetchCategories, fetchCountries } from '../api.js'
+import { fetchMovies, fetchCategories, fetchCountries, getMovieLimit, isMobileViewport } from '../api.js'
 import { store, getFavs, getHist, isFav } from '../store.js'
 
 function renderSkeletonGrid(count = 6) {
@@ -62,6 +62,10 @@ export function renderMovieList(items, page, totalPages, type) {
   store.listType = type
 }
 
+export function limitRenderedItems(items, isMobile = isMobileViewport()) {
+  return isMobile ? items.slice(0, getMovieLimit(true)) : items
+}
+
 export function renderSubList(items, type) {
   const container = $('#screen-list')
   container.innerHTML = '<div class="sub-list">' +
@@ -100,15 +104,16 @@ export function renderLocalList(items, title) {
 export async function loadMovieList(type, page, keyword, category, country) {
   store.searchMode = false
   const container = $('#screen-list')
-  container.innerHTML = renderSkeletonGrid()
+  const limit = getMovieLimit()
+  container.innerHTML = renderSkeletonGrid(limit)
   switchScreen('list')
   window.scrollTo({ top: 0, behavior: 'smooth' })
   store.listType = type
   try {
-    const data = await fetchMovies(type, page, keyword, category, country)
+    const data = await fetchMovies(type, page, keyword, category, country, limit)
     const items = data.items || (data.data && data.data.items) || []
     const pagination = data.pagination || (data.data && data.data.params && data.data.params.pagination) || {}
-    renderMovieList(items, pagination.currentPage || page, pagination.totalPages || 1, type)
+    renderMovieList(limitRenderedItems(items), pagination.currentPage || page, pagination.totalPages || 1, type)
   } catch (err) {
     console.error(err)
     container.innerHTML = `<div class="error-state">

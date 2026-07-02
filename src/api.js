@@ -1,6 +1,8 @@
-const BASE = import.meta.env.VITE_API_BASE || 'https://phimapi.com'
+const BASE = import.meta.env?.VITE_API_BASE || 'https://phimapi.com'
 const MAX_RETRIES = 2
 const TIMEOUT_MS = 15000
+const MOBILE_LIMIT = 4
+const DEFAULT_LIMIT = 20
 
 export async function apiGet(url, retries = MAX_RETRIES) {
   for (let attempt = 0; attempt <= retries; attempt++) {
@@ -23,20 +25,32 @@ export function imgSrc(url) {
   return BASE + '/image.php?url=' + encodeURIComponent(url)
 }
 
-export function fetchMovies(type, page = 1, keyword = '', category = '', country = '') {
-  let url = ''
+export function isMobileViewport() {
+  return typeof window !== 'undefined' && window.matchMedia('(max-width: 600px)').matches
+}
+
+export function getMovieLimit(isMobile = isMobileViewport()) {
+  return isMobile ? MOBILE_LIMIT : DEFAULT_LIMIT
+}
+
+export function buildMovieUrl(type, page = 1, keyword = '', category = '', country = '', limit = getMovieLimit()) {
   if (keyword) {
-    url = `/v1/api/tim-kiem?keyword=${encodeURIComponent(keyword)}&page=${page}&limit=20`
-  } else if (category) {
-    url = `/v1/api/the-loai/${encodeURIComponent(category)}?page=${page}&limit=20`
-  } else if (country) {
-    url = `/v1/api/quoc-gia/${encodeURIComponent(country)}?page=${page}&limit=20`
-  } else if (type === 'phim-moi-cap-nhat') {
-    url = `/danh-sach/phim-moi-cap-nhat?page=${page}`
-  } else {
-    url = `/v1/api/danh-sach/${type}?page=${page}&limit=20`
+    return `/v1/api/tim-kiem?keyword=${encodeURIComponent(keyword)}&page=${page}&limit=${limit}`
   }
-  return apiGet(url)
+  if (category) {
+    return `/v1/api/the-loai/${encodeURIComponent(category)}?page=${page}&limit=${limit}`
+  }
+  if (country) {
+    return `/v1/api/quoc-gia/${encodeURIComponent(country)}?page=${page}&limit=${limit}`
+  }
+  if (type === 'phim-moi-cap-nhat') {
+    return `/danh-sach/phim-moi-cap-nhat?page=${page}&limit=${limit}`
+  }
+  return `/v1/api/danh-sach/${type}?page=${page}&limit=${limit}`
+}
+
+export function fetchMovies(type, page = 1, keyword = '', category = '', country = '', limit = getMovieLimit()) {
+  return apiGet(buildMovieUrl(type, page, keyword, category, country, limit))
 }
 
 export function fetchDetail(slug) {
