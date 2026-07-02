@@ -1,4 +1,4 @@
-const BASE = __API_BASE__ || 'https://phimapi.com'
+const BASE = import.meta.env.VITE_API_BASE || 'https://phimapi.com'
 const MAX_RETRIES = 2
 
 export async function apiGet(url, retries = MAX_RETRIES) {
