@@ -40,7 +40,7 @@ export function renderMovieList(items, page, totalPages, type) {
     const h = hist[m.slug]
     const fav = isFav(m.slug) ? '<span class="card-fav">♥</span>' : ''
     html += `<div class="movie-card" data-slug="${sanitizeAttr(m.slug || '')}">`
-    html += `<img class="poster" src="${thumb}" alt="" loading="lazy" onerror="this.style.display='none'">`
+    html += `<img class="poster" src="${thumb}" alt="" width="300" height="450" loading="lazy" onerror="this.style.display='none'">`
     html += `<div class="card-info">`
     html += `${fav}`
     html += `<div class="card-title">${sanitize(m.name || '')}</div>`

@@ -34,6 +34,10 @@ function buildShell() {
           <span class="p-time" id="p-duration">0:00</span>
         </div>
       </div>
+    </div>
+    <div class="bottom-bar" id="bottom-bar">
+      <div class="nav-btn" id="nav-back">← <span class="label">Back</span></div>
+      <div class="nav-btn" id="nav-home">🏠 <span class="label">Home</span></div>
     </div>`
 }
 
@@ -48,6 +52,8 @@ function switchScreenLocal(id) {
   switchScreen(id)
   const back = $('#header-back')
   if (back) back.style.display = (id === 'home') ? 'none' : ''
+  const bar = $('#bottom-bar')
+  if (bar) bar.classList.toggle('show', id !== 'home')
 }
 
 function goBack() {
@@ -222,24 +228,44 @@ function handleClick(e) {
 
 let lastTap = 0
 let lastTapX = 0
+let touchStartX = 0
+let touchStartY = 0
+let touchStartTime = 0
+
+function handleTouchStart(e) {
+  const touch = e.changedTouches[0]
+  touchStartX = touch.clientX
+  touchStartY = touch.clientY
+  touchStartTime = Date.now()
+}
 
 function handleTouch(e) {
-  if (!store.currentMovie) return
-  if (!e.target.closest('#player-wrap')) return
-  if (e.target.closest('#p-seekbar, #player-overlay, .p-controls')) return
   const touch = e.changedTouches[0]
   const now = Date.now()
-  const dt = now - lastTap
-  const dx = Math.abs(touch.clientX - lastTapX)
-  lastTap = now
-  lastTapX = touch.clientX
-  if (dt < 300 && dx < 40) {
-    e.preventDefault()
-    if (touch.clientX < window.innerWidth / 2) {
-      seek(-10)
-    } else {
-      seek(10)
+
+  if (store.currentMovie && e.target.closest('#player-wrap') && !e.target.closest('#p-seekbar, #player-overlay, .p-controls')) {
+    const dt = now - lastTap
+    const dx = Math.abs(touch.clientX - lastTapX)
+    lastTap = now
+    lastTapX = touch.clientX
+    if (dt < 300 && dx < 40) {
+      e.preventDefault()
+      if (touch.clientX < window.innerWidth / 2) {
+        seek(-10)
+      } else {
+        seek(10)
+      }
     }
+    return
+  }
+
+  if (e.target.closest('#player-wrap')) return
+  const dt = now - touchStartTime
+  const dx = touch.clientX - touchStartX
+  const dy = touch.clientY - touchStartY
+  if (dt < 300 && dx > 50 && Math.abs(dx) > Math.abs(dy) * 2) {
+    e.preventDefault()
+    goBack()
   }
 }
 
@@ -257,9 +283,21 @@ function init() {
   setHeader('WebPhim', '↑↓ Chọn | Enter vào')
   document.addEventListener('keydown', handleKey)
   document.addEventListener('click', handleClick)
+  document.addEventListener('touchstart', handleTouchStart, { passive: true })
   document.addEventListener('touchend', handleTouch)
   $('#header-back').addEventListener('click', goBack)
+  $('#nav-back').addEventListener('click', goBack)
+  $('#nav-home').addEventListener('click', () => { if (store.screen !== 'home') goHome() })
   setTimeout(autoFullscreen, 10000)
+}
+
+function goHome() {
+  if ($('#player-wrap').classList.contains('active')) {
+    exitPlayer()
+  }
+  renderHome()
+  switchScreenLocal('home')
+  setHeader('WebPhim', '')
 }
 
 init()

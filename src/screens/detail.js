@@ -51,7 +51,7 @@ function renderDetail(movie, episodes) {
   if (movie.lang) tags.push(movie.lang)
   if (movie.time) tags.push(movie.time)
 
-  let html = `<div class="detail-layout"><div class="detail-poster"><img src="${poster}" alt="" onerror="this.style.display='none'"></div>`
+  let html = `<div class="detail-layout"><div class="detail-poster"><img src="${poster}" alt="" width="260" height="390" onerror="this.style.display='none'"></div>`
   html += `<div class="detail-info"><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">`
   html += `<h2>${sanitize(movie.name || '')}</h2>`
   html += `<span class="fav-btn" data-slug="${sanitizeAttr(movie.slug || '')}">${favStar}</span></div>`
