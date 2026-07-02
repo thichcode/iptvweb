@@ -1,6 +1,6 @@
 import { $, $$, imgSrc, switchScreen, sanitize, sanitizeAttr } from '../utils.js'
 import { fetchMovies, fetchCategories, fetchCountries, getMovieLimit, isMobileViewport } from '../api.js'
-import { store, getFavs, getHist, isFav } from '../store.js'
+import { store } from '../store.js'
 
 function renderSkeletonGrid(count = 6) {
   let html = '<div class="movie-grid">'
@@ -32,20 +32,15 @@ function renderSkeletonDetail() {
 
 export function renderMovieList(items, page, totalPages, type) {
   const container = $('#screen-list')
-  const hist = getHist()
-  let html = '<div class="movie-grid">'
+  let html = '<div class="local-list">'
+  if (!items.length) { html += '<div class="empty">Trống</div>' }
   for (const m of items) {
     const thumb = imgSrc(m.thumb_url || m.poster_url)
     const meta = [m.year, m.origin_name].filter(Boolean).join(' • ')
-    const h = hist[m.slug]
-    const fav = isFav(m.slug) ? '<span class="card-fav">♥</span>' : ''
-    html += `<div class="movie-card" data-slug="${sanitizeAttr(m.slug || '')}">`
-    html += `<img class="poster" src="${thumb}" alt="" width="300" height="450" loading="lazy" onerror="this.style.display='none'">`
-    html += `<div class="card-info">`
-    html += `${fav}`
-    html += `<div class="card-title">${sanitize(m.name || '')}</div>`
-    html += `<div class="card-meta">${sanitize(meta)}</div>`
-    html += `</div></div>`
+    html += `<div class="local-item" data-slug="${sanitizeAttr(m.slug || '')}">`
+    html += `<img class="thumb" src="${thumb}" alt="" loading="lazy" onerror="this.style.display='none'">`
+    html += `<div class="info"><div class="title">${sanitize(m.name || '')}</div>`
+    html += `<div class="meta">${sanitize(meta)}</div></div></div>`
   }
   html += '</div>'
   if (totalPages > 1) {
