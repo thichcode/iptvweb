@@ -1,5 +1,6 @@
-export { imgSrc } from './api.js'
-export { store } from './store.js'
+import { imgSrc } from './api.js'
+import { store } from './store.js'
+export { imgSrc, store }
 
 export function $(sel, ctx = document) { return ctx.querySelector(sel) }
 export function $$(sel, ctx = document) { return [...ctx.querySelectorAll(sel)] }
