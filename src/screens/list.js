@@ -1,6 +1,6 @@
 import { $, $$, imgSrc, switchScreen, sanitize, sanitizeAttr } from '../utils.js'
 import { fetchMovies, fetchCategories, fetchCountries, getMovieLimit, isMobileViewport } from '../api.js'
-import { store } from '../store.js'
+import { store, getFavs, getHist } from '../store.js'
 
 function renderSkeletonGrid(count = 6) {
   let html = '<div class="movie-grid">'
@@ -32,15 +32,15 @@ function renderSkeletonDetail() {
 
 export function renderMovieList(items, page, totalPages, type) {
   const container = $('#screen-list')
-  let html = '<div class="local-list">'
-  if (!items.length) { html += '<div class="empty">Trống</div>' }
+  if (!items.length) { container.innerHTML = '<div class="empty">Trống</div>'; return }
+  let html = '<div class="movie-grid">'
   for (const m of items) {
-    const thumb = imgSrc(m.thumb_url || m.poster_url)
+    const thumb = imgSrc(m.thumb_url || m.poster_url || m.thumb || m.poster)
     const meta = [m.year, m.origin_name].filter(Boolean).join(' • ')
-    html += `<div class="local-item" data-slug="${sanitizeAttr(m.slug || '')}">`
-    html += `<img class="thumb" src="${thumb}" alt="" loading="lazy" onerror="this.style.display='none'">`
-    html += `<div class="info"><div class="title">${sanitize(m.name || '')}</div>`
-    html += `<div class="meta">${sanitize(meta)}</div></div></div>`
+    html += `<div class="movie-card" data-slug="${sanitizeAttr(m.slug || '')}">`
+    html += `<img class="poster" src="${thumb}" alt="" loading="lazy" onerror="this.style.display='none'">`
+    html += `<div class="card-info"><div class="card-title">${sanitize(m.name || '')}</div>`
+    html += `<div class="card-meta">${sanitize(meta)}</div></div></div>`
   }
   html += '</div>'
   if (totalPages > 1) {
@@ -63,6 +63,7 @@ export function limitRenderedItems(items, isMobile = isMobileViewport()) {
 
 export function renderSubList(items, type) {
   const container = $('#screen-list')
+  if (!items.length) { container.innerHTML = '<div class="empty">Trống</div>'; return }
   container.innerHTML = '<div class="sub-list">' +
     items.map(i => `<div class="sub-item" data-slug="${sanitizeAttr(i.slug || '')}">${sanitize(i.name || '')}</div>`).join('') +
     '</div>'
@@ -114,14 +115,24 @@ export async function loadMovieList(type, page, keyword, category, country) {
     container.innerHTML = `<div class="error-state">
       <div class="error-icon">📡</div>
       <div class="error-title">Không kết nối được</div>
-      <div class="error-hint">Kiểm tra mạng và thử lại</div>
+      <div class="error-hint">Vui lòng kiểm tra kết nối mạng và thử lại</div>
+      <button class="retry-btn" onclick="window.location.reload()">Thử lại</button>
     </div>`
   }
 }
 
+function renderSkeletonSubList() {
+  let html = '<div class="sub-list">'
+  for (let i = 0; i < 10; i++) {
+    html += `<div class="sub-item" style="border-color:transparent;cursor:default"><div class="skeleton" style="height:16px;width:${60 + Math.random() * 30}%"></div></div>`
+  }
+  html += '</div>'
+  return html
+}
+
 export async function loadCategories() {
   const container = $('#screen-list')
-  container.innerHTML = '<div class="loading">Đang tải...</div>'
+  container.innerHTML = renderSkeletonSubList()
   switchScreen('list')
   window.scrollTo({ top: 0, behavior: 'smooth' })
   try {
@@ -133,13 +144,15 @@ export async function loadCategories() {
     container.innerHTML = `<div class="error-state">
       <div class="error-icon">📡</div>
       <div class="error-title">Không thể tải</div>
+      <div class="error-hint">Vui lòng kiểm tra kết nối mạng và thử lại</div>
+      <button class="retry-btn" onclick="window.location.reload()">Thử lại</button>
     </div>`
   }
 }
 
 export async function loadCountries() {
   const container = $('#screen-list')
-  container.innerHTML = '<div class="loading">Đang tải...</div>'
+  container.innerHTML = renderSkeletonSubList()
   switchScreen('list')
   window.scrollTo({ top: 0, behavior: 'smooth' })
   try {
@@ -151,6 +164,8 @@ export async function loadCountries() {
     container.innerHTML = `<div class="error-state">
       <div class="error-icon">📡</div>
       <div class="error-title">Không thể tải</div>
+      <div class="error-hint">Vui lòng kiểm tra kết nối mạng và thử lại</div>
+      <button class="retry-btn" onclick="window.location.reload()">Thử lại</button>
     </div>`
   }
 }

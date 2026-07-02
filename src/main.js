@@ -63,10 +63,12 @@ function goBack() {
   } else if (screen === 'detail') {
     switchScreenLocal(store.prevScreen || 'home')
     setHeader('WebPhim', '')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   } else if (screen === 'list') {
     renderHome()
     switchScreenLocal('home')
     setHeader('WebPhim', '')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 }
 
@@ -82,8 +84,8 @@ function selectHomeItem(idx) {
     case 'categories': loadCategories(); setHeader('Thể Loại', ''); break
     case 'countries': loadCountries(); setHeader('Quốc Gia', ''); break
     case 'search': store.searchMode = true; renderSearchInput(store.currentKeyword); switchScreenLocal('list'); setHeader('Tìm Kiếm', 'Enter để tìm'); break
-    case 'favorites': loadFavorites(); switchScreenLocal('list'); setHeader('♥ Yêu Thích', ''); break
-    case 'history': loadHistory(); switchScreenLocal('list'); setHeader('Đã Xem', ''); break
+    case 'favorites': loadFavorites(); switchScreenLocal('list'); setHeader('♥ Yêu Thích', ''); window.scrollTo({ top: 0, behavior: 'smooth' }); break
+    case 'history': loadHistory(); switchScreenLocal('list'); setHeader('Đã Xem', ''); window.scrollTo({ top: 0, behavior: 'smooth' }); break
     default:
       loadMovieList(item.id, 1, '', '', '')
       setHeader(item.label, '↑↓ Chọn | Enter xem')
@@ -93,7 +95,7 @@ function selectHomeItem(idx) {
 function selectListItem(items, idx) {
   if (idx < 0 || idx >= items.length) return
   const item = items[idx]
-  if (item.classList.contains('movie-item')) {
+  if (item.classList.contains('movie-card') || item.classList.contains('local-item')) {
     const slug = item.dataset.slug
     if (slug) { loadDetail(slug); setHeader('', '') }
   } else if (item.classList.contains('page-btn')) {
@@ -101,8 +103,8 @@ function selectListItem(items, idx) {
     if (!isNaN(page)) loadMovieList(store.listType, page, store.currentKeyword, store.categorySlug, store.countrySlug)
   } else if (item.classList.contains('sub-item')) {
     const slug = item.dataset.slug
-    if (store.listType === 'category') { store.categorySlug = slug; loadMovieList('category', 1, '', slug, '') }
-    else if (store.listType === 'country') { store.countrySlug = slug; loadMovieList('country', 1, '', '', slug) }
+    if (store.listType === 'category') { store.categorySlug = slug; loadMovieList('category', 1, '', slug, ''); setHeader(item.textContent, '↑↓ Chọn | Enter xem') }
+    else if (store.listType === 'country') { store.countrySlug = slug; loadMovieList('country', 1, '', '', slug); setHeader(item.textContent, '↑↓ Chọn | Enter xem') }
   }
 }
 
@@ -144,14 +146,14 @@ function handleKey(e) {
     if (btns[idx]) btns[idx].classList.add('focused')
   } else if (screen === 'list') {
     e.preventDefault()
-    const items = $$('.movie-item, .page-btn, .sub-item')
+    const items = $$('.movie-card, .local-item, .page-btn, .sub-item')
     if (!items.length) return
     let idx = items.findIndex(i => i.classList.contains('focused'))
     if (idx < 0) idx = 0
     if (key === 'ArrowUp') { idx--; if (idx < 0) idx = items.length - 1 }
     else if (key === 'ArrowDown') { idx++; if (idx >= items.length) idx = 0 }
     else if (key === 'Enter') { selectListItem(items, idx); return }
-    else if (key === 'Escape') { renderHome(); switchScreenLocal('home'); setHeader('WebPhim', ''); return }
+    else if (key === 'Escape') { renderHome(); switchScreenLocal('home'); setHeader('WebPhim', ''); window.scrollTo({ top: 0, behavior: 'smooth' }); return }
     else return
     items.forEach(i => i.classList.remove('focused'))
     items[idx].classList.add('focused')
@@ -179,7 +181,7 @@ function handleKey(e) {
       }
       return
     }
-    else if (key === 'Escape') { switchScreenLocal(store.prevScreen || 'home'); setHeader('WebPhim', ''); return }
+    else if (key === 'Escape') { switchScreenLocal(store.prevScreen || 'home'); setHeader('WebPhim', ''); window.scrollTo({ top: 0, behavior: 'smooth' }); return }
     else return
     items.forEach(i => i.classList.remove('focused'))
     items[idx].classList.add('focused')
@@ -216,8 +218,9 @@ function handleClick(e) {
       if (result.action === 'detail') { loadDetail(result.slug); setHeader('', '') }
       else if (result.action === 'page') loadMovieList(store.listType, result.page, store.currentKeyword, store.categorySlug, store.countrySlug)
       else if (result.action === 'subSelect') {
-        if (result.type === 'category') { store.categorySlug = result.slug; loadMovieList('category', 1, '', result.slug, '') }
-        else if (result.type === 'country') { store.countrySlug = result.slug; loadMovieList('country', 1, '', '', result.slug) }
+        const label = e.target.textContent
+        if (result.type === 'category') { store.categorySlug = result.slug; loadMovieList('category', 1, '', result.slug, ''); setHeader(label, '↑↓ Chọn | Enter xem') }
+        else if (result.type === 'country') { store.countrySlug = result.slug; loadMovieList('country', 1, '', '', result.slug); setHeader(label, '↑↓ Chọn | Enter xem') }
       }
     }
   } else if (screen === 'detail') {
@@ -298,6 +301,7 @@ function goHome() {
   renderHome()
   switchScreenLocal('home')
   setHeader('WebPhim', '')
+  window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
 init()

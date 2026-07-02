@@ -28,12 +28,7 @@ export async function loadDetail(slug) {
     renderDetail(data.movie, data.episodes || [])
   } catch (err) {
     console.error(err)
-    container.innerHTML = `<div class="error-state">
-      <div class="error-icon">📡</div>
-      <div class="error-title">Lỗi kết nối</div>
-      <div class="error-hint">Kiểm tra mạng và thử lại</div>
-    </div>`
-  }
+    container.innerHTML = `<div class="error-state">\n      <div class="error-icon">📡</div>\n      <div class="error-title">Lỗi kết nối</div>\n      <div class="error-hint">Kiểm tra mạng và thử lại</div>\n    </div>`\n  }
 }
 
 function renderDetail(movie, episodes) {
@@ -43,7 +38,7 @@ function renderDetail(movie, episodes) {
   store.serverIdx = 0
   store.epIdx = 0
 
-  const poster = imgSrc(movie.poster_url || movie.thumb_url)
+  const poster = imgSrc(movie.poster_url || movie.thumb_url || movie.poster || movie.thumb)
   const favStar = isFav(movie.slug) ? '★' : '☆'
   const tags = [movie.year]
   if (movie.country) movie.country.forEach(c => tags.push(c.name))

@@ -168,6 +168,7 @@ body { background: #0d0d0d; color: #fff; font-family: system-ui, -apple-system, 
 .search-input { flex: 1; padding: 12px 16px; background: #1a1a1a; border: 2px solid #333; border-radius: 6px; color: #fff; font-size: 16px; outline: none; }
 .search-input:focus { border-color: #ffd600; }
 .search-btn { padding: 12px 20px; background: #ffd600; color: #000; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; font-weight: 600; }
+.search-btn:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 
 /* Detail */
 .detail-layout { display: flex; gap: 24px; padding-top: 16px; }
@@ -356,6 +357,7 @@ body { background: #0d0d0d; color: #fff; font-family: system-ui, -apple-system, 
   -webkit-tap-highlight-color: transparent;
 }
 .nav-btn:active { background: #2a2a2a; }
+.nav-btn:focus-visible { outline: 2px solid #ffd600; outline-offset: -2px; }
 .nav-btn .label { font-size: 13px; color: #888; }
 
 .retry-btn {
