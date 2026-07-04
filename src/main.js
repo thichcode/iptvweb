@@ -132,15 +132,11 @@ function handleKey(e) {
   if (screen === 'home') {
     e.preventDefault()
     let idx = store.menuIndex
-    if (key === 'ArrowLeft') { idx--; if (idx < 0) idx = HOME_MENU.length - 1 }
-    else if (key === 'ArrowRight') { idx++; if (idx >= HOME_MENU.length) idx = 0 }
+    if (key === 'ArrowUp') { idx--; if (idx < 0) idx = HOME_MENU.length - 1 }
+    else if (key === 'ArrowDown') { idx++; if (idx >= HOME_MENU.length) idx = 0 }
     else if (key === 'Enter') { selectHomeItem(idx); return }
     else return
     store.menuIndex = idx
-    const btns = $$('.menu-btn')
-    btns.forEach(b => b.classList.remove('focused'))
-    const realIdx = idx + Math.floor(HOME_MENU.length * 3 / 2)
-    if (btns[realIdx]) btns[realIdx].classList.add('focused')
     scrollMenuTo(idx)
   } else if (screen === 'list') {
     e.preventDefault()
