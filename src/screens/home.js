@@ -25,7 +25,7 @@ function updateWheel(dy) {
   const vh = vp.clientHeight || 360
   const center = vh / 2
   const total = HOME_MENU.length
-  const virtualCenter = Math.floor(total * 1.5) + sel
+  const virtualCenter = total + sel
 
   items.forEach((el, i) => {
     const off = i - virtualCenter
@@ -87,17 +87,9 @@ function onMove(y) {
 
 function onEnd(e) {
   if (dragging) { dragging = false; snapTo(sel); return }
-  const btn = e.target.closest('.wheel-item')
-  if (!btn) return
-  const vp = $('#wheel-vp')
-  if (!vp) return
-  const rect = btn.getBoundingClientRect()
-  const btnCenter = rect.top + rect.height / 2
-  const vpRect = vp.getBoundingClientRect()
-  const vpCenter = vpRect.top + vpRect.height / 2
-  if (Math.abs(btnCenter - vpCenter) > STEP / 2) return
+  if (!e.target.closest('.wheel-viewport')) return
   tapped = true
-  doSelect(parseInt(btn.dataset.idx))
+  doSelect(((sel % HOME_MENU.length) + HOME_MENU.length) % HOME_MENU.length)
 }
 
 function onWheel(e) {
@@ -133,15 +125,7 @@ export function setHomeSelectHandler(fn) {
 
 export function handleHomeClick(e) {
   if (tapped) { tapped = false; return null }
-  const btn = e.target.closest('.wheel-item')
-  if (!btn) return
-  const vp = $('#wheel-vp')
-  if (!vp) return
-  const rect = btn.getBoundingClientRect()
-  const btnCenter = rect.top + rect.height / 2
-  const vpRect = vp.getBoundingClientRect()
-  const vpCenter = vpRect.top + vpRect.height / 2
-  if (Math.abs(btnCenter - vpCenter) > STEP / 2) return
-  doSelect(parseInt(btn.dataset.idx))
+  if (!e.target.closest('.wheel-viewport')) return null
+  doSelect(((sel % HOME_MENU.length) + HOME_MENU.length) % HOME_MENU.length)
   return null
 }
