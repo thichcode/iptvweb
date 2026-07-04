@@ -55,6 +55,8 @@ function renderDetail(movie, episodes) {
   html += `<div class="detail-info"><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">`
   html += `<h2>${sanitize(movie.name || '')}</h2>`
   html += `<span class="fav-btn" data-slug="${sanitizeAttr(movie.slug || '')}">${favStar}</span></div>`
+  // FAB yêu thích: luôn nằm trong tầm ngón cái ở góc dưới phải màn hình (chỉ hiện trên mobile)
+  html += `<span class="fav-fab" data-slug="${sanitizeAttr(movie.slug || '')}">${favStar}</span>`
   if (tags.some(Boolean)) {
     html += '<div class="tags">' + tags.filter(Boolean).map(t => `<span>${sanitize(t)}</span>`).join('') + '</div>'
   }
@@ -80,12 +82,13 @@ function renderDetail(movie, episodes) {
 }
 
 export function handleDetailClick(e) {
-  const fav = e.target.closest('.fav-btn')
+  const fav = e.target.closest('.fav-btn, .fav-fab')
   if (fav) {
     const slug = fav.dataset.slug
     if (slug) {
       toggleFav(slug, store.currentMovie)
-      fav.textContent = isFav(slug) ? '★' : '☆'
+      const star = isFav(slug) ? '★' : '☆'
+      $$('.fav-btn, .fav-fab').forEach(el => { if (el.dataset.slug === slug) el.textContent = star })
     }
     return null
   }

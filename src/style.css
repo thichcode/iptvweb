@@ -9,6 +9,12 @@ body { background: #0d0d0d; color: #fff; font-family: system-ui, -apple-system, 
 .header-back { font-size: 24px; color: #ffd600; cursor: pointer; padding: 0 12px 0 0; user-select: none; }
 @media (max-width: 600px) { .header { padding: 10px 12px; } .header h1 { font-size: 18px; } .header .hint { font-size: 11px; } }
 
+/* Trên mobile, nút back đã có ở bottom-bar (vùng dễ chạm bằng ngón cái).
+   Ẩn header-back để tránh trùng chức năng và tránh vùng khó with ở góc trên. */
+@media (max-width: 600px) {
+  .header-back { display: none !important; }
+}
+
 /* Screen Transitions */
 .screen {
   display: none;
@@ -77,6 +83,11 @@ body { background: #0d0d0d; color: #fff; font-family: system-ui, -apple-system, 
   transition: background 0.15s, border-color 0.15s, transform 0.15s, box-shadow 0.15s;
 }
 
+/* Mobile: tăng vùng chạm để ngón cái bấm chính xác hơn khi dùng 1 tay */
+@media (max-width: 600px) {
+  .local-item { min-height: 58px; padding: 10px 12px; }
+}
+
 .local-item:hover,
 .local-item.focused {
   border-color: #ffd600;
@@ -120,6 +131,24 @@ body { background: #0d0d0d; color: #fff; font-family: system-ui, -apple-system, 
 .search-btn { padding: 12px 24px; min-height: 48px; background: #ffd600; color: #000; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; font-weight: 600; white-space: nowrap; }
 .search-btn:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 
+/* Mobile: dán thanh tìm kiếm ngay dưới header (luôn hiện, không cần with tay lên),
+   nút "Tìm" full-width bên dưới input để bấm bằng ngón cái dễ dàng và chính xác hơn. */
+@media (max-width: 600px) {
+  .search-wrap {
+    position: sticky;
+    top: 46px; /* nằm ngay dưới header sticky (không đè lên header) */
+    z-index: 15;
+    flex-direction: column;
+    max-width: 100%;
+    margin: 0 0 16px;
+    padding: 12px;
+    background: #111;
+    border-bottom: 1px solid #2a2a2a;
+  }
+  .search-input { min-height: 52px; font-size: 16px; }
+  .search-btn { width: 100%; min-height: 52px; }
+}
+
 /* Detail */
 .detail-layout { display: flex; gap: 24px; padding-top: 16px; }
 .detail-poster { width: clamp(140px, 25vw, 300px); flex-shrink: 0; }
@@ -131,6 +160,35 @@ body { background: #0d0d0d; color: #fff; font-family: system-ui, -apple-system, 
 .tags span { background: #2a2a2a; padding: 3px 10px; border-radius: 4px; font-size: 13px; color: #ccc; }
 .fav-btn { font-size: 28px; color: #ffd600; cursor: pointer; padding: 4px 10px; min-height: 44px; border: 1px solid transparent; border-radius: 4px; user-select: none; display: inline-flex; align-items: center; transition: border-color 0.15s, transform 0.15s; }
 .fav-btn:hover, .fav-btn.focused { border-color: #ffd600; transform: scale(1.1); }
+
+/* FAB yêu thích: chỉ hiện trên mobile, cố định ở góc dưới phải,
+   luôn nằm trong tầm ngón cái bất kể scroll tới đâu trên trang chi tiết */
+.fav-fab {
+  display: none;
+}
+@media (max-width: 600px) {
+  .fav-btn { display: none; } /* tránh trùng lặp với FAB */
+  .fav-fab {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    right: 16px;
+    bottom: calc(52px + 16px + env(safe-area-inset-bottom, 0px));
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: #1a1a1a;
+    border: 2px solid #ffd600;
+    color: #ffd600;
+    font-size: 24px;
+    cursor: pointer;
+    user-select: none;
+    z-index: 40;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  }
+  .fav-fab:active { transform: scale(0.92); }
+}
 .episode-section { margin-top: 24px; }
 .server-name { font-size: 16px; color: #ffd600; margin: 12px 0 6px; font-weight: 600; }
 .episode-grid { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
@@ -154,6 +212,18 @@ body { background: #0d0d0d; color: #fff; font-family: system-ui, -apple-system, 
 .p-time { font-size: 13px; color: #ccc; min-width: 36px; font-variant-numeric: tabular-nums; }
 .p-seekbar { flex: 1; height: 6px; background: #444; border-radius: 3px; cursor: pointer; position: relative; }
 .p-seekbar:hover { height: 8px; }
+
+/* Mobile: tăng vùng chạm ảo của seekbar (không đổi visual height) để
+   ngón cái dễ rê chính xác hơn khi cầm máy 1 tay */
+@media (max-width: 600px) {
+  .p-seekbar { margin: 14px 0; }
+  .p-seekbar::before {
+    content: '';
+    position: absolute;
+    top: -14px; bottom: -14px;
+    left: 0; right: 0;
+  }
+}
 .p-progress { height: 100%; background: #ffd600; border-radius: 3px; width: 0; pointer-events: none; }
 .p-hint { font-size: 13px; color: #888; pointer-events: none; }
 
