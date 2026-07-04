@@ -28,7 +28,12 @@ export async function loadDetail(slug) {
     renderDetail(data.movie, data.episodes || [])
   } catch (err) {
     console.error(err)
-    container.innerHTML = `<div class="error-state">\n      <div class="error-icon">📡</div>\n      <div class="error-title">Lỗi kết nối</div>\n      <div class="error-hint">Kiểm tra mạng và thử lại</div>\n    </div>`\n  }
+    container.innerHTML = `<div class="error-state">
+      <div class="error-icon">📡</div>
+      <div class="error-title">Lỗi kết nối</div>
+      <div class="error-hint">Kiểm tra mạng và thử lại</div>
+    </div>`
+  }
 }
 
 function renderDetail(movie, episodes) {
