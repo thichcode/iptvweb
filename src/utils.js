@@ -34,15 +34,15 @@ export function scrollTo(el) {
 }
 
 export const HOME_MENU = [
-  { id: 'phim-moi-cap-nhat', label: 'Phim Mới' },
-  { id: 'phim-bo', label: 'Phim Bộ' },
-  { id: 'phim-le', label: 'Phim Lẻ' },
   { id: 'tv-shows', label: 'TV Shows' },
   { id: 'hoat-hinh', label: 'Hoạt Hình' },
-  { id: 'favorites', label: '♥ Yêu Thích' },
-  { id: 'history', label: 'Đã Xem' },
+  { id: 'phim-le', label: 'Phim Lẻ' },
+  { id: 'phim-bo', label: 'Phim Bộ' },
+  { id: 'phim-moi-cap-nhat', label: 'Phim Mới' },
   { id: 'categories', label: 'Thể Loại' },
   { id: 'countries', label: 'Quốc Gia' },
+  { id: 'history', label: 'Đã Xem' },
+  { id: 'favorites', label: '♥ Yêu Thích' },
   { id: 'search', label: 'Tìm Kiếm' }
 ]
 
