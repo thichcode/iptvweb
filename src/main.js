@@ -95,7 +95,7 @@ function selectHomeItem(idx) {
 function selectListItem(items, idx) {
   if (idx < 0 || idx >= items.length) return
   const item = items[idx]
-  if (item.classList.contains('movie-card') || item.classList.contains('local-item')) {
+  if (item.classList.contains('local-item')) {
     const slug = item.dataset.slug
     if (slug) { loadDetail(slug); setHeader('', '') }
   } else if (item.classList.contains('page-btn')) {
@@ -146,7 +146,7 @@ function handleKey(e) {
     if (btns[idx]) btns[idx].classList.add('focused')
   } else if (screen === 'list') {
     e.preventDefault()
-    const items = $$('.movie-card, .local-item, .page-btn, .sub-item')
+    const items = $$('.local-item, .page-btn, .sub-item')
     if (!items.length) return
     let idx = items.findIndex(i => i.classList.contains('focused'))
     if (idx < 0) idx = 0

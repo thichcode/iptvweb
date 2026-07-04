@@ -2,14 +2,14 @@ import { $, $$, imgSrc, switchScreen, sanitize, sanitizeAttr } from '../utils.js
 import { fetchMovies, fetchCategories, fetchCountries, getMovieLimit, isMobileViewport } from '../api.js'
 import { store, getFavs, getHist } from '../store.js'
 
-function renderSkeletonGrid(count = 6) {
-  let html = '<div class="movie-grid">'
+function renderSkeletonList(count = 6) {
+  let html = '<div class="local-list">'
   for (let i = 0; i < count; i++) {
-    html += `<div class="movie-card skeleton-card">
-      <div class="skeleton skeleton-poster"></div>
-      <div class="card-info">
-        <div class="skeleton skeleton-line skeleton-line-medium"></div>
-        <div class="skeleton skeleton-line skeleton-line-short"></div>
+    html += `<div class="local-item" style="border-color:transparent;cursor:default">
+      <div class="skeleton" style="width:60px;height:84px;border-radius:4px;flex-shrink:0"></div>
+      <div class="info" style="flex:1">
+        <div class="skeleton skeleton-line" style="height:15px;width:65%;margin-bottom:8px"></div>
+        <div class="skeleton skeleton-line" style="height:12px;width:40%"></div>
       </div>
     </div>`
   }
@@ -33,14 +33,14 @@ function renderSkeletonDetail() {
 export function renderMovieList(items, page, totalPages, type) {
   const container = $('#screen-list')
   if (!items.length) { container.innerHTML = '<div class="empty">Trống</div>'; return }
-  let html = '<div class="movie-grid">'
+  let html = '<div class="local-list">'
   for (const m of items) {
     const thumb = imgSrc(m.thumb_url || m.poster_url || m.thumb || m.poster)
-    const meta = [m.year, m.origin_name].filter(Boolean).join(' • ')
-    html += `<div class="movie-card" data-slug="${sanitizeAttr(m.slug || '')}">`
-    html += `<img class="poster" src="${thumb}" alt="" loading="lazy" onerror="this.style.display='none'">`
-    html += `<div class="card-info"><div class="card-title">${sanitize(m.name || '')}</div>`
-    html += `<div class="card-meta">${sanitize(meta)}</div></div></div>`
+    const meta = [m.year, m.origin_name || m.origin].filter(Boolean).join(' • ')
+    html += `<div class="local-item" data-slug="${sanitizeAttr(m.slug || '')}">`
+    html += `<img class="thumb" src="${thumb}" alt="" loading="lazy" onerror="this.style.display='none'">`
+    html += `<div class="info"><div class="title">${sanitize(m.name || '')}</div>`
+    html += `<div class="meta">${sanitize(meta)}</div></div></div>`
   }
   html += '</div>'
   if (totalPages > 1) {
@@ -101,7 +101,7 @@ export async function loadMovieList(type, page, keyword, category, country) {
   store.searchMode = false
   const container = $('#screen-list')
   const limit = getMovieLimit()
-  container.innerHTML = renderSkeletonGrid(limit)
+  container.innerHTML = renderSkeletonList(limit)
   switchScreen('list')
   window.scrollTo({ top: 0, behavior: 'smooth' })
   store.listType = type
@@ -185,9 +185,9 @@ export function loadHistory() {
 }
 
 export function handleListClick(e) {
-  const item = e.target.closest('.movie-card, .page-btn, .sub-item, .local-item')
+  const item = e.target.closest('.page-btn, .sub-item, .local-item')
   if (!item) return null
-  if (item.classList.contains('movie-card') || item.classList.contains('local-item')) {
+  if (item.classList.contains('local-item')) {
     return { action: 'detail', slug: item.dataset.slug }
   }
   if (item.classList.contains('page-btn')) {
