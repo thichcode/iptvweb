@@ -1,7 +1,7 @@
 const BASE = import.meta.env?.VITE_API_BASE || 'https://phimapi.com'
 const MAX_RETRIES = 2
 const TIMEOUT_MS = 15000
-const MOBILE_LIMIT = 4
+const MOBILE_LIMIT = 5
 const DEFAULT_LIMIT = 20
 
 export async function apiGet(url, retries = MAX_RETRIES) {
