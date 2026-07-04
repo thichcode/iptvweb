@@ -15,6 +15,7 @@ export function renderHome() {
   html += '</div></div>'
   $('#screen-home').innerHTML = html
   requestAnimationFrame(() => updateWheel(0))
+  bindWheelEvents()
 }
 
 function updateWheel(dy) {
@@ -80,17 +81,20 @@ function onEnd() {
   snapTo(sel)
 }
 
+let eventsBound = false
+
 function bindWheelEvents() {
-  const vp = $('#wheel-vp')
-  if (!vp) return
-  vp.addEventListener('touchstart', e => onStart(e.touches[0].clientY), { passive: true })
-  vp.addEventListener('touchmove', e => onMove(e.touches[0].clientY), { passive: false })
-  vp.addEventListener('touchend', onEnd, { passive: true })
-  vp.addEventListener('mousedown', e => { e.preventDefault(); onStart(e.clientY) })
-  vp.addEventListener('mousemove', e => { if (dragging) onMove(e.clientY) })
-  vp.addEventListener('mouseup', onEnd)
-  vp.addEventListener('mouseleave', onEnd)
-  vp.addEventListener('wheel', e => { e.preventDefault(); sel += e.deltaY > 0 ? 1 : -1; snapTo(sel) }, { passive: false })
+  if (eventsBound) return
+  eventsBound = true
+  const root = $('#screen-home')
+  if (!root) return
+  root.addEventListener('touchstart', e => { const t = e.target.closest('.wheel-viewport'); if (t) onStart(e.touches[0].clientY) }, { passive: true })
+  root.addEventListener('touchmove', e => { if (dragging) { e.preventDefault(); onMove(e.touches[0].clientY) } }, { passive: false })
+  root.addEventListener('touchend', e => { if (dragging) onEnd() }, { passive: true })
+  root.addEventListener('mousedown', e => { if (e.target.closest('.wheel-viewport')) { e.preventDefault(); onStart(e.clientY) } })
+  document.addEventListener('mousemove', e => { if (dragging) onMove(e.clientY) })
+  document.addEventListener('mouseup', e => { if (dragging) onEnd() })
+  root.addEventListener('wheel', e => { if (e.target.closest('.wheel-wrap')) { e.preventDefault(); sel += e.deltaY > 0 ? 1 : -1; snapTo(sel) } }, { passive: false })
 }
 
 export function handleHomeClick(e) {
