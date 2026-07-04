@@ -1,5 +1,5 @@
 import { $, $$, HOME_MENU, KEY_MAP, store, switchScreen } from './utils.js'
-import { renderHome, handleHomeClick } from './screens/home.js'
+import { renderHome, handleHomeClick, scrollMenuTo } from './screens/home.js'
 import {
   renderMovieList, renderSubList, renderSearchInput, renderLocalList,
   loadMovieList, loadCategories, loadCountries, loadFavorites, loadHistory,
@@ -132,14 +132,16 @@ function handleKey(e) {
   if (screen === 'home') {
     e.preventDefault()
     let idx = store.menuIndex
-    if (key === 'ArrowUp') { idx--; if (idx < 0) idx = HOME_MENU.length - 1 }
-    else if (key === 'ArrowDown') { idx++; if (idx >= HOME_MENU.length) idx = 0 }
+    if (key === 'ArrowLeft') { idx--; if (idx < 0) idx = HOME_MENU.length - 1 }
+    else if (key === 'ArrowRight') { idx++; if (idx >= HOME_MENU.length) idx = 0 }
     else if (key === 'Enter') { selectHomeItem(idx); return }
     else return
     store.menuIndex = idx
     const btns = $$('.menu-btn')
     btns.forEach(b => b.classList.remove('focused'))
-    if (btns[idx]) btns[idx].classList.add('focused')
+    const realIdx = idx + Math.floor(HOME_MENU.length * 3 / 2)
+    if (btns[realIdx]) btns[realIdx].classList.add('focused')
+    scrollMenuTo(idx)
   } else if (screen === 'list') {
     e.preventDefault()
     const items = $$('.local-item, .page-btn, .sub-item')
