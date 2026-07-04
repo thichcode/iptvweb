@@ -15,6 +15,7 @@ export function renderHome() {
   html += '</div></div>'
   $('#screen-home').innerHTML = html
   requestAnimationFrame(() => updateWheel(0))
+  bindWheelEvents()
 }
 
 function updateWheel(dy) {
