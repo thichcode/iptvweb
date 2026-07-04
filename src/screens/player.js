@@ -41,13 +41,28 @@ export function playEpisode(serverIdx, epIdx) {
   player.removeAttribute('src')
 
   if (Hls.isSupported()) {
-    hlsInstance = new Hls()
+    hlsInstance = new Hls({ maxBufferLength: 30, enableWorker: true })
     hlsInstance.loadSource(src)
     hlsInstance.attachMedia(player)
     hlsInstance.on(Hls.Events.MANIFEST_PARSED, () => player.play().catch(() => {}))
+    hlsInstance.on(Hls.Events.ERROR, (_evt, data) => {
+      if (!data.fatal) return
+      if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
+        // Thử recover network error (ví dụ: mất mạng tạm thời)
+        hlsInstance.startLoad()
+      } else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
+        hlsInstance.recoverMediaError()
+      } else {
+        // Lỗi không thể recover — hiển thị thông báo cho người dùng
+        showPlayerError('Không thể phát video. Thử chọn server khác.')
+      }
+    })
   } else if (player.canPlayType('application/vnd.apple.mpegurl')) {
     player.src = src
     player.addEventListener('loadedmetadata', () => player.play().catch(() => {}), { once: true })
+    player.addEventListener('error', () => {
+      showPlayerError('Không thể phát video. Thử chọn server khác.')
+    }, { once: true })
   }
 
   showOverlay()
@@ -151,6 +166,24 @@ function showSeekFeedback(delta) {
 
   requestAnimationFrame(() => el.classList.add('show'))
   setTimeout(() => el.remove(), 500)
+}
+
+function showPlayerError(msg) {
+  const wrap = $('#player-wrap')
+  if (!wrap) return
+
+  // Xóa thông báo lỗi cũ nếu có
+  const old = wrap.querySelector('.player-error')
+  if (old) old.remove()
+
+  const el = document.createElement('div')
+  el.className = 'player-error'
+  el.innerHTML = `
+    <div class="player-error-icon">📡</div>
+    <div class="player-error-msg">${msg}</div>
+    <button class="player-error-close" onclick="this.closest('.player-error').remove()">Đóng</button>
+  `
+  wrap.appendChild(el)
 }
 
 export function handlePlayerClick(e) {

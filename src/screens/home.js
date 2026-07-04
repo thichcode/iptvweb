@@ -98,29 +98,44 @@ function onWheel(e) {
   snapTo(sel)
 }
 
-let eventsBound = false
+// Lưu các handler để có thể removeEventListener khi cần
+let _mouseMoveHandler = null
+let _mouseUpHandler = null
+let _rootEl = null
 
 function bindWheelEvents() {
-  if (eventsBound) return
-  eventsBound = true
   const root = $('#screen-home')
   if (!root) return
+
+  // Nếu đã bind vào đúng root element này rồi thì bỏ qua
+  if (_rootEl === root) return
+
+  // Gỡ listener cũ trên document nếu có (tránh duplicate)
+  if (_mouseMoveHandler) document.removeEventListener('mousemove', _mouseMoveHandler)
+  if (_mouseUpHandler) document.removeEventListener('mouseup', _mouseUpHandler)
+
+  _rootEl = root
+
   root.addEventListener('touchstart', e => { if (e.target.closest('.wheel-viewport')) onStart(e.touches[0].clientY) }, { passive: true })
-  root.addEventListener('touchmove', e => { if (onMove) { const t = e.touches[0]; if (t) onMove(t.clientY) } }, { passive: true })
+  root.addEventListener('touchmove', e => { const t = e.touches[0]; if (t) onMove(t.clientY) }, { passive: true })
   root.addEventListener('touchend', e => { onEnd(e) }, { passive: true })
   root.addEventListener('mousedown', e => { if (e.target.closest('.wheel-viewport')) { e.preventDefault(); onStart(e.clientY) } })
-  document.addEventListener('mousemove', e => { if (dragging) onMove(e.clientY) })
-  document.addEventListener('mouseup', e => { if (dragging) { dragging = false; snapTo(sel) } })
   root.addEventListener('wheel', e => { if (e.target.closest('.wheel-wrap')) onWheel(e) }, { passive: false })
+
+  _mouseMoveHandler = e => { if (dragging) onMove(e.clientY) }
+  _mouseUpHandler = e => { if (dragging) { dragging = false; snapTo(sel) } }
+  document.addEventListener('mousemove', _mouseMoveHandler)
+  document.addEventListener('mouseup', _mouseUpHandler)
 }
 
+let _homeSelectHandler = null
+
 document.addEventListener('homeselect', e => {
-  const handler = window.__homeSelectHandler
-  if (handler) handler(e.detail.idx)
+  if (_homeSelectHandler) _homeSelectHandler(e.detail.idx)
 })
 
 export function setHomeSelectHandler(fn) {
-  window.__homeSelectHandler = fn
+  _homeSelectHandler = fn
 }
 
 export function handleHomeClick(e) {
