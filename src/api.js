@@ -38,20 +38,22 @@ export function getMovieLimit(isMobile = isMobileViewport()) {
   return isMobile ? MOBILE_LIMIT : DEFAULT_LIMIT
 }
 
+const SORT = '&sort_field=year&sort_type=desc'
+
 export function buildMovieUrl(type, page = 1, keyword = '', category = '', country = '', limit = getMovieLimit()) {
   if (keyword) {
-    return `/v1/api/tim-kiem?keyword=${encodeURIComponent(keyword)}&page=${page}&limit=${limit}`
+    return `/v1/api/tim-kiem?keyword=${encodeURIComponent(keyword)}&page=${page}&limit=${limit}${SORT}`
   }
   if (category) {
-    return `/v1/api/the-loai/${encodeURIComponent(category)}?page=${page}&limit=${limit}`
+    return `/v1/api/the-loai/${encodeURIComponent(category)}?page=${page}&limit=${limit}${SORT}`
   }
   if (country) {
-    return `/v1/api/quoc-gia/${encodeURIComponent(country)}?page=${page}&limit=${limit}`
+    return `/v1/api/quoc-gia/${encodeURIComponent(country)}?page=${page}&limit=${limit}${SORT}`
   }
   if (type === 'phim-moi-cap-nhat') {
     return `/danh-sach/phim-moi-cap-nhat?page=${page}&limit=${limit}`
   }
-  return `/v1/api/danh-sach/${type}?page=${page}&limit=${limit}`
+  return `/v1/api/danh-sach/${type}?page=${page}&limit=${limit}${SORT}`
 }
 
 export function fetchMovies(type, page = 1, keyword = '', category = '', country = '', limit = getMovieLimit()) {
