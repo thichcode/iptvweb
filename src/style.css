@@ -28,7 +28,7 @@ body { background: #0d0d0d; color: #fff; font-family: system-ui, -apple-system, 
 
 /* Home wheel */
 #screen-home { display: flex; flex-direction: column; padding: 0; overflow: hidden; }
-.wheel-wrap { flex: 1; position: relative; display: flex; align-items: center; justify-content: center; perspective: 600px; overflow: hidden; user-select: none; -webkit-user-select: none; }
+.wheel-wrap { flex: 1; position: relative; display: flex; align-items: center; justify-content: center; perspective: 600px; overflow: hidden; user-select: none; -webkit-user-select: none; touch-action: none; }
 .wheel-viewport { position: relative; width: 100%; height: 280px; overflow: hidden; }
 .wheel-item { position: absolute; left: 10%; right: 10%; height: 48px; display: flex; align-items: center; justify-content: center; padding: 0 16px; background: #1a1a1a; border: 2px solid transparent; border-radius: 10px; color: #fff; cursor: pointer; font-size: 15px; white-space: nowrap; backface-visibility: hidden; will-change: transform, opacity; }
 .wheel-item.focused { border-color: #ffd600; background: #2a2a2a; font-weight: 600; }

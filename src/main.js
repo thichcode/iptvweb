@@ -1,5 +1,5 @@
 import { $, $$, HOME_MENU, KEY_MAP, store, switchScreen } from './utils.js'
-import { renderHome, handleHomeClick, scrollMenuTo } from './screens/home.js'
+import { renderHome, handleHomeClick, scrollMenuTo, setHomeSelectHandler } from './screens/home.js'
 import {
   renderMovieList, renderSubList, renderSearchInput, renderLocalList,
   loadMovieList, loadCategories, loadCountries, loadFavorites, loadHistory,
@@ -278,6 +278,7 @@ function init() {
   buildShell()
   renderHome()
   setHeader('WebPhim', '↑↓ Chọn | Enter vào')
+  setHomeSelectHandler(idx => selectHomeItem(idx))
   document.addEventListener('keydown', handleKey)
   document.addEventListener('click', handleClick)
   document.addEventListener('touchstart', handleTouchStart, { passive: true })
