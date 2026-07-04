@@ -24,11 +24,11 @@ function updateWheel(dy) {
   const vh = vp.clientHeight || 360
   const center = vh / 2
   const total = HOME_MENU.length
-  const virtualCenter = Math.floor(total * 1.5) + sel + dy / STEP
+  const virtualCenter = Math.floor(total * 1.5) + sel
 
   items.forEach((el, i) => {
     const off = i - virtualCenter
-    const y = off * STEP + (dy % STEP)
+    const y = off * STEP + dy
     const dist = Math.abs(off) / 2.5
 
     if (dist > 1.2) { el.style.display = 'none'; return }
@@ -90,6 +90,7 @@ function bindWheelEvents() {
   vp.addEventListener('mousemove', e => { if (dragging) onMove(e.clientY) })
   vp.addEventListener('mouseup', onEnd)
   vp.addEventListener('mouseleave', onEnd)
+  vp.addEventListener('wheel', e => { e.preventDefault(); sel += e.deltaY > 0 ? 1 : -1; snapTo(sel) }, { passive: false })
 }
 
 export function handleHomeClick(e) {
@@ -104,7 +105,7 @@ export function handleHomeClick(e) {
   const vpRect = vp.getBoundingClientRect()
   const vpCenter = vpRect.top + vpRect.height / 2
   const dist = Math.abs(btnCenter - vpCenter)
-  if (dist > ITEM_H) return
-  if (idx !== sel % HOME_MENU.length) { snapTo(idx); return }
+  if (dist > STEP / 2) return
+  if (idx !== ((sel % HOME_MENU.length) + HOME_MENU.length) % HOME_MENU.length) { snapTo(idx); return }
   return { action: 'selectHome', idx }
 }
