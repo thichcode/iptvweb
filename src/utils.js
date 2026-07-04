@@ -23,6 +23,10 @@ export function switchScreen(id) {
   const el = $('#screen-' + id)
   if (el) el.classList.add('active')
   store.screen = id
+  const back = $('#header-back')
+  if (back) back.style.display = (id === 'home') ? 'none' : ''
+  const bar = $('#bottom-bar')
+  if (bar) bar.classList.toggle('show', id !== 'home')
 }
 
 export function scrollTo(el) {

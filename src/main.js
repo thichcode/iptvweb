@@ -50,10 +50,6 @@ function setHeader(title, hint) {
 
 function switchScreenLocal(id) {
   switchScreen(id)
-  const back = $('#header-back')
-  if (back) back.style.display = (id === 'home') ? 'none' : ''
-  const bar = $('#bottom-bar')
-  if (bar) bar.classList.toggle('show', id !== 'home')
 }
 
 function goBack() {

@@ -20,8 +20,13 @@ export async function apiGet(url, retries = MAX_RETRIES) {
   }
 }
 
+const CDN = 'https://phimimg.com'
+
 export function imgSrc(url) {
   if (!url) return ''
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    url = CDN + '/' + url.replace(/^\//, '')
+  }
   return BASE + '/image.php?url=' + encodeURIComponent(url)
 }
 
