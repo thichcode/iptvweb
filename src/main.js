@@ -23,10 +23,13 @@ function buildShell() {
     <div id="screen-detail" class="screen"></div>
     <div id="player-wrap">
       <video id="player" playsinline></video>
+      <div id="player-center-btn">▶</div>
+      <div id="player-exit-btn">✕</div>
+      <div id="player-fs-btn">⛶</div>
       <div id="player-ui">
         <div id="player-overlay">
           <div class="p-title" id="p-title"></div>
-          <div class="p-hint">← → Click seek  |  Space Play/Pause  |  Esc thoát</div>
+          <div class="p-hint">← → Seek  |  Space Play/Pause  |  Esc thoát</div>
         </div>
         <div class="p-controls">
           <span class="p-time" id="p-current">0:00</span>
@@ -191,14 +194,12 @@ function handleKey(e) {
 
 function handleClick(e) {
   if ($('#player-wrap').classList.contains('active')) {
+    if (e.target.closest('#player-exit-btn')) { exitPlayer(); return }
+    if (e.target.closest('#player-fs-btn')) { document.documentElement.requestFullscreen?.().catch(() => {}); return }
+    if (e.target.closest('#player-center-btn')) { togglePlay(); return }
     if (e.target.closest('#p-seekbar')) { seekTo(e); return }
     if (e.target === $('#player')) togglePlay()
-    const ui = $('#player-ui')
-    if (ui) {
-      ui.classList.add('show')
-      if (overlayTimer) clearTimeout(overlayTimer)
-      overlayTimer = setTimeout(() => ui.classList.remove('show'), 4000)
-    }
+    showOverlay()
     return
   }
 

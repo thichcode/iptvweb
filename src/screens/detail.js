@@ -30,8 +30,9 @@ export async function loadDetail(slug) {
     console.error(err)
     container.innerHTML = `<div class="error-state">
       <div class="error-icon">📡</div>
-      <div class="error-title">Lỗi kết nối</div>
-      <div class="error-hint">Kiểm tra mạng và thử lại</div>
+      <div class="error-title">Không thể tải thông tin phim</div>
+      <div class="error-hint">Vui lòng kiểm tra kết nối mạng và thử lại</div>
+      <button class="retry-btn" onclick="location.reload()">Thử lại</button>
     </div>`
   }
 }

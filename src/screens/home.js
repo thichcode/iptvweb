@@ -1,4 +1,4 @@
-import { HOME_MENU, $, $$, store } from '../utils.js'
+import { HOME_MENU, $, $$, store, toggleLargeMode } from '../utils.js'
 
 const ITEM_H = 48
 const STEP = 56
@@ -12,7 +12,7 @@ export function renderHome() {
       html += `<div class="wheel-item" data-idx="${i}">${HOME_MENU[i].label}</div>`
     }
   }
-  html += '</div></div><div class="dl-apk"><a href="https://github.com/thichcode/iptvweb/releases/latest/download/WebPhim.apk" target="_blank">Tải APK cho Android TV</a></div>'
+  html += '</div></div><div class="dl-apk"><a href="https://github.com/thichcode/iptvweb/releases/latest/download/WebPhim.apk" target="_blank">Tải APK cho Android TV</a> <span class="mode-btn" id="mode-btn">' + (store.largeMode ? '🔍 Thường' : '👁 Chữ to') + '</span></div>'
   $('#screen-home').innerHTML = html
   requestAnimationFrame(() => updateWheel(0))
   bindWheelEvents()
@@ -121,6 +121,10 @@ function bindWheelEvents() {
   root.addEventListener('touchend', e => { onEnd(e) }, { passive: true })
   root.addEventListener('mousedown', e => { if (e.target.closest('.wheel-viewport')) { e.preventDefault(); onStart(e.clientY) } })
   root.addEventListener('wheel', e => { if (e.target.closest('.wheel-wrap')) onWheel(e) }, { passive: false })
+  root.addEventListener('click', e => {
+    const btn = e.target.closest('#mode-btn')
+    if (btn) { toggleLargeMode(); btn.textContent = store.largeMode ? '🔍 Thường' : '👁 Chữ to' }
+  })
 
   _mouseMoveHandler = e => { if (dragging) onMove(e.clientY) }
   _mouseUpHandler = e => { if (dragging) { dragging = false; snapTo(sel) } }

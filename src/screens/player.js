@@ -6,6 +6,11 @@ let hlsInstance = null
 let overlayTimer = null
 let progressTimer = null
 
+function showPlayerBtns(show) {
+  const els = ['#player-center-btn', '#player-exit-btn', '#player-fs-btn']
+  els.forEach(id => $(id)?.classList.toggle('show', show))
+}
+
 export function playEpisode(serverIdx, epIdx) {
   if (!store.episodes || !store.episodes[serverIdx]) return
   const server = store.episodes[serverIdx]
@@ -48,24 +53,23 @@ export function playEpisode(serverIdx, epIdx) {
     hlsInstance.on(Hls.Events.ERROR, (_evt, data) => {
       if (!data.fatal) return
       if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
-        // Thử recover network error (ví dụ: mất mạng tạm thời)
         hlsInstance.startLoad()
       } else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
         hlsInstance.recoverMediaError()
       } else {
-        // Lỗi không thể recover — hiển thị thông báo cho người dùng
-        showPlayerError('Không thể phát video. Thử chọn server khác.')
+        showPlayerError('Kênh này đang lỗi. Vui lòng thử lại hoặc chọn kênh khác.')
       }
     })
   } else if (player.canPlayType('application/vnd.apple.mpegurl')) {
     player.src = src
     player.addEventListener('loadedmetadata', () => player.play().catch(() => {}), { once: true })
     player.addEventListener('error', () => {
-      showPlayerError('Không thể phát video. Thử chọn server khác.')
+      showPlayerError('Kênh này đang lỗi. Vui lòng thử lại hoặc chọn kênh khác.')
     }, { once: true })
   }
 
   showOverlay()
+  showPlayerBtns(true)
   player.onended = () => autoNext()
   player.ontimeupdate = updateProgress
   if (movie) saveHist(movie.slug, movie, data[epIdx].name || 'Tập ' + (epIdx + 1), serverIdx, epIdx)
@@ -119,6 +123,7 @@ export function exitPlayer() {
   if (player) { player.pause(); player.onended = null; player.ontimeupdate = null; player.removeAttribute('src'); player.load() }
   wrap.classList.remove('active')
   if (overlayTimer) { clearTimeout(overlayTimer); overlayTimer = null }
+  showPlayerBtns(false)
   $$('.screen').forEach(s => s.classList.remove('active'))
   const detail = $('#screen-detail')
   if (detail) detail.classList.add('active')
@@ -129,6 +134,8 @@ export function togglePlay() {
   const player = $('#player')
   if (!player) return
   if (player.paused) { player.play() } else { player.pause() }
+  const ctr = $('#player-center-btn')
+  if (ctr) ctr.textContent = player.paused ? '▶' : ''
   showOverlay()
 }
 
@@ -144,10 +151,13 @@ function showOverlay() {
   const ui = $('#player-ui')
   if (!ui) return
   ui.classList.add('show')
-  if (overlayTimer) clearTimeout(overlayTimer)
+  showPlayerBtns(true)
   const player = $('#player')
+  const ctr = $('#player-center-btn')
+  if (ctr) ctr.textContent = player && !player.paused ? '▶' : '▶'
+  if (overlayTimer) clearTimeout(overlayTimer)
   if (player && !player.paused) {
-    overlayTimer = setTimeout(() => ui.classList.remove('show'), 4000)
+    overlayTimer = setTimeout(() => { ui.classList.remove('show'); showPlayerBtns(false) }, 4000)
   }
 }
 
@@ -172,7 +182,6 @@ function showPlayerError(msg) {
   const wrap = $('#player-wrap')
   if (!wrap) return
 
-  // Xóa thông báo lỗi cũ nếu có
   const old = wrap.querySelector('.player-error')
   if (old) old.remove()
 
@@ -181,7 +190,8 @@ function showPlayerError(msg) {
   el.innerHTML = `
     <div class="player-error-icon">📡</div>
     <div class="player-error-msg">${msg}</div>
-    <button class="player-error-close" onclick="this.closest('.player-error').remove()">Đóng</button>
+    <button class="retry-btn" onclick="this.closest('.player-error').remove();location.reload()">Thử lại</button>
+    <button class="player-error-close" onclick="exitPlayer()">Quay lại danh sách</button>
   `
   wrap.appendChild(el)
 }

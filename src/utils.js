@@ -46,6 +46,17 @@ export const HOME_MENU = [
   { id: 'search', label: 'Tìm Kiếm' }
 ]
 
+export function toggleLargeMode() {
+  store.largeMode = !store.largeMode
+  document.body.classList.toggle('large-mode', store.largeMode)
+  try { localStorage.setItem('wp_large', store.largeMode ? '1' : '') } catch {}
+}
+
+// Khôi phục chế độ khi load
+;(() => {
+  try { if (localStorage.getItem('wp_large')) { store.largeMode = true; document.body.classList.add('large-mode') } } catch {}
+})()
+
 export const KEY_MAP = {
   13: 'Enter', 27: 'Escape', 37: 'ArrowLeft', 38: 'ArrowUp',
   39: 'ArrowRight', 40: 'ArrowDown', 32: 'Space',

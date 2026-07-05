@@ -10,6 +10,7 @@ function write(key, val) {
 
 export const store = {
   screen: 'home',
+  largeMode: false,
   menuIndex: 0,
   listItems: [],
   listPage: 1,
