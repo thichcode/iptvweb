@@ -1,11 +1,5 @@
 import { HOME_MENU, $, $$, store, toggleLargeMode, checkUpdate, APP_VER } from '../utils.js'
 
-const ICONS = {
-  'tv-shows': '📺', 'hoat-hinh': '🎨', 'phim-le': '🎬', 'phim-bo': '📺',
-  'phim-moi-cap-nhat': '🆕', 'categories': '🎯', 'countries': '🌍',
-  'history': '📋', 'favorites': '❤️', 'search': '🔍'
-}
-
 const VISIBLE = 5
 const ANGLE = 40
 const RADIUS = 280
@@ -18,8 +12,7 @@ export function renderHome() {
   for (let r = 0; r < 3; r++) {
     for (let i = 0; i < HOME_MENU.length; i++) {
       const item = HOME_MENU[i]
-      const icon = ICONS[item.id] || '•'
-      html += `<div class="wheel-item" data-idx="${i}"><span class="wi-icon">${icon}</span><span class="wi-label">${item.label}</span></div>`
+      html += `<div class="wheel-item" data-idx="${i}"><span class="wi-label">${item.label}</span></div>`
     }
   }
   html += '</div><div class="wheel-indicator bottom">▼</div></div><div class="home-actions"><a class="home-action" href="https://github.com/thichcode/iptvweb/releases/latest/download/WebPhim.apk" target="_blank" rel="noopener">Tải APK Android TV</a><span class="home-action" id="mode-btn">' + (store.largeMode ? 'Chữ thường' : 'Chữ to') + '</span><span class="home-action" id="update-btn">Cập nhật</span></div><div id="update-msg" class="update-msg"></div>'
@@ -140,13 +133,13 @@ export function setHomeSelectHandler(fn) { _homeSelectHandler = fn }
 export async function checkForUpdate() {
   const msg = $('#update-msg')
   if (!msg) return
-  msg.textContent = '🔄 Đang kiểm tra...'
+  msg.textContent = 'Đang kiểm tra...'
   msg.className = 'update-msg'
   const data = await checkUpdate()
-  if (!data) { msg.textContent = '❌ Lỗi kết nối. Thử lại sau.'; msg.className = 'update-msg err'; return }
+  if (!data) { msg.textContent = 'Lỗi kết nối. Thử lại sau.'; msg.className = 'update-msg err'; return }
   const cur = APP_VER
-  if (data.tag === 'build-' + cur) { msg.textContent = '✅ Đã là phiên bản mới nhất (' + cur + ')'; msg.className = 'update-msg ok'; return }
-  msg.innerHTML = '📥 Phiên bản mới: <strong>' + data.tag + '</strong> <a href="' + data.url + '" target="_blank" class="dl-link">Tải ngay</a>'
+  if (data.tag === 'build-' + cur) { msg.textContent = 'Đã là phiên bản mới nhất (' + cur + ')'; msg.className = 'update-msg ok'; return }
+  msg.innerHTML = 'Phiên bản mới: <strong>' + data.tag + '</strong> <a href="' + data.url + '" target="_blank" class="dl-link">Tải ngay</a>'
   msg.className = 'update-msg'
 }
 

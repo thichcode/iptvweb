@@ -1,4 +1,5 @@
-const BASE = import.meta.env?.VITE_API_BASE || 'https://phimapi.com'
+export const API_BASE = import.meta.env?.VITE_API_BASE || 'https://ophim1.com'
+export const IMAGE_BASE = import.meta.env?.VITE_IMAGE_BASE || 'https://img.ophim.live/uploads/movies'
 const MAX_RETRIES = 2
 const TIMEOUT_MS = 15000
 const MOBILE_LIMIT = 5
@@ -9,7 +10,7 @@ export async function apiGet(url, retries = MAX_RETRIES) {
     try {
       const ctrl = new AbortController()
       const timer = setTimeout(() => ctrl.abort(), TIMEOUT_MS)
-      const res = await fetch(BASE + url, { signal: ctrl.signal, cache: 'no-cache' })
+      const res = await fetch(API_BASE + url, { signal: ctrl.signal, cache: 'no-cache' })
       clearTimeout(timer)
       if (!res.ok) throw new Error('HTTP ' + res.status)
       return res.json()
@@ -20,14 +21,10 @@ export async function apiGet(url, retries = MAX_RETRIES) {
   }
 }
 
-const CDN = 'https://phimimg.com'
-
 export function imgSrc(url) {
   if (!url) return ''
-  if (!url.startsWith('http://') && !url.startsWith('https://')) {
-    url = CDN + '/' + url.replace(/^\//, '')
-  }
-  return BASE + '/image.php?url=' + encodeURIComponent(url)
+  if (url.startsWith('http://') || url.startsWith('https://')) return url
+  return IMAGE_BASE.replace(/\/$/, '') + '/' + url.replace(/^\//, '')
 }
 
 export function isMobileViewport() {

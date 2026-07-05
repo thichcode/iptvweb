@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { getMovieLimit, buildMovieUrl } from '../src/api.js'
+import { API_BASE, getMovieLimit, buildMovieUrl, imgSrc } from '../src/api.js'
 import { limitRenderedItems, renderMovieCard, renderEmptyState } from '../src/screens/list.js'
 
 test('mobile viewport uses 5 movies per page', () => {
@@ -11,6 +11,15 @@ test('mobile viewport uses 5 movies per page', () => {
 test('API URLs include the requested limit for endpoints that support it', () => {
   assert.equal(buildMovieUrl('phim-bo', 2, '', '', '', 4), '/v1/api/danh-sach/phim-bo?page=2&limit=4&sort_field=year&sort_type=desc')
   assert.equal(buildMovieUrl('search', 1, 'test phim', '', '', 4), '/v1/api/tim-kiem?keyword=test%20phim&page=1&limit=4&sort_field=year&sort_type=desc')
+})
+
+test('API defaults to the live OPhim host', () => {
+  assert.equal(API_BASE, 'https://ophim1.com')
+})
+
+test('image URLs use live CDN directly', () => {
+  assert.equal(imgSrc('poster.jpg'), 'https://img.ophim.live/uploads/movies/poster.jpg')
+  assert.equal(imgSrc('https://img.ophim.live/uploads/movies/poster.jpg'), 'https://img.ophim.live/uploads/movies/poster.jpg')
 })
 
 test('mobile render fallback only keeps first 5 items', () => {
