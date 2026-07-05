@@ -1,5 +1,4 @@
 import { HOME_MENU, $, $$, store, toggleLargeMode, checkUpdate, APP_VER } from '../utils.js'
-import { getToday } from '../lunar.js'
 
 const ICONS = {
   'tv-shows': '📺', 'hoat-hinh': '🎨', 'phim-le': '🎬', 'phim-bo': '📺',
@@ -15,10 +14,7 @@ let sel = 0, touchY = 0, touchOff = 0, dragging = false, tapped = false
 
 export function renderHome() {
   sel = store.menuIndex || 0
-  const d = getToday()
-  let html = '<div class="wheel-bg"></div>'
-  html += `<div class="date-bar"><div class="date-solar"><span class="dow">${d.dow}</span><span class="day-num">${d.solar.day}</span><span class="sub">Tháng ${d.solar.month}, ${d.solar.year}</span></div><div class="date-lunar"><span class="label">am</span><span class="day-num">${d.lunar.day}</span><span class="sub">${d.dayCanChi} · Tháng ${d.lunar.month}${d.lunar.leap ? ' (nhuận)' : ''} · ${d.yearCanChi}</span></div></div>'
-  html += '<div class="wheel-wrap"><div class="wheel-indicator top">▲</div><div class="wheel-viewport" id="wheel-vp">'
+  let html = '<div class="wheel-bg"></div><div class="wheel-wrap"><div class="wheel-indicator top">▲</div><div class="wheel-viewport" id="wheel-vp">'
   for (let r = 0; r < 3; r++) {
     for (let i = 0; i < HOME_MENU.length; i++) {
       const item = HOME_MENU[i]

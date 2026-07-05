@@ -70,38 +70,6 @@ body.large-mode .update-msg { font-size: 18px; }
 .update-msg.err { color: #ff5252; }
 .update-msg .dl-link { color: #ffd600; text-decoration: none; font-weight: 600; margin-left: 8px; padding: 6px 14px; border: 1px solid #ffd600; border-radius: 6px; }
 
-/* Date bar — solar + lunar */
-.date-bar { display: flex; justify-content: center; gap: 24px; padding: 12px 16px 4px; text-align: center; }
-@media (max-width: 400px) { .date-bar { gap: 16px; padding: 8px 8px 2px; } .date-solar .day-num { font-size: clamp(32px, 10vw, 40px); } .date-lunar .day-num { font-size: clamp(28px, 8vw, 34px); } }
-.date-solar, .date-lunar { display: flex; flex-direction: column; align-items: center; gap: 0; }
-.date-solar .day-num { font-size: clamp(40px, 8vw, 64px); font-weight: 700; line-height: 1; color: #ffd600; letter-spacing: -0.02em; }
-.date-lunar .day-num { font-size: clamp(34px, 7vw, 54px); font-weight: 600; line-height: 1; color: #ccc; letter-spacing: -0.02em; }
-.date-solar .dow { font-size: 13px; color: #aaa; letter-spacing: 0.5px; text-transform: uppercase; }
-.date-solar .sub { font-size: 12px; color: #888; margin-top: 2px; }
-.date-lunar .label { font-size: 10px; color: #666; letter-spacing: 1.5px; text-transform: uppercase; }
-.date-lunar .sub { font-size: 11px; color: #888; margin-top: 2px; }
-
-@media (min-width: 900px) {
-  .date-bar { gap: 48px; padding: 20px 32px 8px; }
-  .date-solar .day-num { font-size: clamp(48px, 6vw, 72px); }
-  .date-lunar .day-num { font-size: clamp(40px, 5vw, 60px); }
-  .date-solar .dow { font-size: 15px; }
-  .date-solar .sub, .date-lunar .sub { font-size: 14px; }
-}
-@media (min-width: 1200px) {
-  .date-bar { gap: 64px; padding: 24px 48px 12px; }
-  .date-solar .day-num { font-size: clamp(56px, 5vw, 80px); }
-  .date-lunar .day-num { font-size: clamp(48px, 4.5vw, 68px); }
-  .date-solar .dow { font-size: 17px; }
-  .date-solar .sub, .date-lunar .sub { font-size: 16px; }
-  .date-lunar .label { font-size: 12px; }
-}
-body.large-mode .date-bar { gap: 32px; padding: 16px 16px 8px; }
-body.large-mode .date-solar .day-num { font-size: clamp(52px, 10vw, 80px); }
-body.large-mode .date-lunar .day-num { font-size: clamp(44px, 8vw, 68px); }
-body.large-mode .date-solar .dow { font-size: 18px; }
-body.large-mode .date-solar .sub, body.large-mode .date-lunar .sub { font-size: 16px; }
-
 /* Home wheel — 3D cylindrical drum */
 #screen-home { display: flex; flex-direction: column; padding: 0; overflow: hidden; }
 .wheel-bg { position: absolute; inset: 0; background: radial-gradient(ellipse 70% 50% at 50% 50%, rgba(255,214,0,0.08) 0%, transparent 70%); pointer-events: none; }
