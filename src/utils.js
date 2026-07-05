@@ -49,5 +49,7 @@ export const HOME_MENU = [
 export const KEY_MAP = {
   13: 'Enter', 27: 'Escape', 37: 'ArrowLeft', 38: 'ArrowUp',
   39: 'ArrowRight', 40: 'ArrowDown', 32: 'Space',
+  4: 'Escape', 23: 'Enter',
+  85: 'PlayPause', 126: 'PlayPause', 127: 'PlayPause',
   10009: 'Escape', 10190: 'PlayPause', 10252: 'PlayPause'
 }

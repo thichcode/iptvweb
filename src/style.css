@@ -258,6 +258,16 @@ body { background: #0d0d0d; color: #fff; font-family: system-ui, -apple-system, 
 .skeleton-line-short { width: 60%; }
 .skeleton-line-medium { width: 80%; }
 
+/* TV / large screen */
+@media (min-width: 1200px) {
+  .local-item .info .title { font-size: 17px; }
+  .local-item .info .meta { font-size: 14px; }
+  .sub-item { font-size: 17px; padding: 8px 18px; }
+  .wheel-item { font-size: 19px; }
+  .page-btn { font-size: 16px; }
+  .episode-btn { font-size: 15px; }
+}
+
 /* Custom Scrollbar */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: #111; }
