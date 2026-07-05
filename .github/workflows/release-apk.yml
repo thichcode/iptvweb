@@ -5,6 +5,7 @@ on:
       version:
         description: 'Version tag (e.g. v1.0.0)'
         required: true
+permissions: { contents: write }
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -14,16 +15,13 @@ jobs:
         with: { distribution: 'zulu', java-version: '17' }
       - uses: actions/setup-node@v4
         with: { node-version: '20' }
-      - uses: actions/cache@v4
-        with:
-          path: ~/.gradle
-          key: ${{ runner.os }}-gradle-${{ hashFiles('android/**/*.gradle*') }}
       - run: npm ci
       - run: npm run build
+      - name: Accept Android SDK licenses
+        run: yes | ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --licenses || true
       - run: npx cap add android
-        env: { CAPACITOR_ANDROID_STUDIO_PATH: '' }
       - run: npx cap sync android
-      - run: cd android && ./gradlew assembleDebug
+      - run: cd android && ./gradlew assembleDebug --no-daemon
       - uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.event.inputs.version }}
