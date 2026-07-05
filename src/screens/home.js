@@ -10,11 +10,11 @@ const HOME_ROWS = [
   { type: 'tv-shows', label: 'TV Shows' }
 ]
 const HOME_ACTIONS = [
-  { id: 'categories', label: 'Thể Loại' },
-  { id: 'countries', label: 'Quốc Gia' },
-  { id: 'search', label: 'Tìm Kiếm' },
-  { id: 'favorites', label: 'Yêu Thích' },
-  { id: 'history', label: 'Đã Xem' }
+  { id: 'phim-moi-cap-nhat', label: 'Phim Mới' },
+  { id: 'phim-bo', label: 'Phim Bộ' },
+  { id: 'phim-le', label: 'Phim Lẻ' },
+  { id: 'hoat-hinh', label: 'Hoạt Hình' },
+  { id: 'search', label: 'Tìm Kiếm' }
 ]
 const ROW_LIMIT = 12
 

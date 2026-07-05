@@ -216,13 +216,10 @@ function handleClick(e) {
     if (result) {
       if (result.action === 'detail') { loadDetail(result.slug); setHeader('', '') }
       else if (result.action === 'menu') {
-        switch (result.id) {
-          case 'categories': loadCategories(); setHeader('Thể Loại', ''); break
-          case 'countries': loadCountries(); setHeader('Quốc Gia', ''); break
-          case 'search': store.searchMode = true; renderSearchInput(store.currentKeyword); switchScreenLocal('list'); setHeader('Tìm Kiếm', 'Enter để tìm'); break
-          case 'favorites': loadFavorites(); switchScreenLocal('list'); setHeader('♥ Yêu Thích', ''); break
-          case 'history': loadHistory(); switchScreenLocal('list'); setHeader('Đã Xem', ''); break
-        }
+        if (result.id === 'search') { store.searchMode = true; renderSearchInput(store.currentKeyword); switchScreenLocal('list'); setHeader('Tìm Kiếm', 'Enter để tìm'); return }
+        const labelMap = { 'phim-moi-cap-nhat':'Phim Mới', 'phim-bo':'Phim Bộ', 'phim-le':'Phim Lẻ', 'hoat-hinh':'Hoạt Hình' }
+        loadMovieList(result.id, 1, '', '', '')
+        setHeader(labelMap[result.id] || '', '↑↓ Chọn | Enter xem')
       }
     }
   } else if (screen === 'list') {
