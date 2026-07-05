@@ -1,10 +1,12 @@
 name: Release APK
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version tag (e.g. v1.0.0)'
-        required: true
+        description: 'Custom tag (e.g. v1.0.0). Default: auto-increment'
+        required: false
 permissions: { contents: write }
 jobs:
   build:
@@ -18,12 +20,21 @@ jobs:
       - run: npm ci
       - run: npm run build
       - name: Accept Android SDK licenses
-        run: yes | ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --licenses || true
+        run: yes | ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --licenses || yes | ${ANDROID_HOME}/tools/bin/sdkmanager --licenses || true
       - run: npx cap add android
       - run: npx cap sync android
-      - run: cd android && ./gradlew assembleDebug --no-daemon
+      - run: cd android && chmod +x gradlew && ./gradlew assembleDebug --no-daemon
+      - name: Rename APK
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk WebPhim.apk
+      - name: Set tag
+        id: tag
+        run: |
+          TAG="${{ github.event.inputs.version }}"
+          if [ -z "$TAG" ]; then TAG="build-${{ github.run_number }}"; fi
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
       - uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.event.inputs.version }}
-          files: android/app/build/outputs/apk/debug/app-debug.apk
+          tag_name: ${{ steps.tag.outputs.tag }}
+          files: WebPhim.apk
           generate_release_notes: true
+          make_latest: true
