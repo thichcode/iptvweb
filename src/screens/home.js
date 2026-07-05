@@ -153,6 +153,6 @@ export async function checkForUpdate() {
 export function handleHomeClick(e) {
   if (tapped) { tapped = false; return null }
   if (!e.target.closest('.wheel-viewport')) return null
-  doSelect(((sel % HOME_MENU.length) + HOME_MENU.length) % HOME_MENU.length)
-  return null
+  const idx = ((sel % HOME_MENU.length) + HOME_MENU.length) % HOME_MENU.length
+  return { action: 'selectHome', idx }
 }
