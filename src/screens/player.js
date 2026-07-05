@@ -147,7 +147,7 @@ export function seek(delta) {
   showOverlay()
 }
 
-function showOverlay() {
+export function showOverlay() {
   const ui = $('#player-ui')
   if (!ui) return
   ui.classList.add('show')
@@ -191,7 +191,7 @@ function showPlayerError(msg) {
     <div class="player-error-icon">📡</div>
     <div class="player-error-msg">${msg}</div>
     <button class="retry-btn" onclick="this.closest('.player-error').remove();location.reload()">Thử lại</button>
-    <button class="player-error-close" onclick="exitPlayer()">Quay lại danh sách</button>
+    <button class="player-error-close">Quay lại danh sách</button>
   `
   wrap.appendChild(el)
 }

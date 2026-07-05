@@ -7,7 +7,7 @@ import {
 } from './screens/list.js'
 import { loadDetail, handleDetailClick } from './screens/detail.js'
 import { isFav, toggleFav } from './store.js'
-import { playEpisode, exitPlayer, togglePlay, seek, seekTo } from './screens/player.js'
+import { playEpisode, exitPlayer, togglePlay, seek, seekTo, showOverlay } from './screens/player.js'
 
 let overlayTimer = null
 
@@ -196,6 +196,7 @@ function handleKey(e) {
 function handleClick(e) {
   if ($('#player-wrap').classList.contains('active')) {
     if (e.target.closest('#player-exit-btn')) { exitPlayer(); return }
+    if (e.target.closest('.player-error-close')) { exitPlayer(); return }
     if (e.target.closest('#player-fs-btn')) { document.documentElement.requestFullscreen?.().catch(() => {}); return }
     if (e.target.closest('#player-center-btn')) { togglePlay(); return }
     if (e.target.closest('#p-seekbar')) { seekTo(e); return }
