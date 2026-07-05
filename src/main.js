@@ -39,8 +39,8 @@ function buildShell() {
       </div>
     </div>
     <div class="bottom-bar" id="bottom-bar">
-      <div class="nav-btn" id="nav-back">← <span class="label">Back</span></div>
-      <div class="nav-btn" id="nav-home">🏠 <span class="label">Home</span></div>
+      <div class="nav-btn" id="nav-back" role="button" aria-label="Quay lại">← <span class="label">Quay lại</span></div>
+      <div class="nav-btn" id="nav-home" role="button" aria-label="Trang chủ"><span class="label">Trang chủ</span></div>
     </div>`
 }
 
@@ -49,6 +49,7 @@ function setHeader(title, hint) {
   const hh = $('#header-hint')
   if (ht) ht.textContent = title || 'WebPhim'
   if (hh) hh.textContent = hint || ''
+  document.title = (title && title !== 'WebPhim' ? title + ' — ' : '') + 'WebPhim'
 }
 
 function switchScreenLocal(id) {
