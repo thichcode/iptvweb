@@ -9,6 +9,9 @@ export function empty(el) { el.innerHTML = '' }
 
 export function sanitize(str) {
   if (typeof str !== 'string') return ''
+  if (typeof document === 'undefined') {
+    return str.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]))
+  }
   const div = document.createElement('div')
   div.textContent = str
   return div.innerHTML

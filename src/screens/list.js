@@ -30,18 +30,22 @@ function renderSkeletonDetail() {
   </div>`
 }
 
+export function renderEmptyState(title = 'Chưa có phim', hint = 'Thử chọn mục khác hoặc quay lại sau.') {
+  return `<div class="empty-state"><div class="empty-title">${sanitize(title)}</div><div class="empty-hint">${sanitize(hint)}</div></div>`
+}
+
+export function renderMovieCard(m) {
+  const title = m.name || ''
+  const thumb = imgSrc(m.thumb_url || m.poster_url || m.thumb || m.poster)
+  const meta = [m.year, m.origin_name || m.origin].filter(Boolean).join(' • ')
+  return `<div class="local-item movie-card" data-slug="${sanitizeAttr(m.slug || '')}"><img class="thumb" src="${thumb}" alt="${sanitizeAttr(title)}" loading="lazy" onerror="this.style.display='none'"><div class="info"><div class="title">${sanitize(title)}</div><div class="meta">${sanitize(meta)}</div></div></div>`
+}
+
 export function renderMovieList(items, page, totalPages, type) {
   const container = $('#screen-list')
-  if (!items.length) { container.innerHTML = '<div class="empty">Trống</div>'; return }
-  let html = '<div class="local-list">'
-  for (const m of items) {
-    const thumb = imgSrc(m.thumb_url || m.poster_url || m.thumb || m.poster)
-    const meta = [m.year, m.origin_name || m.origin].filter(Boolean).join(' • ')
-    html += `<div class="local-item" data-slug="${sanitizeAttr(m.slug || '')}">`
-    html += `<img class="thumb" src="${thumb}" alt="" loading="lazy" onerror="this.style.display='none'">`
-    html += `<div class="info"><div class="title">${sanitize(m.name || '')}</div>`
-    html += `<div class="meta">${sanitize(meta)}</div></div></div>`
-  }
+  if (!items.length) { container.innerHTML = renderEmptyState(); return }
+  let html = '<div class="local-list movie-grid">'
+  for (const m of items) html += renderMovieCard(m)
   html += '</div>'
   if (totalPages > 1) {
     html += '<div class="pagination">'
@@ -81,16 +85,9 @@ export function renderSearchInput(keyword = '') {
 
 export function renderLocalList(items, title) {
   const container = $('#screen-list')
-  let html = '<div class="local-list">'
-  if (!items.length) { html += '<div class="empty">Trống</div>' }
-  for (const m of items) {
-    const thumb = imgSrc(m.thumb)
-    const meta = [m.year, m.origin, m.episode].filter(Boolean).join(' • ')
-    html += `<div class="local-item" data-slug="${sanitizeAttr(m.slug || '')}">`
-    html += `<img class="thumb" src="${thumb}" alt="" loading="lazy" onerror="this.style.display='none'">`
-    html += `<div class="info"><div class="title">${sanitize(m.name || '')}</div>`
-    html += `<div class="meta">${sanitize(meta)}</div></div></div>`
-  }
+  let html = '<div class="local-list movie-grid">'
+  if (!items.length) { container.innerHTML = renderEmptyState('Danh sách trống', 'Phim đã xem hoặc yêu thích sẽ hiện ở đây.'); return }
+  for (const m of items) html += renderMovieCard(m)
   html += '</div>'
   container.innerHTML = html
   store.listItems = items
