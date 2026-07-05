@@ -12,7 +12,7 @@ export function renderHome() {
       html += `<div class="wheel-item" data-idx="${i}">${HOME_MENU[i].label}</div>`
     }
   }
-  html += '</div></div>'
+  html += '</div></div><div class="dl-apk"><a href="/apk/WebPhim.apk" target="_blank" download>Tải APK cho Android TV</a></div>'
   $('#screen-home').innerHTML = html
   requestAnimationFrame(() => updateWheel(0))
   bindWheelEvents()
