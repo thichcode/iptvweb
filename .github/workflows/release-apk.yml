@@ -20,10 +20,16 @@ jobs:
       - uses: android-actions/setup-android@v3
       - run: npm ci
       - run: npm run build
+      - name: Debug info
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          echo "JAVA_HOME=$JAVA_HOME"
+          ls -la node_modules/.bin/cap node_modules/.bin/capacitor 2>/dev/null || echo "cap not found in .bin"
+          node -e "try{require.resolve('@capacitor/cli');console.log('CLI found')}catch(e){console.log('CLI NOT found:'+e.message)}"
       - name: Add Android platform
-        run: npx @capacitor/cli add android --skip-install
+        run: node node_modules/.bin/cap add android
       - name: Sync web to Android
-        run: npx @capacitor/cli sync android
+        run: node node_modules/.bin/cap sync android
       - name: Patch AndroidManifest for TV
         run: |
           M="android/app/src/main/AndroidManifest.xml"
