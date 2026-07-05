@@ -205,16 +205,18 @@ body.large-mode .update-msg { font-size: 18px; }
 }
 
 /* Detail */
-.detail-layout { display: flex; gap: 24px; padding-top: 16px; }
-.detail-poster { width: clamp(140px, 25vw, 300px); flex-shrink: 0; }
-.detail-poster img { width: 100%; border-radius: 8px; }
+.detail-hero { padding-top: 16px; }
+.detail-layout { display: flex; gap: 28px; align-items: flex-start; background: linear-gradient(135deg, rgba(255,255,255,0.045), rgba(255,255,255,0.015)); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 18px; box-shadow: var(--shadow-dark); }
+.detail-poster { width: clamp(150px, 24vw, 320px); flex-shrink: 0; }
+.detail-poster img { width: 100%; border-radius: var(--radius-md); box-shadow: 0 24px 70px rgba(0,0,0,0.45); }
 .detail-info { flex: 1; min-width: 0; }
-.detail-info h2 { font-size: clamp(18px, 3vw, 28px); margin: 0 0 8px; color: #ffd600; }
-.desc { color: #aaa; font-size: 15px; line-height: 1.75; margin-bottom: 12px; max-width: 65ch; }
-.tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
-.tags span { background: #2a2a2a; padding: 3px 10px; border-radius: 4px; font-size: 13px; color: #ccc; }
-.fav-btn { font-size: 28px; color: #ffd600; cursor: pointer; padding: 4px 10px; min-height: 44px; border: 1px solid transparent; border-radius: 8px; user-select: none; display: inline-flex; align-items: center; transition: border-color 0.15s, transform 0.15s; }
-.fav-btn:hover, .fav-btn.focused { border-color: #ffd600; transform: scale(1.1); }
+.detail-title-row { display: flex; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+.detail-info h2 { font-size: clamp(24px, 4vw, 42px); line-height: 1.08; letter-spacing: -0.035em; margin: 0 0 12px; color: var(--accent); text-wrap: balance; }
+.desc { color: var(--muted); font-size: 15px; line-height: 1.75; margin-bottom: 12px; max-width: 65ch; }
+.tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.tags span { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.06); padding: 5px 10px; border-radius: 999px; font-size: 13px; color: var(--muted); }
+.fav-btn { font-size: 28px; color: var(--accent); cursor: pointer; padding: 4px 10px; min-height: 44px; border: 1px solid transparent; border-radius: 8px; user-select: none; display: inline-flex; align-items: center; transition: border-color 0.15s, transform 0.15s; }
+.fav-btn:hover, .fav-btn.focused { border-color: var(--accent); transform: scale(1.1); }
 .fav-btn:active { transform: scale(0.92); }
 
 /* FAB yêu thích: chỉ hiện trên mobile, cố định ở góc dưới phải,
@@ -245,23 +247,17 @@ body.large-mode .update-msg { font-size: 18px; }
   }
   .fav-fab:active { transform: scale(0.92); }
 }
-.episode-section { margin-top: 24px; }
-.server-name { font-size: 16px; color: #ffd600; margin: 12px 0 6px; font-weight: 600; }
-.episode-grid { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
-@media (min-width: 900px) { .episode-section { max-width: 640px; } }
-.episode-btn { padding: 10px 14px; min-height: 44px; background: #1a1a1a; border: 1px solid transparent; border-radius: 8px; color: #fff; cursor: pointer; font-size: 13px; display: flex; align-items: center; transition: background 0.15s, border-color 0.15s, transform 0.15s; }
-.episode-btn:hover, .episode-btn.focused { border-color: #ffd600; background: #2a2a2a; transform: scale(1.05); }
+.episode-section { margin-top: 18px; max-width: none; }
+.episode-panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 16px; }
+.server-name { font-size: 16px; color: var(--accent); margin: 4px 0 10px; font-weight: 700; }
+.episode-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.episode-btn { padding: 11px 15px; min-height: 46px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-sm); color: var(--text); cursor: pointer; font-size: 14px; display: flex; align-items: center; transition: background 0.15s, border-color 0.15s, transform 0.15s, box-shadow 0.2s; }
+.episode-btn:hover, .episode-btn.focused { border-color: var(--accent); background: rgba(255,212,90,0.08); transform: scale(1.04); box-shadow: var(--shadow-amber); }
 .episode-btn:active { transform: scale(0.97); }
 
-@media (max-width: 900px) {
-  .detail-layout { flex-direction: column; align-items: flex-start; }
-  .detail-poster { width: clamp(120px, 40vw, 180px); }
-}
-@media (max-width: 900px) and (orientation: landscape) {
-  .detail-layout { flex-direction: row; align-items: flex-start; }
-  .detail-poster { width: clamp(100px, 18vw, 140px); }
-  .local-list { grid-template-columns: repeat(2, 1fr); }
-}
+@media (max-width: 900px) { .detail-layout { flex-direction: column; align-items: flex-start; padding: 14px; } .detail-poster { width: clamp(120px, 42vw, 190px); } .detail-info h2 { font-size: clamp(22px, 7vw, 30px); } }
+@media (max-width: 900px) and (orientation: landscape) { .detail-layout { flex-direction: row; align-items: flex-start; } .detail-poster { width: clamp(110px, 18vw, 150px); } .local-list { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1200px) { .detail-poster { width: clamp(240px, 21vw, 380px); } .detail-info h2 { font-size: clamp(32px, 3vw, 48px); } .desc { font-size: 17px; } .episode-panel { max-width: 920px; } .episode-btn { font-size: 17px; min-height: 56px; padding: 14px 20px; } }
 
 /* Player */
 #player-wrap { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 100; }
@@ -336,12 +332,8 @@ body.large-mode .update-msg { font-size: 18px; }
   .wheel-item { font-size: 22px; height: 64px; left: 14%; right: 14%; }
   .wi-icon { font-size: 26px; }
   .page-btn { font-size: 17px; }
-  .episode-btn { font-size: 16px; }
+  .episode-btn { font-size: 17px; }
 
-  .detail-poster { width: clamp(200px, 20vw, 340px); }
-  .detail-info h2 { font-size: clamp(24px, 2.5vw, 36px); }
-  .desc { font-size: 16px; }
-  .episode-section { max-width: 800px; }
   .wheel-viewport { height: clamp(340px, 50vh, 520px); }
   .wheel-indicator { font-size: 16px; }
 }

@@ -52,19 +52,18 @@ function renderDetail(movie, episodes) {
   if (movie.lang) tags.push(movie.lang)
   if (movie.time) tags.push(movie.time)
 
-  let html = `<div class="detail-layout"><div class="detail-poster"><img src="${poster}" alt="" width="260" height="390" onerror="this.style.display='none'"></div>`
-  html += `<div class="detail-info"><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">`
+  let html = `<div class="detail-hero"><div class="detail-layout"><div class="detail-poster"><img src="${poster}" alt="${sanitizeAttr(movie.name || '')}" width="260" height="390" loading="lazy" onerror="this.style.display='none'"></div>`
+  html += `<div class="detail-info"><div class="detail-title-row">`
   html += `<h2>${sanitize(movie.name || '')}</h2>`
-  html += `<span class="fav-btn" data-slug="${sanitizeAttr(movie.slug || '')}">${favStar}</span></div>`
-  // FAB yêu thích: luôn nằm trong tầm ngón cái ở góc dưới phải màn hình (chỉ hiện trên mobile)
-  html += `<span class="fav-fab" data-slug="${sanitizeAttr(movie.slug || '')}">${favStar}</span>`
+  html += `<span class="fav-btn" data-slug="${sanitizeAttr(movie.slug || '')}" aria-label="Yêu thích">${favStar}</span></div>`
+  html += `<span class="fav-fab" data-slug="${sanitizeAttr(movie.slug || '')}" aria-label="Yêu thích">${favStar}</span>`
   if (tags.some(Boolean)) {
     html += '<div class="tags">' + tags.filter(Boolean).map(t => `<span>${sanitize(t)}</span>`).join('') + '</div>'
   }
-  html += `<div class="desc">${sanitize(movie.content || movie.description || 'Chưa có mô tả')}</div></div></div>`
+  html += `<div class="desc">${sanitize(movie.content || movie.description || 'Chưa có mô tả')}</div></div></div></div>`
 
   if (episodes.length) {
-    html += '<div class="episode-section">'
+    html += '<div class="episode-section"><div class="episode-panel">'
     for (let s = 0; s < episodes.length; s++) {
       const ep = episodes[s]
       const data = ep.server_data || []
@@ -75,7 +74,7 @@ function renderDetail(movie, episodes) {
       }
       html += '</div>'
     }
-    html += '</div>'
+    html += '</div></div>'
   } else {
     html += '<div class="empty">Chưa có tập phim</div>'
   }
