@@ -1,5 +1,5 @@
 import { $, $$, HOME_MENU, KEY_MAP, store, switchScreen } from './utils.js'
-import { renderHome, handleHomeClick, scrollMenuTo, setHomeSelectHandler } from './screens/home.js'
+import { renderHome, handleHomeClick, loadHomeData, resetHomeFocus, navigateHome, selectHomeFocused } from './screens/home.js'
 import {
   renderMovieList, renderSubList, renderSearchInput, renderLocalList,
   loadMovieList, loadCategories, loadCountries, loadFavorites, loadHistory,
@@ -71,8 +71,8 @@ function goBack() {
     setHeader('WebPhim', '')
     window.scrollTo({ top: 0, behavior: 'smooth' })
   } else if (screen === 'list') {
-    renderHome()
     switchScreenLocal('home')
+    resetHomeFocus()
     setHeader('WebPhim', '')
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
@@ -141,13 +141,12 @@ function handleKey(e) {
   const screen = store.screen
   if (screen === 'home') {
     e.preventDefault()
-    let idx = store.menuIndex
-    if (key === 'ArrowUp') { idx--; if (idx < 0) idx = HOME_MENU.length - 1 }
-    else if (key === 'ArrowDown') { idx++; if (idx >= HOME_MENU.length) idx = 0 }
-    else if (key === 'Enter') { selectHomeItem(idx); return }
+    if (key === 'ArrowUp') { navigateHome('up'); return }
+    else if (key === 'ArrowDown') { navigateHome('down'); return }
+    else if (key === 'ArrowLeft') { navigateHome('left'); return }
+    else if (key === 'ArrowRight') { navigateHome('right'); return }
+    else if (key === 'Enter') { selectHomeFocused(); return }
     else return
-    store.menuIndex = idx
-    scrollMenuTo(idx)
   } else if (screen === 'list') {
     e.preventDefault()
     const items = $$('.local-item, .page-btn, .sub-item')
@@ -214,7 +213,10 @@ function handleClick(e) {
 
   if (screen === 'home') {
     const result = handleHomeClick(e)
-    if (result && result.action === 'selectHome') selectHomeItem(result.idx)
+    if (result && result.action === 'detail') {
+      loadDetail(result.slug)
+      setHeader('', '')
+    }
   } else if (screen === 'list') {
     const result = handleListClick(e)
     if (result) {
@@ -285,9 +287,8 @@ function autoFullscreen() {
 
 function init() {
   buildShell()
-  renderHome()
-  setHeader('WebPhim', '↑↓ Chọn | Enter vào')
-  setHomeSelectHandler(idx => selectHomeItem(idx))
+  loadHomeData()
+  setHeader('WebPhim', '↑↓ Chọn hàng | ←→ Chọn phim | Enter xem')
   document.addEventListener('keydown', handleKey)
   document.addEventListener('click', handleClick)
   document.addEventListener('touchstart', handleTouchStart, { passive: true })
@@ -302,8 +303,9 @@ function goHome() {
   if ($('#player-wrap').classList.contains('active')) {
     exitPlayer()
   }
-  renderHome()
+  // No need to renderHome here if data is already loaded
   switchScreenLocal('home')
+  resetHomeFocus()
   setHeader('WebPhim', '')
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }

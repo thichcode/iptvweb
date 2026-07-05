@@ -1,152 +1,132 @@
-import { HOME_MENU, $, $$, store, toggleLargeMode, checkUpdate, APP_VER } from '../utils.js'
+import { $, $$, imgSrc, sanitize, sanitizeAttr, store } from '../utils.js'
+import { fetchMovies } from '../api.js'
+import { getFavs, getHist } from '../store.js'
 
-const VISIBLE = 5
-const ANGLE = 40
-const RADIUS = 280
-const STEP = 56
-const WHEEL_Y_OFFSET = 100
-let sel = 0, touchY = 0, touchOff = 0, dragging = false, tapped = false
+const HOME_ROWS = [
+  { type: 'phim-moi-cap-nhat', label: 'Phim Mới Cập Nhật' },
+  { type: 'phim-bo', label: 'Phim Bộ' },
+  { type: 'phim-le', label: 'Phim Lẻ' },
+  { type: 'hoat-hinh', label: 'Hoạt Hình' },
+  { type: 'tv-shows', label: 'TV Shows' }
+]
+const ROW_LIMIT = 12
+
+let rows = []
+
+function renderPosterCard(m) {
+  const thumb = imgSrc(m.thumb_url || m.poster_url || m.thumb || m.poster)
+  const title = sanitizeAttr(m.name || '')
+  const year = m.year || ''
+  return `<div class="poster-card" data-slug="${sanitizeAttr(m.slug || '')}">
+    <img class="poster-img" src="${thumb}" alt="${title}" loading="lazy" onerror="this.style.display='none'">
+    <div class="poster-overlay">
+      <div class="poster-year">${year}</div>
+      <div class="poster-title">${title}</div>
+    </div>
+  </div>`
+}
+
+function renderHomeRow(data) {
+  if (!data || !data.length) return ''
+  const items = data.slice(0, ROW_LIMIT)
+  return `<div class="home-row">
+    <h2 class="home-row-title">${sanitize(data.label || '')}</h2>
+    <div class="poster-carousel">${items.map(renderPosterCard).join('')}</div>
+  </div>`
+}
 
 export function renderHome() {
-  sel = store.menuIndex || 0
-  let html = '<div class="wheel-bg"></div><div class="wheel-wrap"><div class="wheel-indicator top">▲</div><div class="wheel-viewport" id="wheel-vp">'
-  for (let r = 0; r < 3; r++) {
-    for (let i = 0; i < HOME_MENU.length; i++) {
-      const item = HOME_MENU[i]
-      html += `<div class="wheel-item" data-idx="${i}"><span class="wi-label">${item.label}</span></div>`
+  const container = $('#screen-home')
+  if (!container) return
+
+  store.favItems = Object.entries(getFavs()).map(([slug, v]) => ({ slug, name: v.name, thumb: v.thumb, year: v.year, origin: v.origin }))
+  store.histItems = Object.entries(getHist()).sort((a, b) => (b[1].at || 0) - (a[1].at || 0)).map(([slug, v]) => ({ slug, name: v.name, thumb: v.thumb, year: v.year, origin: v.origin }))
+
+  let html = '<div class="home-rows">'
+  if (rows.length === 0) {
+    html += '<div class="home-loading">Đang tải...</div>'
+  } else {
+    for (const rowData of rows) {
+      html += renderHomeRow(rowData)
+    }
+    if (store.histItems.length) {
+      html += `<div class="home-row">
+        <h2 class="home-row-title">Tiếp Tục Xem</h2>
+        <div class="poster-carousel">${store.histItems.map(renderPosterCard).join('')}</div>
+      </div>`
+    }
+    if (store.favItems.length) {
+      html += `<div class="home-row">
+        <h2 class="home-row-title">Yêu Thích</h2>
+        <div class="poster-carousel">${store.favItems.map(renderPosterCard).join('')}</div>
+      </div>`
     }
   }
-  html += '</div><div class="wheel-indicator bottom">▼</div></div><div class="home-actions"><a class="home-action" href="https://github.com/thichcode/iptvweb/releases/latest/download/WebPhim.apk" target="_blank" rel="noopener">Tải APK Android TV</a><span class="home-action" id="mode-btn">' + (store.largeMode ? 'Chữ thường' : 'Chữ to') + '</span><span class="home-action" id="update-btn">Cập nhật</span></div><div id="update-msg" class="update-msg"></div>'
-  $('#screen-home').innerHTML = html
-  requestAnimationFrame(() => updateWheel(0))
-  bindWheelEvents()
+  html += '</div>'
+  container.innerHTML = html
 }
 
-function updateWheel(dy) {
-  const items = $$('.wheel-item')
-  const vp = $('#wheel-vp')
-  if (!vp) return
-  const total = HOME_MENU.length
-  const virtualCenter = total + sel
-  const frac = (dy || 0) / STEP
-
-  vp.classList.toggle('no-transition', dragging)
-
-  items.forEach((el, i) => {
-    const off = i - virtualCenter + frac
-    const absOff = Math.abs(off)
-    if (absOff > VISIBLE / 2 + 0.7) { el.style.display = 'none'; return }
-    el.style.display = ''
-    const rotX = off * ANGLE
-    const y = off * STEP + WHEEL_Y_OFFSET
-    const z = RADIUS - absOff * 50
-    const s = 1 - absOff * 0.12
-    el.style.transform = `translateY(${y}px) rotateX(${rotX}deg) translateZ(${Math.max(20, z)}px) scale(${Math.max(0.45, s)})`
-    el.style.opacity = Math.max(0.1, Math.min(1, 1 - absOff * 0.18))
-    el.classList.toggle('focused', absOff < 0.3)
-  })
-}
-
-export function scrollMenuTo(idx) {
-  sel = idx
-  updateWheel(0)
-}
-
-function snapTo(idx) {
-  sel = ((idx % HOME_MENU.length) + HOME_MENU.length) % HOME_MENU.length
-  store.menuIndex = sel
-  touchOff = 0
-  dragging = false
-  updateWheel(0)
-}
-
-function doSelect(idx) {
-  const current = ((sel % HOME_MENU.length) + HOME_MENU.length) % HOME_MENU.length
-  if (idx !== current) { snapTo(idx); return }
-  const evt = new CustomEvent('homeselect', { detail: { idx } })
-  document.dispatchEvent(evt)
-}
-
-function onStart(y) {
-  touchY = y; dragging = false; touchOff = 0
-}
-
-function onMove(y) {
-  const dy = (touchY - y) * 0.8
-  if (Math.abs(dy) < 3) return
-  dragging = true
-  touchOff += dy
-  touchY = y
-  const stepOff = Math.round(touchOff / STEP)
-  if (stepOff !== 0) {
-    sel += stepOff
-    touchOff -= stepOff * STEP
+export async function loadHomeData() {
+  rows = []
+  for (const rowDef of HOME_ROWS) {
+    try {
+      const data = await fetchMovies(rowDef.type, 1, '', '', '', ROW_LIMIT)
+      const items = data.items || (data.data && data.data.items) || []
+      rows.push({ type: rowDef.type, label: rowDef.label, items })
+    } catch {
+      rows.push({ type: rowDef.type, label: rowDef.label, items: [] })
+    }
   }
-  updateWheel(touchOff)
+  renderHome()
 }
 
-function onEnd(e) {
-  if (dragging) { dragging = false; snapTo(sel); return }
-  if (!e.target.closest('.wheel-viewport')) return
-  tapped = true
-  doSelect(((sel % HOME_MENU.length) + HOME_MENU.length) % HOME_MENU.length)
+let focusedRow = 0
+let focusedCard = 0
+export function resetHomeFocus() { focusedRow = 0; focusedCard = 0 }
+
+export function navigateHome(dir) {
+  const carousels = $$('.poster-carousel')
+  if (!carousels.length) return
+
+  if (dir === 'down') {
+    focusedRow = Math.min(focusedRow + 1, carousels.length - 1)
+    focusedCard = 0
+  } else if (dir === 'up') {
+    focusedRow = Math.max(focusedRow - 1, 0)
+    focusedCard = 0
+  } else if (dir === 'right') {
+    const cards = carousels[focusedRow].querySelectorAll('.poster-card')
+    focusedCard = Math.min(focusedCard + 1, cards.length - 1)
+  } else if (dir === 'left') {
+    focusedCard = Math.max(focusedCard - 1, 0)
+  }
+
+  carousels.forEach((c, ri) => c.classList.toggle('row-focused', ri === focusedRow))
+  const activeCarousel = carousels[focusedRow]
+  if (activeCarousel) {
+    const cards = activeCarousel.querySelectorAll('.poster-card')
+    cards.forEach((c, ci) => c.classList.toggle('card-focused', ci === focusedCard))
+    const target = cards[focusedCard]
+    if (target) target.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+  }
 }
 
-function onWheel(e) {
-  e.preventDefault()
-  sel += e.deltaY > 0 ? 1 : -1
-  snapTo(sel)
-}
-
-let _mouseMoveHandler = null, _mouseUpHandler = null, _rootEl = null
-
-function bindWheelEvents() {
-  const root = $('#screen-home')
-  if (!root || _rootEl === root) return
-  if (_mouseMoveHandler) document.removeEventListener('mousemove', _mouseMoveHandler)
-  if (_mouseUpHandler) document.removeEventListener('mouseup', _mouseUpHandler)
-  _rootEl = root
-  root.addEventListener('touchstart', e => { if (e.target.closest('.wheel-viewport')) onStart(e.touches[0].clientY) }, { passive: true })
-  root.addEventListener('touchmove', e => { const t = e.touches[0]; if (t) onMove(t.clientY) }, { passive: true })
-  root.addEventListener('touchend', e => { onEnd(e) }, { passive: true })
-  root.addEventListener('mousedown', e => { if (e.target.closest('.wheel-viewport')) { e.preventDefault(); onStart(e.clientY) } })
-  root.addEventListener('wheel', e => { if (e.target.closest('.wheel-wrap')) onWheel(e) }, { passive: false })
-  root.addEventListener('click', e => {
-    const btn = e.target.closest('#mode-btn')
-    if (btn) { toggleLargeMode(); btn.textContent = store.largeMode ? 'Chữ thường' : 'Chữ to' }
-    const upd = e.target.closest('#update-btn')
-    if (upd) checkForUpdate()
-  })
-  _mouseMoveHandler = e => { if (dragging) onMove(e.clientY) }
-  _mouseUpHandler = e => { if (dragging) { dragging = false; snapTo(sel) } }
-  document.addEventListener('mousemove', _mouseMoveHandler)
-  document.addEventListener('mouseup', _mouseUpHandler)
-}
-
-let _homeSelectHandler = null
-
-document.addEventListener('homeselect', e => {
-  if (_homeSelectHandler) _homeSelectHandler(e.detail.idx)
-})
-
-export function setHomeSelectHandler(fn) { _homeSelectHandler = fn }
-
-export async function checkForUpdate() {
-  const msg = $('#update-msg')
-  if (!msg) return
-  msg.textContent = 'Đang kiểm tra...'
-  msg.className = 'update-msg'
-  const data = await checkUpdate()
-  if (!data) { msg.textContent = 'Lỗi kết nối. Thử lại sau.'; msg.className = 'update-msg err'; return }
-  const cur = APP_VER
-  if (data.tag === 'build-' + cur) { msg.textContent = 'Đã là phiên bản mới nhất (' + cur + ')'; msg.className = 'update-msg ok'; return }
-  msg.innerHTML = 'Phiên bản mới: <strong>' + data.tag + '</strong> <a href="' + data.url + '" target="_blank" class="dl-link">Tải ngay</a>'
-  msg.className = 'update-msg'
+export function selectHomeFocused() {
+  const carousels = $$('.poster-carousel')
+  const target = carousels[focusedRow]?.querySelectorAll('.poster-card')[focusedCard]
+  const slug = target?.dataset?.slug
+  if (slug) {
+    import('./detail.js').then(m => {
+      m.loadDetail(slug)
+      store.prevScreen = 'home'
+    })
+  }
 }
 
 export function handleHomeClick(e) {
-  if (tapped) { tapped = false; return null }
-  if (!e.target.closest('.wheel-viewport')) return null
-  const idx = ((sel % HOME_MENU.length) + HOME_MENU.length) % HOME_MENU.length
-  return { action: 'selectHome', idx }
+  const card = e.target.closest('.poster-card')
+  if (!card) return null
+  const slug = card.dataset.slug
+  if (slug) return { action: 'detail', slug }
+  return null
 }
