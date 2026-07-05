@@ -4,6 +4,7 @@ const VISIBLE = 5
 const ANGLE = 40
 const RADIUS = 280
 const STEP = 56
+const WHEEL_Y_OFFSET = 100
 let sel = 0, touchY = 0, touchOff = 0, dragging = false, tapped = false
 
 export function renderHome() {
@@ -37,7 +38,7 @@ function updateWheel(dy) {
     if (absOff > VISIBLE / 2 + 0.7) { el.style.display = 'none'; return }
     el.style.display = ''
     const rotX = off * ANGLE
-    const y = off * STEP
+    const y = off * STEP + WHEEL_Y_OFFSET
     const z = RADIUS - absOff * 50
     const s = 1 - absOff * 0.12
     el.style.transform = `translateY(${y}px) rotateX(${rotX}deg) translateZ(${Math.max(20, z)}px) scale(${Math.max(0.45, s)})`
