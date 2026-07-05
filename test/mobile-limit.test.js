@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { API_BASE, getMovieLimit, buildMovieUrl, imgSrc } from '../src/api.js'
+import { API_BASE, FALLBACK_API_BASE, apiGet, getMovieLimit, buildMovieUrl, imgSrc } from '../src/api.js'
 import { limitRenderedItems, renderMovieCard, renderEmptyState } from '../src/screens/list.js'
 
 test('mobile viewport uses 5 movies per page', () => {
@@ -13,8 +13,29 @@ test('API URLs include the requested limit for endpoints that support it', () =>
   assert.equal(buildMovieUrl('search', 1, 'test phim', '', '', 4), '/v1/api/tim-kiem?keyword=test%20phim&page=1&limit=4&sort_field=year&sort_type=desc')
 })
 
-test('API defaults to the live OPhim host', () => {
-  assert.equal(API_BASE, 'https://ophim1.com')
+test('API defaults to phimapi.com with OPhim fallback', () => {
+  assert.equal(API_BASE, 'https://phimapi.com')
+  assert.equal(FALLBACK_API_BASE, 'https://ophim1.com')
+})
+
+test('apiGet falls back when primary API returns 404', async () => {
+  const oldFetch = globalThis.fetch
+  const urls = []
+  globalThis.fetch = async url => {
+    urls.push(url)
+    if (urls.length === 1) return { ok: false, status: 404 }
+    return { ok: true, json: async () => ({ status: 'success' }) }
+  }
+
+  try {
+    assert.deepEqual(await apiGet('/v1/api/danh-sach/phim-bo?page=1', 0), { status: 'success' })
+    assert.deepEqual(urls, [
+      'https://phimapi.com/v1/api/danh-sach/phim-bo?page=1',
+      'https://ophim1.com/v1/api/danh-sach/phim-bo?page=1'
+    ])
+  } finally {
+    globalThis.fetch = oldFetch
+  }
 })
 
 test('image URLs use live CDN directly', () => {

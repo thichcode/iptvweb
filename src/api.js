@@ -1,4 +1,5 @@
-export const API_BASE = import.meta.env?.VITE_API_BASE || 'https://ophim1.com'
+export const API_BASE = import.meta.env?.VITE_API_BASE || 'https://phimapi.com'
+export const FALLBACK_API_BASE = import.meta.env?.VITE_FALLBACK_API_BASE || 'https://ophim1.com'
 export const IMAGE_BASE = import.meta.env?.VITE_IMAGE_BASE || 'https://img.ophim.live/uploads/movies'
 const MAX_RETRIES = 2
 const TIMEOUT_MS = 15000
@@ -6,17 +7,19 @@ const MOBILE_LIMIT = 5
 const DEFAULT_LIMIT = 20
 
 export async function apiGet(url, retries = MAX_RETRIES) {
-  for (let attempt = 0; attempt <= retries; attempt++) {
-    try {
-      const ctrl = new AbortController()
-      const timer = setTimeout(() => ctrl.abort(), TIMEOUT_MS)
-      const res = await fetch(API_BASE + url, { signal: ctrl.signal, cache: 'no-cache' })
-      clearTimeout(timer)
-      if (!res.ok) throw new Error('HTTP ' + res.status)
-      return res.json()
-    } catch (err) {
-      if (attempt === retries) throw err
-      await new Promise(r => setTimeout(r, 500 * (attempt + 1)))
+  for (const base of [API_BASE, FALLBACK_API_BASE].filter(Boolean)) {
+    for (let attempt = 0; attempt <= retries; attempt++) {
+      try {
+        const ctrl = new AbortController()
+        const timer = setTimeout(() => ctrl.abort(), TIMEOUT_MS)
+        const res = await fetch(base + url, { signal: ctrl.signal, cache: 'no-cache' })
+        clearTimeout(timer)
+        if (!res.ok) throw new Error('HTTP ' + res.status)
+        return res.json()
+      } catch (err) {
+        if (attempt === retries && base === FALLBACK_API_BASE) throw err
+        if (attempt < retries) await new Promise(r => setTimeout(r, 500 * (attempt + 1)))
+      }
     }
   }
 }
