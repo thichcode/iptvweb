@@ -615,6 +615,32 @@ body.large-mode #player-fs-btn { font-size: 36px; }
 .player-error-close:hover { background: var(--accent-strong); }
 
 /* Netflix-style home */
+.home-actions-row {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 16px 4px 8px;
+  scrollbar-width: none;
+}
+.home-actions-row::-webkit-scrollbar { display: none; }
+.home-action-btn {
+  flex: 0 0 auto;
+  padding: 8px 18px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.home-action-btn:hover, .home-action-btn:active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #141006;
+}
 .home-rows {
   width: 100%;
   padding: 12px 0 80px;

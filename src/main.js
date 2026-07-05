@@ -213,9 +213,17 @@ function handleClick(e) {
 
   if (screen === 'home') {
     const result = handleHomeClick(e)
-    if (result && result.action === 'detail') {
-      loadDetail(result.slug)
-      setHeader('', '')
+    if (result) {
+      if (result.action === 'detail') { loadDetail(result.slug); setHeader('', '') }
+      else if (result.action === 'menu') {
+        switch (result.id) {
+          case 'categories': loadCategories(); setHeader('Thể Loại', ''); break
+          case 'countries': loadCountries(); setHeader('Quốc Gia', ''); break
+          case 'search': store.searchMode = true; renderSearchInput(store.currentKeyword); switchScreenLocal('list'); setHeader('Tìm Kiếm', 'Enter để tìm'); break
+          case 'favorites': loadFavorites(); switchScreenLocal('list'); setHeader('♥ Yêu Thích', ''); break
+          case 'history': loadHistory(); switchScreenLocal('list'); setHeader('Đã Xem', ''); break
+        }
+      }
     }
   } else if (screen === 'list') {
     const result = handleListClick(e)

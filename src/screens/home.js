@@ -9,6 +9,13 @@ const HOME_ROWS = [
   { type: 'hoat-hinh', label: 'Hoạt Hình' },
   { type: 'tv-shows', label: 'TV Shows' }
 ]
+const HOME_ACTIONS = [
+  { id: 'categories', label: 'Thể Loại' },
+  { id: 'countries', label: 'Quốc Gia' },
+  { id: 'search', label: 'Tìm Kiếm' },
+  { id: 'favorites', label: 'Yêu Thích' },
+  { id: 'history', label: 'Đã Xem' }
+]
 const ROW_LIMIT = 12
 
 let rows = []
@@ -42,7 +49,9 @@ export function renderHome() {
   store.favItems = Object.entries(getFavs()).map(([slug, v]) => ({ slug, name: v.name, thumb: v.thumb, year: v.year, origin: v.origin }))
   store.histItems = Object.entries(getHist()).sort((a, b) => (b[1].at || 0) - (a[1].at || 0)).map(([slug, v]) => ({ slug, name: v.name, thumb: v.thumb, year: v.year, origin: v.origin }))
 
-  let html = '<div class="home-rows">'
+  let html = '<div class="home-actions-row">'
+  for (const a of HOME_ACTIONS) html += `<div class="home-action-btn" data-action="${sanitizeAttr(a.id)}">${sanitize(a.label)}</div>`
+  html += '</div><div class="home-rows">'
   if (rows.length === 0) {
     html += '<div class="home-loading">Đang tải...</div>'
   } else {
@@ -124,6 +133,8 @@ export function selectHomeFocused() {
 }
 
 export function handleHomeClick(e) {
+  const action = e.target.closest('.home-action-btn')
+  if (action) return { action: 'menu', id: action.dataset.action }
   const card = e.target.closest('.poster-card')
   if (!card) return null
   const slug = card.dataset.slug
