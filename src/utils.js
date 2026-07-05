@@ -52,10 +52,24 @@ export function toggleLargeMode() {
   try { localStorage.setItem('wp_large', store.largeMode ? '1' : '') } catch {}
 }
 
-// Khôi phục chế độ khi load
-;(() => {
+export const APP_VER = '1.0.0'
+
+export async function checkUpdate() {
+  try {
+    const r = await fetch('https://api.github.com/repos/thichcode/iptvweb/releases/latest')
+    if (!r.ok) return null
+    const data = await r.json()
+    const tag = data.tag_name || ''
+    const apk = data.assets?.find(a => a.name.endsWith('.apk'))
+    return { tag, url: apk?.browser_download_url || '', notes: data.body || '' }
+  } catch { return null }
+}
+
+function restoreLargeMode() {
   try { if (localStorage.getItem('wp_large')) { store.largeMode = true; document.body.classList.add('large-mode') } } catch {}
-})()
+}
+
+restoreLargeMode()
 
 export const KEY_MAP = {
   13: 'Enter', 27: 'Escape', 37: 'ArrowLeft', 38: 'ArrowUp',

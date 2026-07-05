@@ -46,6 +46,12 @@ body { background: #0d0d0d; color: #fff; font-family: system-ui, -apple-system, 
 .dl-apk a:hover, .mode-btn:hover { color: #ffd600; border-color: #ffd600; background: #1a1a1a; }
 @media (min-width: 1200px) { .dl-apk a, .mode-btn { font-size: 16px; padding: 12px 22px; } }
 body.large-mode .dl-apk a, body.large-mode .mode-btn { font-size: 18px; padding: 14px 26px; min-height: 56px; }
+body.large-mode .update-msg { font-size: 18px; }
+
+.update-msg { text-align: center; padding: 4px 16px 12px; font-size: 14px; color: #aaa; }
+.update-msg.ok { color: #4caf50; }
+.update-msg.err { color: #ff5252; }
+.update-msg .dl-link { color: #ffd600; text-decoration: none; font-weight: 600; margin-left: 8px; padding: 6px 14px; border: 1px solid #ffd600; border-radius: 6px; }
 
 /* Home wheel */
 #screen-home { display: flex; flex-direction: column; padding: 0; overflow: hidden; }

@@ -1,4 +1,4 @@
-import { HOME_MENU, $, $$, store, toggleLargeMode } from '../utils.js'
+import { HOME_MENU, $, $$, store, toggleLargeMode, checkUpdate, APP_VER } from '../utils.js'
 
 const ITEM_H = 48
 const STEP = 56
@@ -12,7 +12,7 @@ export function renderHome() {
       html += `<div class="wheel-item" data-idx="${i}">${HOME_MENU[i].label}</div>`
     }
   }
-  html += '</div></div><div class="dl-apk"><a href="https://github.com/thichcode/iptvweb/releases/latest/download/WebPhim.apk" target="_blank">Tải APK cho Android TV</a> <span class="mode-btn" id="mode-btn">' + (store.largeMode ? '🔍 Thường' : '👁 Chữ to') + '</span></div>'
+  html += '</div></div><div class="dl-apk"><a href="https://github.com/thichcode/iptvweb/releases/latest/download/WebPhim.apk" target="_blank">Tải APK cho Android TV</a> <span class="mode-btn" id="mode-btn">' + (store.largeMode ? '🔍 Thường' : '👁 Chữ to') + '</span> <span class="mode-btn" id="update-btn">🔄 Cập nhật</span></div><div id="update-msg" class="update-msg"></div>'
   $('#screen-home').innerHTML = html
   requestAnimationFrame(() => updateWheel(0))
   bindWheelEvents()
@@ -124,6 +124,8 @@ function bindWheelEvents() {
   root.addEventListener('click', e => {
     const btn = e.target.closest('#mode-btn')
     if (btn) { toggleLargeMode(); btn.textContent = store.largeMode ? '🔍 Thường' : '👁 Chữ to' }
+    const upd = e.target.closest('#update-btn')
+    if (upd) checkForUpdate()
   })
 
   _mouseMoveHandler = e => { if (dragging) onMove(e.clientY) }
@@ -140,6 +142,19 @@ document.addEventListener('homeselect', e => {
 
 export function setHomeSelectHandler(fn) {
   _homeSelectHandler = fn
+}
+
+export async function checkForUpdate() {
+  const msg = $('#update-msg')
+  if (!msg) return
+  msg.textContent = '🔄 Đang kiểm tra...'
+  msg.className = 'update-msg'
+  const data = await checkUpdate()
+  if (!data) { msg.textContent = '❌ Lỗi kết nối. Thử lại sau.'; msg.className = 'update-msg err'; return }
+  const cur = APP_VER
+  if (data.tag === 'build-' + cur) { msg.textContent = '✅ Đã là phiên bản mới nhất (' + cur + ')'; msg.className = 'update-msg ok'; return }
+  msg.innerHTML = '📥 Phiên bản mới: <strong>' + data.tag + '</strong> <a href="' + data.url + '" target="_blank" class="dl-link">Tải ngay</a>'
+  msg.className = 'update-msg'
 }
 
 export function handleHomeClick(e) {
