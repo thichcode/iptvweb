@@ -22,7 +22,7 @@ export function renderHome() {
       html += `<div class="wheel-item" data-idx="${i}"><span class="wi-icon">${icon}</span><span class="wi-label">${item.label}</span></div>`
     }
   }
-  html += '</div><div class="wheel-indicator bottom">▼</div></div><div class="dl-apk"><a href="https://github.com/thichcode/iptvweb/releases/latest/download/WebPhim.apk" target="_blank">Tải APK cho Android TV</a> <span class="mode-btn" id="mode-btn">' + (store.largeMode ? '🔍 Thường' : '👁 Chữ to') + '</span> <span class="mode-btn" id="update-btn">🔄 Cập nhật</span></div><div id="update-msg" class="update-msg"></div>'
+  html += '</div><div class="wheel-indicator bottom">▼</div></div><div class="home-actions"><a class="home-action" href="https://github.com/thichcode/iptvweb/releases/latest/download/WebPhim.apk" target="_blank" rel="noopener">Tải APK Android TV</a><span class="home-action" id="mode-btn">' + (store.largeMode ? 'Chữ thường' : 'Chữ to') + '</span><span class="home-action" id="update-btn">Cập nhật</span></div><div id="update-msg" class="update-msg"></div>'
   $('#screen-home').innerHTML = html
   requestAnimationFrame(() => updateWheel(0))
   bindWheelEvents()
@@ -119,7 +119,7 @@ function bindWheelEvents() {
   root.addEventListener('wheel', e => { if (e.target.closest('.wheel-wrap')) onWheel(e) }, { passive: false })
   root.addEventListener('click', e => {
     const btn = e.target.closest('#mode-btn')
-    if (btn) { toggleLargeMode(); btn.textContent = store.largeMode ? '🔍 Thường' : '👁 Chữ to' }
+    if (btn) { toggleLargeMode(); btn.textContent = store.largeMode ? 'Chữ thường' : 'Chữ to' }
     const upd = e.target.closest('#update-btn')
     if (upd) checkForUpdate()
   })
