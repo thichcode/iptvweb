@@ -1,5 +1,5 @@
 import { $, $$, HOME_MENU, KEY_MAP, store, switchScreen } from './utils.js'
-import { renderHome, handleHomeClick, loadHomeData, resetHomeFocus, navigateHome, selectHomeFocused } from './screens/home.js'
+import { renderHome, handleHomeClick, loadHomeData, resetHomeFocus, navigateHome, selectHomeFocused, handleActionRow } from './screens/home.js'
 import {
   renderMovieList, renderSubList, renderSearchInput, renderLocalList,
   loadMovieList, loadCategories, loadCountries, loadFavorites, loadHistory,
@@ -217,9 +217,7 @@ function handleClick(e) {
       if (result.action === 'detail') { loadDetail(result.slug); setHeader('', '') }
       else if (result.action === 'menu') {
         if (result.id === 'search') { store.searchMode = true; renderSearchInput(store.currentKeyword); switchScreenLocal('list'); setHeader('Tìm Kiếm', 'Enter để tìm'); return }
-        const labelMap = { 'phim-moi-cap-nhat':'Phim Mới', 'phim-bo':'Phim Bộ', 'phim-le':'Phim Lẻ', 'hoat-hinh':'Hoạt Hình' }
-        loadMovieList(result.id, 1, '', '', '')
-        setHeader(labelMap[result.id] || '', '↑↓ Chọn | Enter xem')
+        handleActionRow(result.id)
       }
     }
   } else if (screen === 'list') {

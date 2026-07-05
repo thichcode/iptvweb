@@ -141,3 +141,22 @@ export function handleHomeClick(e) {
   if (slug) return { action: 'detail', slug }
   return null
 }
+
+export async function handleActionRow(id) {
+  const labelMap = { 'phim-bo':'Phim Bộ', 'phim-le':'Phim Lẻ', 'hoat-hinh':'Hoạt Hình', 'phim-moi-cap-nhat':'Phim Mới' }
+  const label = labelMap[id] || id
+  try {
+    const data = await fetchMovies(id, 1, '', '', '', ROW_LIMIT)
+    const items = data.items || (data.data && data.data.items) || []
+    if (!items.length) return
+    const oldRow = $(`[data-action-type="${id}"]`)
+    if (oldRow) oldRow.remove()
+    const el = $('.home-actions-row')
+    if (!el) return
+    el.insertAdjacentHTML('afterend',
+      `<div class="home-row action-result" data-action-type="${id}">
+        <h2 class="home-row-title">${sanitize(label)}</h2>
+        <div class="poster-carousel">${items.map(renderPosterCard).join('')}</div>
+      </div>`)
+  } catch {}
+}
