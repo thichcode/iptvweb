@@ -20,14 +20,19 @@ jobs:
       - uses: android-actions/setup-android@v3
       - run: npm ci
       - run: npm run build
-      - run: npx cap add android
-      - run: npx cap sync
+      - name: Add Android platform
+        run: npx @capacitor/cli add android --skip-install
+      - name: Sync web to Android
+        run: npx @capacitor/cli sync android
       - name: Patch AndroidManifest for TV
         run: |
           M="android/app/src/main/AndroidManifest.xml"
-          sed -i 's|</manifest>|  <uses-feature android:name="android.software.leanback" android:required="false" />\n  <uses-feature android:name="android.hardware.touchscreen" android:required="false" />\n</manifest>|' "$M"
-          sed -i 's|<activity android:name=".MainActivity"|<activity android:name=".MainActivity" android:banner="@mipmap/ic_launcher" android:screenOrientation="landscape"|' "$M"
-      - run: cd android && ./gradlew assembleDebug --no-daemon
+          if [ -f "$M" ]; then
+            sed -i 's|</manifest>|  <uses-feature android:name="android.software.leanback" android:required="false" />\n  <uses-feature android:name="android.hardware.touchscreen" android:required="false" />\n</manifest>|' "$M"
+            sed -i 's|<activity android:name=".MainActivity"|<activity android:name=".MainActivity" android:banner="@mipmap/ic_launcher" android:screenOrientation="landscape"|' "$M"
+          fi
+      - name: Build APK
+        run: cd android && chmod +x gradlew && ./gradlew assembleDebug --no-daemon
       - name: Rename APK
         run: cp android/app/build/outputs/apk/debug/app-debug.apk WebPhim.apk
       - name: Set tag
