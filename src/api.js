@@ -27,6 +27,7 @@ export async function apiGet(url, retries = MAX_RETRIES) {
 export function imgSrc(url) {
   if (!url) return ''
   if (url.startsWith('http://') || url.startsWith('https://')) return url
+  if (url.startsWith('upload/')) return 'https://phimimg.com/' + url
   return IMAGE_BASE.replace(/\/$/, '') + '/' + url.replace(/^\//, '')
 }
 

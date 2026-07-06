@@ -40,6 +40,7 @@ test('apiGet falls back when primary API returns 404', async () => {
 
 test('image URLs use live CDN directly', () => {
   assert.equal(imgSrc('poster.jpg'), 'https://img.ophim.live/uploads/movies/poster.jpg')
+  assert.equal(imgSrc('upload/vod/poster.jpg'), 'https://phimimg.com/upload/vod/poster.jpg')
   assert.equal(imgSrc('https://img.ophim.live/uploads/movies/poster.jpg'), 'https://img.ophim.live/uploads/movies/poster.jpg')
 })
 
