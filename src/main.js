@@ -1,4 +1,4 @@
-import { $, $$, HOME_MENU, KEY_MAP, store, switchScreen } from './utils.js'
+import { $, $$, HOME_MENU, KEY_MAP, store, switchScreen, toggleLargeMode } from './utils.js'
 import { renderHome, handleHomeClick, loadHomeData, resetHomeFocus, navigateHome, selectHomeFocused, handleActionRow } from './screens/home.js'
 import {
   renderMovieList, renderSubList, renderSearchInput, renderLocalList,
@@ -15,7 +15,21 @@ function buildShell() {
   document.getElementById('app').innerHTML = `
     <div class="header">
       <span id="header-back" class="header-back" style="display:none">←</span>
-      <h1 id="header-title">WebPhim</h1>
+      <h1 id="header-title"><span>Web</span>Phim</h1>
+      <nav class="top-nav" aria-label="Điều hướng chính">
+        <button class="top-nav-btn active" data-nav="home">⌂ Trang chủ</button>
+        <button class="top-nav-btn" data-nav="phim-moi-cap-nhat">Phim Mới</button>
+        <button class="top-nav-btn" data-nav="phim-le">Phim Lẻ</button>
+        <button class="top-nav-btn" data-nav="phim-bo">Phim Bộ</button>
+        <button class="top-nav-btn" data-nav="categories">Thể Loại</button>
+        <button class="top-nav-btn" data-nav="favorites">Yêu Thích</button>
+        <button class="top-nav-btn" data-nav="history">Lịch Sử</button>
+      </nav>
+      <div class="header-search">
+        <input id="header-search-input" type="search" placeholder="Tìm phim..." aria-label="Tìm phim">
+        <button id="header-search-btn" aria-label="Tìm kiếm">⌕</button>
+      </div>
+      <button class="settings-btn" id="mode-btn" aria-label="Chế độ chữ">⚙</button>
       <span class="hint" id="header-hint"></span>
     </div>
     <div id="screen-home" class="screen active"></div>
@@ -47,7 +61,7 @@ function buildShell() {
 function setHeader(title, hint) {
   const ht = $('#header-title')
   const hh = $('#header-hint')
-  if (ht) ht.textContent = title || 'WebPhim'
+  if (ht) ht.innerHTML = '<span>Web</span>Phim'
   if (hh) hh.textContent = hint || ''
   document.title = (title && title !== 'WebPhim' ? title + ' — ' : '') + 'WebPhim'
 }
@@ -117,6 +131,14 @@ function selectListItem(items, idx) {
 function handleKey(e) {
   const keyCode = e.keyCode || e.which
   const key = KEY_MAP[keyCode] || e.key
+
+  if (e.target?.id === 'header-search-input') {
+    if (key === 'Enter') {
+      e.preventDefault()
+      runHeaderSearch()
+    }
+    return
+  }
 
   if (store.searchMode) {
     if (key === 'Enter') {
@@ -205,6 +227,23 @@ function handleClick(e) {
   }
 
   const screen = store.screen
+
+  const nav = e.target.closest('.top-nav-btn')
+  if (nav) {
+    handleTopNav(nav.dataset.nav)
+    return
+  }
+
+  if (e.target.closest('#header-search-btn')) {
+    runHeaderSearch()
+    return
+  }
+
+  if (e.target.closest('#mode-btn')) {
+    toggleLargeMode()
+    return
+  }
+
   if (e.target.closest('.search-btn')) {
     const inp = $('.search-input')
     if (inp && inp.value.trim()) { store.searchMode = false; loadMovieList('search', 1, inp.value.trim(), '', ''); setHeader('Tìm: ' + inp.value.trim(), '') }
@@ -235,6 +274,30 @@ function handleClick(e) {
     const result = handleDetailClick(e)
     if (result && result.action === 'play') playEpisode(result.serverIdx, result.epIdx)
   }
+}
+
+function runHeaderSearch() {
+  const inp = $('#header-search-input')
+  const keyword = inp?.value.trim()
+  if (!keyword) return
+  store.searchMode = false
+  loadMovieList('search', 1, keyword, '', '')
+  setHeader('Tìm: ' + keyword, '')
+}
+
+function handleTopNav(id) {
+  $$('.top-nav-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.nav === id))
+  store.searchMode = false
+  store.currentKeyword = ''
+  store.categorySlug = ''
+  store.countrySlug = ''
+  if (id === 'home') { goHome(); return }
+  if (id === 'categories') { loadCategories(); setHeader('Thể Loại', ''); return }
+  if (id === 'favorites') { loadFavorites(); switchScreenLocal('list'); setHeader('Yêu Thích', ''); return }
+  if (id === 'history') { loadHistory(); switchScreenLocal('list'); setHeader('Lịch Sử', ''); return }
+  loadMovieList(id, 1, '', '', '')
+  const labelMap = { 'phim-moi-cap-nhat':'Phim Mới', 'phim-bo':'Phim Bộ', 'phim-le':'Phim Lẻ' }
+  setHeader(labelMap[id] || 'WebPhim', '')
 }
 
 let lastTap = 0
@@ -308,6 +371,7 @@ function goHome() {
   }
   // No need to renderHome here if data is already loaded
   switchScreenLocal('home')
+  $$('.top-nav-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.nav === 'home'))
   resetHomeFocus()
   setHeader('WebPhim', '')
   window.scrollTo({ top: 0, behavior: 'smooth' })
