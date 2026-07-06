@@ -8,6 +8,7 @@ import {
 import { loadDetail, handleDetailClick } from './screens/detail.js'
 import { isFav, toggleFav } from './store.js'
 import { playEpisode, exitPlayer, togglePlay, seek, seekTo, showOverlay } from './screens/player.js'
+import { checkUpdate, showUpdateModal, initUpdateChecker } from './update.js'
 
 let overlayTimer = null
 
@@ -30,6 +31,7 @@ function buildShell() {
         <input id="header-search-input" type="search" placeholder="Tìm phim..." aria-label="Tìm phim">
         <button id="header-search-btn" aria-label="Tìm kiếm">⌕</button>
       </div>
+      <button class="settings-btn" id="check-update-btn" aria-label="Kiểm tra cập nhật" title="Kiểm tra cập nhật">⬆</button>
       <button class="settings-btn" id="mode-btn" aria-label="Chế độ chữ">⚙</button>
       <span class="hint" id="header-hint"></span>
     </div>
@@ -240,6 +242,11 @@ function handleClick(e) {
     return
   }
 
+  if (e.target.closest('#check-update-btn')) {
+    checkUpdate().then(info => { if (info) showUpdateModal(info); else alert('Bạn đang dùng phiên bản mới nhất!') })
+    return
+  }
+
   if (e.target.closest('#mode-btn')) {
     toggleLargeMode()
     return
@@ -364,6 +371,7 @@ function init() {
   $('#nav-back').addEventListener('click', goBack)
   $('#nav-home').addEventListener('click', () => { if (store.screen !== 'home') goHome() })
   setTimeout(autoFullscreen, 10000)
+  initUpdateChecker()
 }
 
 function goHome() {
