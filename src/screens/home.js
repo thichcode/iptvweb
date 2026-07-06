@@ -106,15 +106,16 @@ export function renderHome() {
 
 export async function loadHomeData() {
   rows = []
-  for (const rowDef of HOME_ROWS) {
+  renderHome()
+  rows = await Promise.all(HOME_ROWS.map(async rowDef => {
     try {
       const data = await fetchMovies(rowDef.type, 1, '', '', '', ROW_LIMIT)
       const items = data.items || (data.data && data.data.items) || []
-      rows.push({ type: rowDef.type, label: rowDef.label, items })
+      return { type: rowDef.type, label: rowDef.label, items }
     } catch {
-      rows.push({ type: rowDef.type, label: rowDef.label, items: [] })
+      return { type: rowDef.type, label: rowDef.label, items: [] }
     }
-  }
+  }))
   renderHome()
 }
 

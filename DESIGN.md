@@ -47,8 +47,8 @@ Motion should use transform and opacity only. Default feel is weighty and calm: 
 Every interactive element must support keyboard/remote focus. Touch targets are minimum 44px; TV-focused episode buttons should target 56px minimum height. Do not animate layout properties such as width, height, top, or left.
 
 ## 7. API And Media Rules
-- Primary API host is `https://phimapi.com`.
-- Fallback API host is `https://ophim1.com` when the primary host returns an error.
+- Primary API host is `https://ophim1.com`.
+- Fallback API host is `https://phimapi.com` when the primary host returns an error.
 - Default image host is `https://img.ophim.live/uploads/movies`.
 - Do not proxy images through `phimapi.com/image.php`; that endpoint is unreliable and currently returns 404 for valid OPhim images.
 - API calls must use `GET`; do not rely on `HEAD` checks for OPhim endpoints.

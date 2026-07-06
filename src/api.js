@@ -1,5 +1,5 @@
-export const API_BASE = import.meta.env?.VITE_API_BASE || 'https://phimapi.com'
-export const FALLBACK_API_BASE = import.meta.env?.VITE_FALLBACK_API_BASE || 'https://ophim1.com'
+export const API_BASE = import.meta.env?.VITE_API_BASE || 'https://ophim1.com'
+export const FALLBACK_API_BASE = import.meta.env?.VITE_FALLBACK_API_BASE || 'https://phimapi.com'
 export const IMAGE_BASE = import.meta.env?.VITE_IMAGE_BASE || 'https://img.ophim.live/uploads/movies'
 const MAX_RETRIES = 2
 const TIMEOUT_MS = 15000
