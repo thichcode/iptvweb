@@ -24,6 +24,7 @@ function buildShell() {
         <button class="top-nav-btn" data-nav="categories">Thể Loại</button>
         <button class="top-nav-btn" data-nav="favorites">Yêu Thích</button>
         <button class="top-nav-btn" data-nav="history">Lịch Sử</button>
+        <a class="top-nav-btn apk-nav-link" href="https://github.com/thichcode/iptvweb/releases/latest/download/WebPhim.apk" target="_blank" rel="noopener">Tải APK</a>
       </nav>
       <div class="header-search">
         <input id="header-search-input" type="search" placeholder="Tìm phim..." aria-label="Tìm phim">
@@ -228,7 +229,7 @@ function handleClick(e) {
 
   const screen = store.screen
 
-  const nav = e.target.closest('.top-nav-btn')
+  const nav = e.target.closest('.top-nav-btn[data-nav]')
   if (nav) {
     handleTopNav(nav.dataset.nav)
     return

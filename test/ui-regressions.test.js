@@ -5,6 +5,7 @@ import fs from 'node:fs'
 const css = fs.readFileSync(new URL('../src/style.css', import.meta.url), 'utf8')
 const playerSource = fs.readFileSync(new URL('../src/screens/player.js', import.meta.url), 'utf8')
 const homeSource = fs.readFileSync(new URL('../src/screens/home.js', import.meta.url), 'utf8')
+const mainSource = fs.readFileSync(new URL('../src/main.js', import.meta.url), 'utf8')
 
 test('home screen only displays when active', () => {
   assert.doesNotMatch(css, /#screen-home\s*\{[^}]*display:\s*flex/)
@@ -23,6 +24,11 @@ test('player overlay helper is exported for app-level player clicks', async () =
 test('home wheel does not render emoji icon spans', () => {
   assert.doesNotMatch(homeSource, /wi-icon/)
   assert.doesNotMatch(homeSource, /const ICONS/)
+})
+
+test('home navigation keeps APK download link', () => {
+  assert.match(mainSource, /releases\/latest\/download\/WebPhim\.apk/)
+  assert.match(mainSource, />Tải APK</)
 })
 
 test('theme avoids pure black color values', () => {
