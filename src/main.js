@@ -3,12 +3,13 @@ import { renderHome, handleHomeClick, loadHomeData, resetHomeFocus, navigateHome
 import {
   renderMovieList, renderSubList, renderSearchInput, renderLocalList,
   loadMovieList, loadCategories, loadCountries, loadFavorites, loadHistory,
-  handleListClick
+  handleListClick, limitRenderedItems
 } from './screens/list.js'
 import { loadDetail, handleDetailClick } from './screens/detail.js'
 import { isFav, toggleFav } from './store.js'
 import { playEpisode, exitPlayer, togglePlay, seek, seekTo, showOverlay } from './screens/player.js'
 import { checkUpdate, showUpdateModal, initUpdateChecker } from './update.js'
+import { loadMovies, searchLocal } from './data.js'
 
 let overlayTimer = null
 
@@ -146,7 +147,7 @@ function handleKey(e) {
   if (store.searchMode) {
     if (key === 'Enter') {
       const inp = $('.search-input')
-      if (inp && inp.value.trim()) { e.preventDefault(); store.searchMode = false; loadMovieList('search', 1, inp.value.trim(), '', ''); setHeader('Tìm: ' + inp.value.trim(), '') }
+      if (inp && inp.value.trim()) { e.preventDefault(); doSearch(inp.value.trim()) }
     }
     if (key === 'Escape') {
       e.preventDefault(); store.searchMode = false; renderHome(); switchScreenLocal('home'); setHeader('WebPhim', '')
@@ -254,7 +255,7 @@ function handleClick(e) {
 
   if (e.target.closest('.search-btn')) {
     const inp = $('.search-input')
-    if (inp && inp.value.trim()) { store.searchMode = false; loadMovieList('search', 1, inp.value.trim(), '', ''); setHeader('Tìm: ' + inp.value.trim(), '') }
+    if (inp && inp.value.trim()) doSearch(inp.value.trim())
     return
   }
 
@@ -284,13 +285,22 @@ function handleClick(e) {
   }
 }
 
-function runHeaderSearch() {
-  const inp = $('#header-search-input')
-  const keyword = inp?.value.trim()
+function doSearch(keyword) {
   if (!keyword) return
   store.searchMode = false
-  loadMovieList('search', 1, keyword, '', '')
   setHeader('Tìm: ' + keyword, '')
+  const local = searchLocal(keyword, 1, 20)
+  if (local.items.length) {
+    switchScreenLocal('list')
+    renderMovieList(limitRenderedItems(local.items), 1, local.totalPages, 'search')
+  } else {
+    loadMovieList('search', 1, keyword, '', '')
+  }
+}
+
+function runHeaderSearch() {
+  const inp = $('#header-search-input')
+  doSearch(inp?.value.trim())
 }
 
 function handleTopNav(id) {
@@ -361,6 +371,7 @@ function autoFullscreen() {
 
 function init() {
   buildShell()
+  loadMovies()
   loadHomeData()
   setHeader('WebPhim', '↑↓ Chọn hàng | ←→ Chọn phim | Enter xem')
   document.addEventListener('keydown', handleKey)
