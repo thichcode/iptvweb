@@ -34,7 +34,8 @@ export default async function handler(req, res) {
     try {
       const r = await fetchWithTimeout(base + path, TIMEOUT)
       if (!r.ok) continue
-      const data = await r.json()
+      const data = await r.json().catch(() => null)
+      if (!data) continue
       cache.set(cacheKey, { data, ts: Date.now() })
       res.setHeader('Content-Type', 'application/json')
       res.setHeader('X-Cache', 'MISS')
