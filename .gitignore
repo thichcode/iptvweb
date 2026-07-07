@@ -3,7 +3,8 @@ dist/
 android/
 .gradle/
 build/
-docs/superpowers/
+docs/
 .vercel
 agency-agents/
 .worktrees/
+crawl-*.txt
