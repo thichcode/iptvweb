@@ -6,6 +6,7 @@ const css = fs.readFileSync(new URL('../src/style.css', import.meta.url), 'utf8'
 const playerSource = fs.readFileSync(new URL('../src/screens/player.js', import.meta.url), 'utf8')
 const homeSource = fs.readFileSync(new URL('../src/screens/home.js', import.meta.url), 'utf8')
 const mainSource = fs.readFileSync(new URL('../src/main.js', import.meta.url), 'utf8')
+const apkWorkflow = fs.readFileSync(new URL('../.github/workflows/release-apk.yml', import.meta.url), 'utf8')
 
 test('home screen only displays when active', () => {
   assert.doesNotMatch(css, /#screen-home\s*\{[^}]*display:\s*flex/)
@@ -42,6 +43,12 @@ test('header has API toggle with health dot styles', () => {
   assert.match(mainSource, /api-toggle-label/)
   assert.match(css, /\.api-dot\.ok/)
   assert.match(css, /\.api-dot\.err/)
+})
+
+test('APK workflow installs custom app icon', () => {
+  assert.ok(fs.existsSync(new URL('../assets/app-icon.png', import.meta.url)))
+  assert.match(apkWorkflow, /assets\/app-icon\.png/)
+  assert.match(apkWorkflow, /ic_launcher\.png/)
 })
 
 test('theme avoids pure black color values', () => {

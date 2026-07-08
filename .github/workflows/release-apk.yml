@@ -30,12 +30,25 @@ jobs:
         run: node node_modules/.bin/cap add android
       - name: Sync web to Android
         run: node node_modules/.bin/cap sync android
+      - name: Install custom app icon
+        run: |
+          ICON="assets/app-icon.png"
+          if [ -f "$ICON" ]; then
+            for D in android/app/src/main/res/mipmap-*dpi; do
+              [ -d "$D" ] || continue
+              cp "$ICON" "$D/ic_launcher.png"
+              cp "$ICON" "$D/ic_launcher_round.png"
+              cp "$ICON" "$D/ic_launcher_foreground.png"
+            done
+            mkdir -p android/app/src/main/res/drawable
+            cp "$ICON" android/app/src/main/res/drawable/banner.png
+          fi
       - name: Patch AndroidManifest for TV
         run: |
           M="android/app/src/main/AndroidManifest.xml"
           if [ -f "$M" ]; then
             sed -i 's|</manifest>|  <uses-feature android:name="android.software.leanback" android:required="false" />\n  <uses-feature android:name="android.hardware.touchscreen" android:required="false" />\n</manifest>|' "$M"
-            sed -i 's|<activity android:name=".MainActivity"|<activity android:name=".MainActivity" android:banner="@mipmap/ic_launcher" android:screenOrientation="landscape"|' "$M"
+            sed -i 's|<activity android:name=".MainActivity"|<activity android:name=".MainActivity" android:banner="@drawable/banner" android:screenOrientation="landscape"|' "$M"
           fi
       - name: Build APK
         run: cd android && chmod +x gradlew && ./gradlew assembleDebug --no-daemon
