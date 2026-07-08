@@ -30,7 +30,7 @@ function focusHomeToolbar(items) {
   const active = items[homeToolbarIdx]
   if (active) {
     if (active.id === 'header-search-input') active.focus()
-    else active.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+    else active.scrollIntoView({ block: 'nearest', behavior: 'auto' })
   }
 }
 

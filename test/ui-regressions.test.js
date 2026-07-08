@@ -68,6 +68,16 @@ test('poster images use decoding async', () => {
   assert.match(homeSource, /decoding="async"/)
 })
 
+test('D-pad navigation scroll is instant, not smooth', () => {
+  assert.match(homeSource, /scrollIntoView\(\{\s*block:\s*'nearest',\s*behavior:\s*'auto'\s*\}\)/)
+  assert.doesNotMatch(homeSource, /scrollIntoView\(\{\s*block:\s*'nearest',\s*behavior:\s*'smooth'/)
+  assert.match(mainSource, /scrollIntoView\(\{\s*block:\s*'nearest',\s*behavior:\s*'auto'/)
+})
+
+test('focus transition is near-instant for TV remote', () => {
+  assert.match(css, /transition-duration:\s*0\.06s/)
+})
+
 test('theme avoids pure black color values', () => {
   assert.doesNotMatch(css, /#[0]{3,6}\b/i)
 })

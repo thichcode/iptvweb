@@ -22,6 +22,12 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 *:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 html { scroll-behavior: smooth; }
+
+/* TV/remote: focus transform appears near-instantly to avoid queued
+   animations when holding the D-pad. ponytail: 0.18s felt laggy on rapid nav */
+.poster-card, .local-item, .sub-item, .page-btn, .episode-btn, .fav-btn, .home-action, .top-nav-btn {
+  transition-duration: 0.06s;
+}
 body {
   background:
     radial-gradient(circle at 12% 0%, rgba(255, 212, 90, 0.08), transparent 34rem),

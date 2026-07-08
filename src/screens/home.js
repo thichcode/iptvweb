@@ -151,7 +151,7 @@ export function navigateHome(dir) {
     const cards = activeCarousel.querySelectorAll('.poster-card')
     cards.forEach((c, ci) => c.classList.toggle('card-focused', ci === focusedCard))
     const target = cards[focusedCard]
-    if (target) target.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+    if (target) target.scrollIntoView({ block: 'nearest', behavior: 'auto' })
   }
 }
 

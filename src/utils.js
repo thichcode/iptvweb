@@ -33,7 +33,7 @@ export function switchScreen(id) {
 }
 
 export function scrollTo(el) {
-  if (el) el.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+  if (el) el.scrollIntoView({ block: 'nearest', behavior: 'auto' })
 }
 
 export const HOME_MENU = [
