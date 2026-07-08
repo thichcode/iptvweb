@@ -10,6 +10,7 @@ import { isFav, toggleFav } from './store.js'
 import { playEpisode, exitPlayer, togglePlay, seek, seekTo, showOverlay } from './screens/player.js'
 import { checkUpdate, showUpdateModal, initUpdateChecker } from './update.js'
 import { loadMovies, searchLocal } from './data.js'
+import { checkApiHealth, getApiSource, nextApiSource, setApiSource } from './api.js'
 
 let overlayTimer = null
 
@@ -33,6 +34,7 @@ function buildShell() {
         <button id="header-search-btn" aria-label="Tìm kiếm">⌕</button>
       </div>
       <button class="settings-btn" id="check-update-btn" aria-label="Kiểm tra cập nhật" title="Kiểm tra cập nhật">⬆</button>
+      <button class="api-toggle-btn" id="api-toggle-btn" aria-label="Chọn API"><span class="api-dot pending"></span><span id="api-toggle-label">API: Proxy</span></button>
       <button class="settings-btn" id="mode-btn" aria-label="Chế độ chữ">⚙</button>
       <span class="hint" id="header-hint"></span>
     </div>
@@ -248,6 +250,13 @@ function handleClick(e) {
     return
   }
 
+  if (e.target.closest('#api-toggle-btn')) {
+    setApiSource(nextApiSource())
+    updateApiToggle()
+    loadHomeData()
+    return
+  }
+
   if (e.target.closest('#mode-btn')) {
     toggleLargeMode()
     return
@@ -301,6 +310,20 @@ function doSearch(keyword) {
 function runHeaderSearch() {
   const inp = $('#header-search-input')
   doSearch(inp?.value.trim())
+}
+
+function updateApiToggle() {
+  const labelMap = { proxy: 'Proxy', ophim: 'OPhim', phimapi: 'PhimAPI' }
+  const source = getApiSource()
+  const label = $('#api-toggle-label')
+  const dot = $('.api-dot')
+  if (label) label.textContent = 'API: ' + labelMap[source]
+  if (dot) dot.className = 'api-dot pending'
+  checkApiHealth(source).then(ok => {
+    if (getApiSource() !== source) return
+    const currentDot = $('.api-dot')
+    if (currentDot) currentDot.className = 'api-dot ' + (ok ? 'ok' : 'err')
+  })
 }
 
 function handleTopNav(id) {
@@ -382,6 +405,7 @@ function init() {
   $('#nav-back').addEventListener('click', goBack)
   $('#nav-home').addEventListener('click', () => { if (store.screen !== 'home') goHome() })
   setTimeout(autoFullscreen, 10000)
+  updateApiToggle()
   initUpdateChecker()
 }
 

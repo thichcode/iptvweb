@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { API_BASE, FALLBACK_API_BASE, apiGet, getMovieLimit, buildMovieUrl, imgSrc } from '../src/api.js'
+import { API_BASE, FALLBACK_API_BASE, apiGet, getMovieLimit, buildMovieUrl, imgSrc, getApiSource, nextApiSource } from '../src/api.js'
 import { limitRenderedItems, renderMovieCard, renderEmptyState } from '../src/screens/list.js'
 
 test('mobile viewport uses 5 movies per page', () => {
@@ -33,6 +33,56 @@ test('apiGet falls back when proxy and primary API return errors', async () => {
     assert.ok(urls[1].includes('ophim1.com'), 'fallback hits external API')
   } finally {
     globalThis.fetch = oldFetch
+  }
+})
+
+test('api source defaults to proxy and cycles sources', () => {
+  const oldLocalStorage = globalThis.localStorage
+  globalThis.localStorage = { getItem: () => null }
+
+  try {
+    assert.equal(getApiSource(), 'proxy')
+    assert.equal(nextApiSource(), 'ophim')
+  } finally {
+    globalThis.localStorage = oldLocalStorage
+  }
+})
+
+test('apiGet uses selected OPhim as primary', async () => {
+  const oldFetch = globalThis.fetch
+  const oldLocalStorage = globalThis.localStorage
+  const urls = []
+  globalThis.localStorage = { getItem: () => 'ophim' }
+  globalThis.fetch = async url => {
+    urls.push(url)
+    return { ok: true, json: async () => ({ status: 'success' }) }
+  }
+
+  try {
+    assert.deepEqual(await apiGet('/v1/api/danh-sach/phim-bo?page=1', 0), { status: 'success' })
+    assert.equal(urls[0], 'https://ophim1.com/v1/api/danh-sach/phim-bo?page=1')
+  } finally {
+    globalThis.fetch = oldFetch
+    globalThis.localStorage = oldLocalStorage
+  }
+})
+
+test('apiGet uses selected PhimAPI as primary', async () => {
+  const oldFetch = globalThis.fetch
+  const oldLocalStorage = globalThis.localStorage
+  const urls = []
+  globalThis.localStorage = { getItem: () => 'phimapi' }
+  globalThis.fetch = async url => {
+    urls.push(url)
+    return { ok: true, json: async () => ({ status: 'success' }) }
+  }
+
+  try {
+    assert.deepEqual(await apiGet('/v1/api/danh-sach/phim-bo?page=1', 0), { status: 'success' })
+    assert.equal(urls[0], 'https://phimapi.com/v1/api/danh-sach/phim-bo?page=1')
+  } finally {
+    globalThis.fetch = oldFetch
+    globalThis.localStorage = oldLocalStorage
   }
 })
 

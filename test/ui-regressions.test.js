@@ -31,6 +31,19 @@ test('home navigation keeps APK download link', () => {
   assert.match(mainSource, />Tải APK</)
 })
 
+test('home uses cinema row instead of animation row', () => {
+  assert.match(homeSource, /phim-chieu-rap/)
+  assert.match(homeSource, /Phim Chiếu Rạp/)
+  assert.doesNotMatch(homeSource, /Hoạt Hình/)
+})
+
+test('header has API toggle with health dot styles', () => {
+  assert.match(mainSource, /api-toggle-btn/)
+  assert.match(mainSource, /api-toggle-label/)
+  assert.match(css, /\.api-dot\.ok/)
+  assert.match(css, /\.api-dot\.err/)
+})
+
 test('theme avoids pure black color values', () => {
   assert.doesNotMatch(css, /#[0]{3,6}\b/i)
 })

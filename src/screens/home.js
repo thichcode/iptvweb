@@ -7,7 +7,7 @@ const HOME_ROWS = [
   { type: 'phim-moi-cap-nhat', label: 'Phim Mới Cập Nhật' },
   { type: 'phim-bo', label: 'Phim Bộ' },
   { type: 'phim-le', label: 'Phim Lẻ' },
-  { type: 'hoat-hinh', label: 'Hoạt Hình' },
+  { type: 'phim-chieu-rap', label: 'Phim Chiếu Rạp' },
   { type: 'tv-shows', label: 'TV Shows' }
 ]
 const ROW_LIMIT = 12
@@ -174,7 +174,7 @@ export function handleHomeClick(e) {
 }
 
 export async function handleActionRow(id) {
-  const labelMap = { 'phim-bo':'Phim Bộ', 'phim-le':'Phim Lẻ', 'hoat-hinh':'Hoạt Hình', 'phim-moi-cap-nhat':'Phim Mới' }
+  const labelMap = { 'phim-bo':'Phim Bộ', 'phim-le':'Phim Lẻ', 'phim-chieu-rap':'Phim Chiếu Rạp', 'phim-moi-cap-nhat':'Phim Mới' }
   const label = labelMap[id] || id
   try {
     const data = await fetchMovies(id, 1, '', '', '', ROW_LIMIT)
