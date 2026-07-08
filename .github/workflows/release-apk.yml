@@ -33,6 +33,7 @@ jobs:
       - name: Install custom app icon
         run: |
           ICON="assets/app-icon.png"
+          node scripts/make-banner.cjs
           if [ -f "$ICON" ]; then
             for D in android/app/src/main/res/mipmap-*dpi; do
               [ -d "$D" ] || continue
@@ -41,14 +42,15 @@ jobs:
               cp "$ICON" "$D/ic_launcher_foreground.png"
             done
             mkdir -p android/app/src/main/res/drawable
-            cp "$ICON" android/app/src/main/res/drawable/banner.png
+            cp assets/banner.png android/app/src/main/res/drawable/banner.png
           fi
       - name: Patch AndroidManifest for TV
         run: |
           M="android/app/src/main/AndroidManifest.xml"
           if [ -f "$M" ]; then
             sed -i 's|</manifest>|  <uses-feature android:name="android.software.leanback" android:required="false" />\n  <uses-feature android:name="android.hardware.touchscreen" android:required="false" />\n</manifest>|' "$M"
-            sed -i 's|<activity android:name=".MainActivity"|<activity android:name=".MainActivity" android:banner="@drawable/banner" android:screenOrientation="landscape"|' "$M"
+            # ponytail: attribute is on its own line in Capacitor manifest, so match the attribute not the tag
+            sed -i 's|android:name=".MainActivity"|android:name=".MainActivity" android:banner="@drawable/banner" android:screenOrientation="landscape"|' "$M"
           fi
       - name: Build APK
         run: cd android && chmod +x gradlew && ./gradlew assembleDebug --no-daemon

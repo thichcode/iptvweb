@@ -47,8 +47,14 @@ test('header has API toggle with health dot styles', () => {
 
 test('APK workflow installs custom app icon', () => {
   assert.ok(fs.existsSync(new URL('../assets/app-icon.png', import.meta.url)))
+  assert.ok(fs.existsSync(new URL('../assets/banner.png', import.meta.url)))
   assert.match(apkWorkflow, /assets\/app-icon\.png/)
+  assert.match(apkWorkflow, /assets\/banner\.png/)
   assert.match(apkWorkflow, /ic_launcher\.png/)
+  assert.match(apkWorkflow, /android:banner="@drawable\/banner"/)
+  // banner sed must match the attribute (Capacitor manifest puts it on its own line)
+  assert.match(apkWorkflow, /s\|android:name="\.MainActivity"\|android:name="\.MainActivity" android:banner=/)
+  assert.doesNotMatch(apkWorkflow, /s\|<activity android:name="\.MainActivity"\|<activity android:name="\.MainActivity" android:banner=/)
 })
 
 test('TV remote toolbar navigation works on home screen', () => {
