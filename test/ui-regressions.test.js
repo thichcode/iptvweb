@@ -78,6 +78,19 @@ test('focus transition is near-instant for TV remote', () => {
   assert.match(css, /transition-duration:\s*0\.06s/)
 })
 
+test('home rows lazy-mount via IntersectionObserver', () => {
+  assert.match(homeSource, /IntersectionObserver/)
+  assert.match(homeSource, /data-row-type/)
+  assert.match(homeSource, /mountRowCarousel/)
+})
+
+test('local 7.5MB index not loaded at startup', () => {
+  assert.match(mainSource, /requestIdleCallback|setTimeout\(\s*loadMovies/)
+  // loadHomeData must reach for local movies only AFTER attempting API fetch
+  assert.match(homeSource, /fetchMovies[\s\S]*loadMovies/)
+  assert.doesNotMatch(homeSource, /const localMovies = await loadMovies\(\)\s*\n\s*rows = await Promise\.all/)
+})
+
 test('theme avoids pure black color values', () => {
   assert.doesNotMatch(css, /#[0]{3,6}\b/i)
 })

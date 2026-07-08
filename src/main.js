@@ -428,7 +428,9 @@ function autoFullscreen() {
 
 function init() {
   buildShell()
-  loadMovies()
+  // ponytail: don't block startup on the 7.5MB local index; preload when idle
+  if ('requestIdleCallback' in window) requestIdleCallback(() => loadMovies())
+  else setTimeout(loadMovies, 2500)
   loadHomeData()
   setHeader('WebPhim', '↑↓ Chọn hàng | ←→ Chọn phim | Enter xem')
   document.addEventListener('keydown', handleKey)

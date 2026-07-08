@@ -64,13 +64,51 @@ function renderHero(items) {
   </section>`
 }
 
-function renderHomeRow(data) {
-  if (!data || !data.items || !data.items.length) return ''
-  const items = data.items.slice(0, ROW_LIMIT)
+function renderHomeRowShell(type, label) {
   return `<div class="home-row">
-    <h2 class="home-section-title">${sanitize(data.label || '')}</h2>
-    <div class="poster-carousel">${items.map(renderPosterCard).join('')}</div>
+    <h2 class="home-section-title">${sanitize(label || '')}</h2>
+    <div class="poster-carousel" data-row-type="${sanitizeAttr(type)}"></div>
   </div>`
+}
+
+function itemsForType(type) {
+  if (type === 'history') return store.histItems || []
+  if (type === 'favorites') return store.favItems || []
+  const r = rows.find(x => x.type === type)
+  return r ? r.items : []
+}
+
+// ponytail: only build poster DOM for rows near the viewport; on weak TV this
+// cuts the initial render from ~70 cards to the first 1-2 screens
+let homeObserver = null
+function mountRowCarousel(carousel) {
+  if (carousel.dataset.mounted) return
+  const items = itemsForType(carousel.dataset.rowType)
+  if (!items || !items.length) return
+  carousel.innerHTML = items.slice(0, ROW_LIMIT).map(renderPosterCard).join('')
+  carousel.dataset.mounted = '1'
+}
+
+function setupHomeLazy() {
+  const carousels = $$('.poster-carousel[data-row-type]')
+  if (!carousels.length) return
+  if (homeObserver) homeObserver.disconnect()
+  if (!('IntersectionObserver' in window)) {
+    carousels.forEach(mountRowCarousel)
+    return
+  }
+  homeObserver = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      if (e.isIntersecting) {
+        mountRowCarousel(e.target)
+        homeObserver.unobserve(e.target)
+      }
+    }
+  }, { rootMargin: '400px 0px' })
+  carousels.forEach((c, i) => {
+    if (i < 2) mountRowCarousel(c)
+    else homeObserver.observe(c)
+  })
 }
 
 export function renderHome() {
@@ -86,35 +124,34 @@ export function renderHome() {
   } else {
     html += renderHero(rows[0].items)
     for (const rowData of rows) {
-      html += renderHomeRow(rowData)
+      html += renderHomeRowShell(rowData.type, rowData.label)
     }
     if (store.histItems.length) {
-      html += `<div class="home-row">
-        <h2 class="home-section-title">Tiếp Tục Xem</h2>
-        <div class="poster-carousel">${store.histItems.map(renderPosterCard).join('')}</div>
-      </div>`
+      html += renderHomeRowShell('history', 'Tiếp Tục Xem')
     }
     if (store.favItems.length) {
-      html += `<div class="home-row">
-        <h2 class="home-section-title">Yêu Thích</h2>
-        <div class="poster-carousel">${store.favItems.map(renderPosterCard).join('')}</div>
-      </div>`
+      html += renderHomeRowShell('favorites', 'Yêu Thích')
     }
   }
   html += '</div>'
   container.innerHTML = html
+  setupHomeLazy()
 }
 
 export async function loadHomeData() {
   rows = []
   renderHome()
-  const localMovies = await loadMovies()
+  // ponytail: prefer API; only touch the 7.5MB local index when an API row fails
   rows = await Promise.all(HOME_ROWS.map(async rowDef => {
     try {
       const data = await fetchMovies(rowDef.type, 1, '', '', '', ROW_LIMIT)
       const items = data.items || (data.data && data.data.items) || []
-      return { type: rowDef.type, label: rowDef.label, items: items.length ? items : localMovies.slice(0, ROW_LIMIT) }
+      if (items.length) return { type: rowDef.type, label: rowDef.label, items }
+      const localMovies = await loadMovies()
+      const idx = HOME_ROWS.findIndex(row => row.type === rowDef.type)
+      return { type: rowDef.type, label: rowDef.label, items: localMovies.slice(idx * ROW_LIMIT, (idx + 1) * ROW_LIMIT) }
     } catch {
+      const localMovies = await loadMovies()
       const idx = HOME_ROWS.findIndex(row => row.type === rowDef.type)
       return { type: rowDef.type, label: rowDef.label, items: localMovies.slice(idx * ROW_LIMIT, (idx + 1) * ROW_LIMIT) }
     }
@@ -147,6 +184,7 @@ export function navigateHome(dir) {
 
   carousels.forEach((c, ri) => c.classList.toggle('row-focused', ri === focusedRow))
   const activeCarousel = carousels[focusedRow]
+  if (activeCarousel && !activeCarousel.dataset.mounted) mountRowCarousel(activeCarousel)
   if (activeCarousel) {
     const cards = activeCarousel.querySelectorAll('.poster-card')
     cards.forEach((c, ci) => c.classList.toggle('card-focused', ci === focusedCard))
@@ -157,7 +195,9 @@ export function navigateHome(dir) {
 
 export function selectHomeFocused() {
   const carousels = $$('.poster-carousel')
-  const target = carousels[focusedRow]?.querySelectorAll('.poster-card')[focusedCard]
+  const active = carousels[focusedRow]
+  if (active && !active.dataset.mounted) mountRowCarousel(active)
+  const target = active?.querySelectorAll('.poster-card')[focusedCard]
   const slug = target?.dataset?.slug
   if (slug) {
     import('./detail.js').then(m => {
