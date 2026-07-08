@@ -652,6 +652,8 @@ body.large-mode #player-fs-btn { font-size: 36px; }
 }
 .home-row {
   margin: 0 0 24px;
+  content-visibility: auto;
+  contain-intrinsic-size: 260px;
 }
 .home-row-title {
   margin: 0 0 10px;
@@ -775,6 +777,16 @@ body.large-mode #player-fs-btn { font-size: 36px; }
   color: #10100d;
   box-shadow: 0 12px 36px rgba(255, 196, 66, 0.2);
 }
+.top-nav-btn.toolbar-focused,
+#header-search-input.toolbar-focused,
+#header-search-btn.toolbar-focused,
+#check-update-btn.toolbar-focused,
+#api-toggle-btn.toolbar-focused,
+#mode-btn.toolbar-focused {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+  background: rgba(255,212,90,0.12);
+}
 .header-search {
   display: flex;
   align-items: center;
@@ -850,7 +862,7 @@ body.large-mode #player-fs-btn { font-size: 36px; }
   border-radius: 3px;
   background: var(--accent);
 }
-.home-hero-section { max-width: 1120px; margin-bottom: 24px; }
+.home-hero-section { max-width: 1120px; margin-bottom: 24px; content-visibility: auto; contain-intrinsic-size: 200px; }
 .home-hero-strip {
   display: grid;
   grid-template-columns: minmax(280px, 1.05fr) 1fr;

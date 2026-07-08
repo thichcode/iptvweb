@@ -1,5 +1,5 @@
 import { $, $$, HOME_MENU, KEY_MAP, store, switchScreen, toggleLargeMode } from './utils.js'
-import { renderHome, handleHomeClick, loadHomeData, resetHomeFocus, navigateHome, selectHomeFocused, handleActionRow } from './screens/home.js'
+import { renderHome, handleHomeClick, loadHomeData, resetHomeFocus, navigateHome, selectHomeFocused, handleActionRow, focusedRow } from './screens/home.js'
 import {
   renderMovieList, renderSubList, renderSearchInput, renderLocalList,
   loadMovieList, loadCategories, loadCountries, loadFavorites, loadHistory,
@@ -13,6 +13,30 @@ import { loadMovies, searchLocal } from './data.js'
 import { checkApiHealth, getApiSource, nextApiSource, setApiSource } from './api.js'
 
 let overlayTimer = null
+let homeToolbarIdx = -1
+
+function getHomeToolbarItems() {
+  const items = []
+  $$('.top-nav-btn').forEach(el => items.push(el))
+  ;['header-search-input', 'header-search-btn', 'check-update-btn', 'api-toggle-btn', 'mode-btn'].forEach(id => {
+    const el = $(`#${id}`)
+    if (el) items.push(el)
+  })
+  return items
+}
+
+function focusHomeToolbar(items) {
+  items.forEach((el, i) => el.classList.toggle('toolbar-focused', i === homeToolbarIdx))
+  const active = items[homeToolbarIdx]
+  if (active) {
+    if (active.id === 'header-search-input') active.focus()
+    else active.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+  }
+}
+
+function clearHomeToolbar(items) {
+  items.forEach(el => el.classList.remove('toolbar-focused'))
+}
 
 function buildShell() {
   document.getElementById('app').innerHTML = `
@@ -169,6 +193,16 @@ function handleKey(e) {
   const screen = store.screen
   if (screen === 'home') {
     e.preventDefault()
+    const tbItems = getHomeToolbarItems()
+    if (homeToolbarIdx >= 0) {
+      if (key === 'ArrowRight') { homeToolbarIdx = (homeToolbarIdx + 1) % tbItems.length; focusHomeToolbar(tbItems); return }
+      else if (key === 'ArrowLeft') { homeToolbarIdx = (homeToolbarIdx - 1 + tbItems.length) % tbItems.length; focusHomeToolbar(tbItems); return }
+      else if (key === 'ArrowDown') { homeToolbarIdx = -1; clearHomeToolbar(tbItems); navigateHome('reset'); return }
+      else if (key === 'Enter') { const el = tbItems[homeToolbarIdx]; if (el.id === 'header-search-input') el.focus(); else el.click(); return }
+      else if (key === 'Escape') { homeToolbarIdx = -1; clearHomeToolbar(tbItems); return }
+      return
+    }
+    if (key === 'ArrowUp' && focusedRow === 0) { homeToolbarIdx = 0; focusHomeToolbar(tbItems); return }
     if (key === 'ArrowUp') { navigateHome('up'); return }
     else if (key === 'ArrowDown') { navigateHome('down'); return }
     else if (key === 'ArrowLeft') { navigateHome('left'); return }

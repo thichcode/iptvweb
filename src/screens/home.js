@@ -19,7 +19,7 @@ function renderPosterCard(m) {
   const title = sanitizeAttr(m.name || '')
   const year = m.year || ''
   return `<div class="poster-card" data-slug="${sanitizeAttr(m.slug || '')}">
-    <img class="poster-img" src="${thumb}" alt="${title}" loading="lazy" onerror="this.style.display='none'">
+    <img class="poster-img" src="${thumb}" alt="${title}" loading="lazy" decoding="async" onerror="this.style.display='none'">
     <div class="poster-overlay">
       <div class="poster-year">${year}</div>
       <div class="poster-title">${title}</div>
@@ -122,15 +122,17 @@ export async function loadHomeData() {
   renderHome()
 }
 
-let focusedRow = 0
-let focusedCard = 0
+export let focusedRow = 0
+export let focusedCard = 0
 export function resetHomeFocus() { focusedRow = 0; focusedCard = 0 }
 
 export function navigateHome(dir) {
   const carousels = $$('.poster-carousel')
   if (!carousels.length) return
 
-  if (dir === 'down') {
+  if (dir === 'reset') {
+    focusedRow = 0; focusedCard = 0
+  } else if (dir === 'down') {
     focusedRow = Math.min(focusedRow + 1, carousels.length - 1)
     focusedCard = 0
   } else if (dir === 'up') {

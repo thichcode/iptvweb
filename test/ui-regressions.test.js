@@ -51,6 +51,23 @@ test('APK workflow installs custom app icon', () => {
   assert.match(apkWorkflow, /ic_launcher\.png/)
 })
 
+test('TV remote toolbar navigation works on home screen', () => {
+  assert.match(mainSource, /homeToolbarIdx/)
+  assert.match(mainSource, /getHomeToolbarItems/)
+  assert.match(mainSource, /toolbar-focused/)
+  assert.match(css, /\.toolbar-focused/)
+  assert.match(homeSource, /export let focusedRow/)
+  assert.match(homeSource, /navigateHome[\s\S]*'reset'/)
+})
+
+test('home rows use content-visibility for performance', () => {
+  assert.match(css, /\.home-row\s*\{[^}]*content-visibility:\s*auto/)
+})
+
+test('poster images use decoding async', () => {
+  assert.match(homeSource, /decoding="async"/)
+})
+
 test('theme avoids pure black color values', () => {
   assert.doesNotMatch(css, /#[0]{3,6}\b/i)
 })
