@@ -1,6 +1,9 @@
 const EXTERNAL_PRIMARY = 'https://ophim1.com'
 const EXTERNAL_FALLBACK = 'https://phimapi.com'
-const PROXY_BASE = '/api/proxy'
+const DEFAULT_PROXY_BASE = typeof location !== 'undefined' && location.protocol === 'https:' && location.hostname === 'localhost'
+  ? 'https://iptvweb-theta.vercel.app/api/proxy'
+  : '/api/proxy'
+const PROXY_BASE = import.meta.env?.VITE_API_PROXY || DEFAULT_PROXY_BASE
 export const API_BASE = import.meta.env?.VITE_API_BASE || PROXY_BASE
 export const FALLBACK_API_BASE = ''
 export const IMAGE_BASE = import.meta.env?.VITE_IMAGE_BASE || 'https://img.ophim.live/uploads/movies'
@@ -14,7 +17,7 @@ export async function apiGet(url, retries = MAX_RETRIES) {
     try {
       const ctrl = new AbortController()
       const timer = setTimeout(() => ctrl.abort(), TIMEOUT_MS)
-      const res = await fetch(PROXY_BASE + '?path=' + encodeURIComponent(url), { signal: ctrl.signal, cache: 'no-cache' })
+      const res = await fetch(API_BASE + '?path=' + encodeURIComponent(url), { signal: ctrl.signal, cache: 'no-cache' })
       clearTimeout(timer)
       if (!res.ok) throw new Error('HTTP ' + res.status)
       return res.json()

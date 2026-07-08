@@ -1,5 +1,6 @@
 import { $, $$, imgSrc, sanitize, sanitizeAttr, store } from '../utils.js'
 import { fetchMovies } from '../api.js'
+import { loadMovies } from '../data.js'
 import { getFavs, getHist } from '../store.js'
 
 const HOME_ROWS = [
@@ -107,13 +108,15 @@ export function renderHome() {
 export async function loadHomeData() {
   rows = []
   renderHome()
+  const localMovies = await loadMovies()
   rows = await Promise.all(HOME_ROWS.map(async rowDef => {
     try {
       const data = await fetchMovies(rowDef.type, 1, '', '', '', ROW_LIMIT)
       const items = data.items || (data.data && data.data.items) || []
-      return { type: rowDef.type, label: rowDef.label, items }
+      return { type: rowDef.type, label: rowDef.label, items: items.length ? items : localMovies.slice(0, ROW_LIMIT) }
     } catch {
-      return { type: rowDef.type, label: rowDef.label, items: [] }
+      const idx = HOME_ROWS.findIndex(row => row.type === rowDef.type)
+      return { type: rowDef.type, label: rowDef.label, items: localMovies.slice(idx * ROW_LIMIT, (idx + 1) * ROW_LIMIT) }
     }
   }))
   renderHome()
