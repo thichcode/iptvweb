@@ -1,7 +1,7 @@
 const EXTERNAL_PRIMARY = 'https://ophim1.com'
 const EXTERNAL_FALLBACK = 'https://phimapi.com'
 const DEFAULT_PROXY_BASE = typeof location !== 'undefined' && location.protocol === 'https:' && location.hostname === 'localhost'
-  ? 'https://iptvweb-theta.vercel.app/api/proxy'
+  ? 'https://iptvweb-phim.vercel.app/api/proxy'
   : '/api/proxy'
 const PROXY_BASE = import.meta.env?.VITE_API_PROXY || DEFAULT_PROXY_BASE
 export const API_BASE = import.meta.env?.VITE_API_BASE || PROXY_BASE
