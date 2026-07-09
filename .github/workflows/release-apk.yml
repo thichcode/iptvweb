@@ -24,6 +24,17 @@ jobs:
         run: node node_modules/.bin/cap add android
       - name: Sync web to Android
         run: node node_modules/.bin/cap sync android
+      - name: Copy app icon
+        run: |
+          cp assets/app-icon.png android/app/src/main/res/mipmap-hdpi/ic_launcher.png
+          cp assets/app-icon.png android/app/src/main/res/mipmap-mdpi/ic_launcher.png
+          cp assets/app-icon.png android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
+          cp assets/app-icon.png android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
+          cp assets/app-icon.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+          # Also copy as foreground for adaptive icons
+          cp assets/app-icon.png android/app/src/main/res/mipmap-hdpi/ic_launcher_foreground.png
+          cp assets/app-icon.png android/app/src/main/res/mipmap-xhdpi/ic_launcher_foreground.png
+          cp assets/app-icon.png android/app/src/main/res/mipmap-xxhdpi/ic_launcher_foreground.png
       - name: Patch for Android TV
         run: |
           M="android/app/src/main/AndroidManifest.xml"
