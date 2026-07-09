@@ -56,7 +56,8 @@ test('APK workflow patches manifest for Android TV', () => {
 test('APK uses a stable debug keystore for consistent sideload signatures', () => {
   assert.ok(fs.existsSync(new URL('../certs/debug.keystore', import.meta.url)))
   assert.match(apkWorkflow, /certs\/debug\.keystore/)
-  assert.match(apkWorkflow, /cp certs\/debug\.keystore ~\/\.android\/debug\.keystore/)
+  assert.match(apkWorkflow, /storeFile.*certs\/debug\.keystore/)
+  assert.match(apkWorkflow, /signingConfig signingConfigs\.debug/)
 })
 
 test('TV remote toolbar navigation works on home screen', () => {
