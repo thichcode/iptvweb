@@ -7,10 +7,9 @@ const HOME_ROWS = [
   { type: 'phim-moi-cap-nhat', label: 'Phim Mới Cập Nhật' },
   { type: 'phim-bo', label: 'Phim Bộ' },
   { type: 'phim-le', label: 'Phim Lẻ' },
-  { type: 'phim-chieu-rap', label: 'Phim Chiếu Rạp' },
-  { type: 'tv-shows', label: 'TV Shows' }
+  { type: 'phim-chieu-rap', label: 'Phim Chiếu Rạp' }
 ]
-const ROW_LIMIT = 12
+const ROW_LIMIT = 10
 
 let rows = []
 
@@ -100,13 +99,13 @@ function setupHomeLazy() {
   homeObserver = new IntersectionObserver((entries) => {
     for (const e of entries) {
       if (e.isIntersecting) {
-        mountRowCarousel(e.target)
+        setTimeout(() => mountRowCarousel(e.target), 100)
         homeObserver.unobserve(e.target)
       }
     }
-  }, { rootMargin: '400px 0px' })
+  }, { rootMargin: '100px 0px' })
   carousels.forEach((c, i) => {
-    if (i < 2) mountRowCarousel(c)
+    if (i < 1) mountRowCarousel(c)
     else homeObserver.observe(c)
   })
 }
