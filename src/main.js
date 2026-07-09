@@ -427,6 +427,8 @@ function autoFullscreen() {
 }
 
 function init() {
+  history.pushState(null, null, location.href)
+  window.addEventListener('popstate', e => { e.preventDefault(); goBack() })
   buildShell()
   // ponytail: don't block startup on the 7.5MB local index; preload when idle
   if ('requestIdleCallback' in window) requestIdleCallback(() => loadMovies())

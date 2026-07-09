@@ -154,11 +154,9 @@ export function showOverlay() {
   showPlayerBtns(true)
   const player = $('#player')
   const ctr = $('#player-center-btn')
-  if (ctr) ctr.textContent = player && !player.paused ? '▶' : '▶'
+  if (ctr) ctr.textContent = player && !player.paused ? '' : '▶'
   if (overlayTimer) clearTimeout(overlayTimer)
-  if (player && !player.paused) {
-    overlayTimer = setTimeout(() => { ui.classList.remove('show'); showPlayerBtns(false) }, 4000)
-  }
+  overlayTimer = setTimeout(() => { ui.classList.remove('show'); showPlayerBtns(false) }, 4000)
 }
 
 function removeGestureHints() {
