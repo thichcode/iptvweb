@@ -100,6 +100,13 @@ test('local 7.5MB index not loaded at startup', () => {
   assert.doesNotMatch(homeSource, /const localMovies = await loadMovies\(\)\s*\n\s*rows = await Promise\.all/)
 })
 
+test('back button uses Capacitor App plugin', () => {
+  assert.match(mainSource, /popstate/)
+  assert.match(mainSource, /preventDefault[\s\S]*goBack/)
+  assert.match(mainSource, /Plugins\.App\.exitApp/)
+  assert.doesNotMatch(mainSource, /window\.history\.back\(\)/)
+})
+
 test('theme avoids pure black color values', () => {
   assert.doesNotMatch(css, /#[0]{3,6}\b/i)
 })

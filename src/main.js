@@ -17,7 +17,7 @@ let homeToolbarIdx = -1
 function getHomeToolbarItems() {
   const items = []
   $$('.top-nav-btn').forEach(el => items.push(el))
-  ;['header-search-input', 'header-search-btn', 'check-update-btn', 'api-toggle-btn', 'mode-btn'].forEach(id => {
+  ;['header-search-input', 'header-search-btn', 'api-toggle-btn', 'mode-btn'].forEach(id => {
     const el = $(`#${id}`)
     if (el) items.push(el)
   })
@@ -56,7 +56,7 @@ function buildShell() {
         <input id="header-search-input" type="search" placeholder="Tìm phim..." aria-label="Tìm phim">
         <button id="header-search-btn" aria-label="Tìm kiếm">⌕</button>
       </div>
-      <button class="settings-btn" id="check-update-btn" aria-label="Kiểm tra cập nhật" title="Kiểm tra cập nhật">⬆</button>
+      
       <button class="api-toggle-btn" id="api-toggle-btn" aria-label="Chọn API"><span class="api-dot pending"></span><span id="api-toggle-label">API: Proxy</span></button>
       <button class="settings-btn" id="mode-btn" aria-label="Chế độ chữ">⚙</button>
       <span class="hint" id="header-hint"></span>
@@ -363,11 +363,6 @@ function handleClick(e) {
 
   if (e.target.closest('#header-search-btn')) {
     runHeaderSearch()
-    return
-  }
-
-  if (e.target.closest('#check-update-btn')) {
-    checkUpdate().then(info => { if (info) showUpdateModal(info); else alert('Bạn đang dùng phiên bản mới nhất!') })
     return
   }
 

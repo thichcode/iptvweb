@@ -35,6 +35,8 @@ jobs:
           cp assets/app-icon.png android/app/src/main/res/mipmap-hdpi/ic_launcher_foreground.png
           cp assets/app-icon.png android/app/src/main/res/mipmap-xhdpi/ic_launcher_foreground.png
           cp assets/app-icon.png android/app/src/main/res/mipmap-xxhdpi/ic_launcher_foreground.png
+      - name: Fix adaptive icon (use PNG foreground)
+        run: rm -f android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_foreground.xml
       - name: Copy TV banner
         run: |
           for dir in mipmap-hdpi mipmap-mdpi mipmap-xhdpi mipmap-xxhdpi mipmap-xxxhdpi; do
