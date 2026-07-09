@@ -14,6 +14,19 @@ import { checkApiHealth, getApiSource, nextApiSource, setApiSource } from './api
 let overlayTimer = null
 let homeToolbarIdx = -1
 
+function showToast(msg) {
+  let t = $('#toast-msg')
+  if (!t) {
+    t = document.createElement('div')
+    t.id = 'toast-msg'
+    document.body.appendChild(t)
+  }
+  t.textContent = msg
+  t.classList.add('show')
+  clearTimeout(t._hide)
+  t._hide = setTimeout(() => t.classList.remove('show'), 2000)
+}
+
 function getHomeToolbarItems() {
   const items = []
   $$('.top-nav-btn').forEach(el => items.push(el))
@@ -96,6 +109,7 @@ function setHeader(title, hint) {
 }
 
 function switchScreenLocal(id) {
+  backFree = false
   switchScreen(id)
   if (id === 'list') {
     requestAnimationFrame(() => {
@@ -105,7 +119,15 @@ function switchScreenLocal(id) {
   }
 }
 
+let backPressTs = 0
+let backFree = false
 function goBack() {
+  if ($('#exit-confirm') || $('#update-modal')) {
+    removeExitConfirm()
+    const um = $('#update-modal')
+    if (um) um.remove()
+    return
+  }
   const screen = store.screen
   if ($('#player-wrap').classList.contains('active')) {
     exitPlayer()
@@ -113,13 +135,27 @@ function goBack() {
     switchScreenLocal(store.prevScreen || 'home')
     setHeader('WebPhim', '')
     window.scrollTo({ top: 0, behavior: 'smooth' })
+  } else if (screen === 'list' && window.history.length > 1) {
+    window.history.back()
   } else if (screen === 'list') {
     switchScreenLocal('home')
     resetHomeFocus()
     setHeader('WebPhim', '')
     window.scrollTo({ top: 0, behavior: 'smooth' })
   } else if (screen === 'home') {
-    showExitConfirm()
+    const now = Date.now()
+    if (backFree) {
+      executeExit()
+      return
+    }
+    backFree = true
+    if (now - backPressTs > 2000) {
+      backPressTs = now
+      showToast('Nhấn Back lần nữa để thoát')
+    } else {
+      backPressTs = now
+      executeExit()
+    }
   }
 }
 
@@ -197,30 +233,16 @@ function selectListItem(items, idx) {
 function handleKey(e) {
   const keyCode = e.keyCode || e.which
   const key = KEY_MAP[keyCode] || e.key
+  let handled = false
 
-  if (e.target?.id === 'header-search-input') {
-    if (key === 'Enter') {
+  // Close overlay/modal dialog if open — take precedence over everything else
+  if ($('#exit-confirm') || $('#update-modal')) {
+    if (key === 'ArrowLeft' || key === 'ArrowRight' || key === 'Enter' || key === 'Escape') {
       e.preventDefault()
-      runHeaderSearch()
+      handleClick(e) // reuse click handler (it knows about these modals)
+      handled = true
     }
-    return
-  }
-
-  // Exit confirm dialog
-  if ($('#exit-confirm')) {
-    e.preventDefault()
-    const btns = $$('#exit-confirm .exit-btn')
-    if (key === 'ArrowLeft' || key === 'ArrowRight') {
-      exitDialogIdx = exitDialogIdx === 0 ? 1 : 0
-      btns.forEach((b, i) => b.classList.toggle('exit-active', i === exitDialogIdx))
-    } else if (key === 'Enter') {
-      const action = btns[exitDialogIdx]?.dataset?.action
-      if (action === 'exit') executeExit()
-      else removeExitConfirm()
-    } else if (key === 'Escape') {
-      removeExitConfirm()
-    }
-    return
+    return handled
   }
 
   if (store.searchMode) {
@@ -510,6 +532,7 @@ function init() {
   loadHomeData()
   setHeader('WebPhim', '↑↓ Chọn hàng | ←→ Chọn phim | Enter xem')
   document.addEventListener('keydown', handleKey)
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') goBack() })
   document.addEventListener('click', handleClick)
   document.addEventListener('touchstart', handleTouchStart, { passive: true })
   document.addEventListener('touchend', handleTouch)
