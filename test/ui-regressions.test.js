@@ -57,6 +57,12 @@ test('APK workflow installs custom app icon', () => {
   assert.doesNotMatch(apkWorkflow, /s\|<activity android:name="\.MainActivity"\|<activity android:name="\.MainActivity" android:banner=/)
 })
 
+test('APK uses a stable debug keystore for consistent sideload signatures', () => {
+  assert.ok(fs.existsSync(new URL('../certs/debug.keystore', import.meta.url)))
+  assert.match(apkWorkflow, /certs\/debug\.keystore/)
+  assert.match(apkWorkflow, /cp certs\/debug\.keystore ~\/\.android\/debug\.keystore/)
+})
+
 test('TV remote toolbar navigation works on home screen', () => {
   assert.match(mainSource, /homeToolbarIdx/)
   assert.match(mainSource, /getHomeToolbarItems/)

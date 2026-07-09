@@ -52,6 +52,12 @@ jobs:
             # ponytail: attribute is on its own line in Capacitor manifest, so match the attribute not the tag
             sed -i 's|android:name=".MainActivity"|android:name=".MainActivity" android:banner="@drawable/banner" android:screenOrientation="landscape"|' "$M"
           fi
+      - name: Use stable debug keystore
+        run: |
+          mkdir -p ~/.android
+          cp certs/debug.keystore ~/.android/debug.keystore
+          mkdir -p android/app
+          cp certs/debug.keystore android/app/debug.keystore
       - name: Build APK
         run: cd android && chmod +x gradlew && ./gradlew assembleDebug --no-daemon
       - name: Rename APK
