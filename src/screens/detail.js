@@ -52,7 +52,7 @@ function renderDetail(movie, episodes) {
   if (movie.lang) tags.push(movie.lang)
   if (movie.time) tags.push(movie.time)
 
-  let html = `<div class="detail-hero"><div class="detail-layout"><div class="detail-poster"><img src="${poster}" alt="${sanitizeAttr(movie.name || '')}" width="260" height="390" loading="lazy" onerror="this.style.display='none'"></div>`
+  let html = `<div class="detail-split"><div class="detail-left"><div class="detail-hero"><div class="detail-layout"><div class="detail-poster"><img src="${poster}" alt="${sanitizeAttr(movie.name || '')}" width="260" height="390" loading="lazy" onerror="this.style.display='none'"></div>`
   html += `<div class="detail-info"><div class="detail-title-row">`
   html += `<h2>${sanitize(movie.name || '')}</h2>`
   html += `<span class="fav-btn" data-slug="${sanitizeAttr(movie.slug || '')}" aria-label="Yêu thích">${favStar}</span></div>`
@@ -60,7 +60,9 @@ function renderDetail(movie, episodes) {
   if (tags.some(Boolean)) {
     html += '<div class="tags">' + tags.filter(Boolean).map(t => `<span>${sanitize(t)}</span>`).join('') + '</div>'
   }
-  html += `<div class="desc">${sanitize(movie.content || movie.description || 'Chưa có mô tả')}</div></div></div></div>`
+  html += `<div class="desc">${sanitize(movie.content || movie.description || 'Chưa có mô tả')}</div></div></div></div></div>`
+
+  html += '<div class="detail-right">'
 
   if (episodes.length) {
     html += '<div class="episode-section"><div class="episode-panel">'
@@ -78,6 +80,7 @@ function renderDetail(movie, episodes) {
   } else {
     html += '<div class="empty">Chưa có tập phim</div>'
   }
+  html += '</div></div>'
   container.innerHTML = html
 }
 

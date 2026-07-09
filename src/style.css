@@ -283,6 +283,17 @@ body.large-mode .update-msg { font-size: 18px; }
 @media (max-width: 900px) and (orientation: landscape) { .detail-layout { flex-direction: row; align-items: flex-start; } .detail-poster { width: clamp(110px, 18vw, 150px); } .local-list { grid-template-columns: repeat(2, 1fr); } }
 @media (min-width: 1200px) { .detail-poster { width: clamp(240px, 21vw, 380px); } .detail-info h2 { font-size: clamp(32px, 3vw, 48px); } .desc { font-size: 17px; } .episode-panel { max-width: 920px; } .episode-btn { font-size: 17px; min-height: 56px; padding: 14px 20px; } }
 
+/* Detail split screen (TV / large) */
+.detail-split { display: block; }
+@media (min-width: 1200px) {
+  .detail-split { display: flex; gap: 28px; align-items: flex-start; }
+  .detail-left { width: 35%; position: sticky; top: 0; align-self: flex-start; }
+  .detail-right { flex: 1; min-width: 0; }
+  .detail-left .detail-poster { width: clamp(160px, 15vw, 220px); }
+  .detail-left .detail-info h2 { font-size: clamp(24px, 2vw, 32px); }
+  .detail-left .desc { font-size: 15px; }
+}
+
 /* Player */
 #player-wrap { display: none; position: fixed; inset: 0; width: 100vw; height: 100dvh; background: #050504; z-index: 100; }
 #player-wrap.active { display: flex; align-items: center; justify-content: center; }
