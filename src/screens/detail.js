@@ -67,7 +67,7 @@ function renderDetail(movie, episodes) {
     for (let s = 0; s < episodes.length; s++) {
       const ep = episodes[s]
       const data = ep.server_data || []
-      html += `<div class="server-name">${sanitize(ep.server_name || 'Server ' + (s + 1))}</div>`
+      html += `<div class="server-name" data-server="${s}">${sanitize(ep.server_name || 'Server ' + (s + 1))}</div>`
       html += '<div class="episode-grid">'
       for (let e = 0; e < data.length; e++) {
         html += `<div class="episode-btn" data-server="${s}" data-ep="${e}">${sanitize(data[e].name || 'Tập ' + (e + 1))}</div>`

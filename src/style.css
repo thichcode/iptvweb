@@ -273,6 +273,7 @@ body.large-mode .update-msg { font-size: 18px; }
 .episode-section { margin-top: 18px; max-width: none; }
 .episode-panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 16px; }
 .server-name { font-size: 16px; color: var(--accent); margin: 4px 0 10px; font-weight: 700; }
+.server-name.server-focused { color: #ffd45a; text-shadow: 0 0 10px rgba(255,212,90,0.5); }
 .episode-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
 .episode-btn { padding: 11px 15px; min-height: 46px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-sm); color: var(--text); cursor: pointer; font-size: 14px; display: flex; align-items: center; transition: background 0.15s, border-color 0.15s, transform 0.15s, box-shadow 0.2s; }
 .episode-btn:hover, .episode-btn.focused { border-color: var(--accent); background: rgba(255,212,90,0.08); transform: scale(1.04); box-shadow: var(--shadow-amber); }

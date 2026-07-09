@@ -6,7 +6,6 @@ import {
   handleListClick, limitRenderedItems
 } from './screens/list.js'
 import { loadDetail, handleDetailClick } from './screens/detail.js'
-import { isFav, toggleFav } from './store.js'
 import { playEpisode, exitPlayer, togglePlay, seek, seekTo, showOverlay } from './screens/player.js'
 import { checkUpdate, showUpdateModal, initUpdateChecker } from './update.js'
 import { loadMovies, searchLocal } from './data.js'
@@ -225,25 +224,45 @@ function handleKey(e) {
     items[idx].scrollIntoView({ block: 'nearest' })
   } else if (screen === 'detail') {
     e.preventDefault()
-    const items = $$('.fav-btn, .episode-btn')
+    const items = $$('.episode-btn')
     if (!items.length) return
     let idx = items.findIndex(i => i.classList.contains('focused'))
     if (idx < 0) idx = 0
+
+    const serverRanges = {}
+    items.forEach((btn, i) => {
+      const s = parseInt(btn.dataset.server)
+      if (!serverRanges[s]) serverRanges[s] = { start: i, end: i }
+      else serverRanges[s].end = i
+    })
+
     if (key === 'ArrowUp') { idx--; if (idx < 0) idx = items.length - 1 }
     else if (key === 'ArrowDown') { idx++; if (idx >= items.length) idx = 0 }
+    else if (key === 'ArrowLeft') {
+      const s = parseInt(items[idx].dataset.server)
+      const range = serverRanges[s]
+      if (idx > range.start) idx--
+      else {
+        const prev = s - 1
+        if (serverRanges[prev]) idx = serverRanges[prev].end
+        else idx = items.length - 1
+      }
+    }
+    else if (key === 'ArrowRight') {
+      const s = parseInt(items[idx].dataset.server)
+      const range = serverRanges[s]
+      if (idx < range.end) idx++
+      else {
+        const next = s + 1
+        if (serverRanges[next]) idx = serverRanges[next].start
+        else idx = 0
+      }
+    }
     else if (key === 'Enter') {
       const el = items[idx]
-      if (el.classList.contains('fav-btn')) {
-        const slug = el.dataset.slug
-        if (slug) {
-          toggleFav(slug, store.currentMovie)
-          el.textContent = isFav(slug) ? '★' : '☆'
-        }
-      } else {
-        const serverIdx = parseInt(el.dataset.server)
-        const epIdx = parseInt(el.dataset.ep)
-        if (!isNaN(serverIdx) && !isNaN(epIdx)) { store.episodeFocusIdx = idx; playEpisode(serverIdx, epIdx) }
-      }
+      const serverIdx = parseInt(el.dataset.server)
+      const epIdx = parseInt(el.dataset.ep)
+      if (!isNaN(serverIdx) && !isNaN(epIdx)) { store.episodeFocusIdx = idx; playEpisode(serverIdx, epIdx) }
       return
     }
     else if (key === 'Escape') { switchScreenLocal(store.prevScreen || 'home'); setHeader('WebPhim', ''); window.scrollTo({ top: 0, behavior: 'smooth' }); return }
@@ -251,6 +270,11 @@ function handleKey(e) {
     items.forEach(i => i.classList.remove('focused'))
     items[idx].classList.add('focused')
     items[idx].scrollIntoView({ block: 'nearest' })
+
+    const focusedServer = parseInt(items[idx].dataset.server)
+    $$('.server-name').forEach(el => {
+      el.classList.toggle('server-focused', parseInt(el.dataset.server) === focusedServer)
+    })
   }
 }
 
