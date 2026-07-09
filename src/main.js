@@ -442,14 +442,6 @@ function handleTouch(e) {
   }
 }
 
-function autoFullscreen() {
-  const el = document.documentElement
-  const fn = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen
-  if (fn) {
-    fn.call(el).catch(() => {})
-  }
-}
-
 function init() {
   history.pushState(null, null, location.href)
   window.addEventListener('popstate', e => { e.preventDefault(); goBack() })
@@ -466,8 +458,7 @@ function init() {
   $('#header-back').addEventListener('click', goBack)
   $('#nav-back').addEventListener('click', goBack)
   $('#nav-home').addEventListener('click', () => { if (store.screen !== 'home') goHome() })
-  setTimeout(autoFullscreen, 10000)
-  updateApiToggle()
+  setTimeout(updateApiToggle, 100)
   initUpdateChecker()
 }
 
