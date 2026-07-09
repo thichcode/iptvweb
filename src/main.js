@@ -118,7 +118,44 @@ function goBack() {
     resetHomeFocus()
     setHeader('WebPhim', '')
     window.scrollTo({ top: 0, behavior: 'smooth' })
+  } else if (screen === 'home') {
+    showExitConfirm()
   }
+}
+
+let exitDialogIdx = 1 // default "Không"
+function showExitConfirm() {
+  if ($('#exit-confirm')) return
+  exitDialogIdx = 1
+  const div = document.createElement('div')
+  div.id = 'exit-confirm'
+  div.innerHTML = `
+    <div class="exit-backdrop"></div>
+    <div class="exit-box">
+      <div class="exit-icon">🚪</div>
+      <div class="exit-msg">Thoát ứng dụng?</div>
+      <div class="exit-actions">
+        <button class="exit-btn" data-action="exit">Có</button>
+        <button class="exit-btn exit-active" data-action="cancel">Không</button>
+      </div>
+    </div>`
+  document.body.appendChild(div)
+  const btns = div.querySelectorAll('.exit-btn')
+  btns.forEach((b, i) => b.classList.toggle('exit-active', i === exitDialogIdx))
+}
+function removeExitConfirm() {
+  const el = $('#exit-confirm')
+  if (el) el.remove()
+}
+function executeExit() {
+  try {
+    const cap = window.Capacitor
+    if (cap?.Plugins?.App) {
+      cap.Plugins.App.exitApp()
+      return
+    }
+  } catch {}
+  window.close()
 }
 
 function selectHomeItem(idx) {
@@ -165,6 +202,23 @@ function handleKey(e) {
     if (key === 'Enter') {
       e.preventDefault()
       runHeaderSearch()
+    }
+    return
+  }
+
+  // Exit confirm dialog
+  if ($('#exit-confirm')) {
+    e.preventDefault()
+    const btns = $$('#exit-confirm .exit-btn')
+    if (key === 'ArrowLeft' || key === 'ArrowRight') {
+      exitDialogIdx = exitDialogIdx === 0 ? 1 : 0
+      btns.forEach((b, i) => b.classList.toggle('exit-active', i === exitDialogIdx))
+    } else if (key === 'Enter') {
+      const action = btns[exitDialogIdx]?.dataset?.action
+      if (action === 'exit') executeExit()
+      else removeExitConfirm()
+    } else if (key === 'Escape') {
+      removeExitConfirm()
     }
     return
   }
@@ -287,6 +341,15 @@ function handleClick(e) {
     if (e.target.closest('#p-seekbar')) { seekTo(e); return }
     if (e.target === $('#player')) togglePlay()
     showOverlay()
+    return
+  }
+
+  // Exit confirm dialog (click)
+  if (e.target.closest('#exit-confirm .exit-backdrop')) { removeExitConfirm(); return }
+  if (e.target.closest('#exit-confirm .exit-btn')) {
+    const action = e.target.closest('.exit-btn').dataset.action
+    if (action === 'exit') executeExit()
+    else removeExitConfirm()
     return
   }
 
