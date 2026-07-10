@@ -52,9 +52,6 @@ jobs:
           # Resizeable + LEANBACK_LAUNCHER
           sed -i 's|android:exported="true"|android:exported="true"\n            android:resizeableActivity="true"|' "$M"
           sed -i 's|<category android:name="android.intent.category.LAUNCHER" />|<category android:name="android.intent.category.LAUNCHER" />\n                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />|' "$M"
-          # TV banner drawable
-          mkdir -p android/app/src/main/res/drawable
-          printf '<?xml version="1.0" encoding="utf-8"?><bitmap xmlns:android="http://schemas.android.com/apk/res/android" android:src="@drawable/tv_banner" android:gravity="center" />' > android/app/src/main/res/drawable/tv_banner.xml
           # Copy banner as PNG into drawable (Android TV expects concrete PNG, not mipmap)
           cp assets/tv_banner.png android/app/src/main/res/drawable/tv_banner.png
       - name: Patch build.gradle with signing config

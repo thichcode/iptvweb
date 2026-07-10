@@ -1,5 +1,13 @@
 # Design System: WebPhim Cinema TV
 
+## Tiếp tục xem
+
+- **Backend API**: Hoàn thiện endpoint chưa xong (user, watchlist, notifications)
+- **Database**: Tối ưu index cho bảng films, episodes, comments; thêm partition cho history
+- **Tính năng mới**: "phim sắp chiếu" (upcoming), auto-suggest dựa trên lịch sử, quản lý vai trò người dùng
+- **Analytics**: Báo cáo lượt xem, download, doanh thu; dashboard admin
+- **Watchlist**: Thêm quản lý watchlist với sync cross-device
+
 ## 1. Visual Theme & Atmosphere
 WebPhim uses a restrained cinema-room interface: dark, quiet, readable, and built for long-distance TV viewing as much as mobile touch. Density is Daily App Balanced (5/10), variance is Offset Asymmetric (6/10), and motion is Fluid CSS (5/10). The mood is warm off-black projection room, not neon arcade.
 

@@ -415,6 +415,48 @@ body.large-mode .p-time { font-size: 18px; }
 body.large-mode .p-hint { font-size: 16px; }
 body.large-mode .nav-btn .label { font-size: 16px; }
 
+/* ── TV mode ────────────────────────────────────────────── */
+/* ponytail: auto-applied by detectTV() in main.js */
+body.tv-mode {
+  --overscan: 48px;
+  --focus-amber: 0 0 0 3px rgba(255, 196, 66, 0.8), 0 0 20px rgba(255, 196, 66, 0.35);
+}
+
+/* Overscan-safe padding */
+body.tv-mode #app {
+  padding-left: var(--overscan);
+  padding-right: var(--overscan);
+}
+
+/* TV: 56px min touch targets, Amber Projector focus, reduced motion */
+body.tv-mode .top-nav-btn,
+body.tv-mode .home-action,
+body.tv-mode .local-item,
+body.tv-mode .sub-item,
+body.tv-mode .page-btn,
+body.tv-mode .episode-btn,
+body.tv-mode .search-input,
+body.tv-mode .search-btn,
+body.tv-mode .nav-btn,
+body.tv-mode .exit-btn,
+body.tv-mode .update-btn {
+  min-height: 56px;
+}
+
+body.tv-mode *:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-amber);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.tv-mode *,
+  body.tv-mode *::before,
+  body.tv-mode *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 /* Custom Scrollbar */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: #111; }

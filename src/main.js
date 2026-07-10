@@ -522,7 +522,15 @@ function handleTouch(e) {
   }
 }
 
+function detectTV() {
+  const ua = navigator.userAgent
+  const isTV = /Android TV|Google TV|SmartTV|Tizen|Web0S|(?:CrKey|AFT)/.test(ua) ||
+    (screen.width >= 1920 && screen.height >= 1080 && !navigator.maxTouchPoints)
+  if (isTV) document.body.classList.add('tv-mode')
+}
+
 function init() {
+  detectTV()
   history.pushState(null, null, location.href)
   window.addEventListener('popstate', e => { e.preventDefault(); goBack() })
   buildShell()
@@ -539,6 +547,8 @@ function init() {
   $('#header-back').addEventListener('click', goBack)
   $('#nav-back').addEventListener('click', goBack)
   $('#nav-home').addEventListener('click', () => { if (store.screen !== 'home') goHome() })
+  // ponytail: Capacitor backButton — overlays goBack handles, double-press already in goBack
+  try { window.Capacitor?.Plugins?.App?.addListener?.('backButton', () => goBack()) } catch {}
   setTimeout(updateApiToggle, 100)
   initUpdateChecker()
 }

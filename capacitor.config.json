@@ -1,6 +1,6 @@
 {
   "appId": "com.webphim.app",
-  "appName": "WebPhim",
+  "appName": "WebPhim TV",
   "webDir": "dist",
   "server": { "androidScheme": "https" },
   "plugins": {

@@ -1,4 +1,17 @@
 <!DOCTYPE html>
+<!--
+  Native patch instructions for Android TV / Fire TV:
+
+  1. AndroidManifest.xml — add `android:isGame="true"` or `android:isTV="true"`
+     to the `<application>` tag so the app shows up in the TV Play Store.
+  2. AndroidManifest.xml — add LEANBACK launcher intent filter:
+     <category android:name="android.intent.category.LEANBACK_LAUNCHER"/>
+  3. MainActivity.java — override onBackPressed() to dispatch to
+     Capacitor's back-button listener and handle double-press exit
+     (see Capacitor's `App.addListener('backButton', ...)`).
+  4. res/xml/file_paths.xml — ensure storage permissions for HLS caching.
+  5. If using ExoPlayer, set `com.google.android.exoplayer2` in build.gradle.
+-->
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
