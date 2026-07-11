@@ -235,6 +235,11 @@ function handleKey(e) {
   const key = KEY_MAP[keyCode] || e.key
   let handled = false
 
+  if (e.target?.id === 'header-search-input') {
+    if (key === 'Enter') { e.preventDefault(); runHeaderSearch() }
+    return
+  }
+
   // Close overlay/modal dialog if open — take precedence over everything else
   if ($('#exit-confirm') || $('#update-modal')) {
     if (key === 'ArrowLeft' || key === 'ArrowRight' || key === 'Enter' || key === 'Escape') {

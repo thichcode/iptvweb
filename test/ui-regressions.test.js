@@ -50,7 +50,7 @@ test('APK workflow patches manifest for Android TV', () => {
   assert.match(apkWorkflow, /android\.software\.leanback/)
   assert.match(apkWorkflow, /android\.hardware\.touchscreen/)
   assert.match(apkWorkflow, /android:banner="@drawable\/tv_banner"/)
-  assert.match(apkWorkflow, /tv_banner\.xml/)
+  assert.match(apkWorkflow, /tv_banner\.png/)
 })
 
 test('APK uses a stable debug keystore for consistent sideload signatures', () => {
