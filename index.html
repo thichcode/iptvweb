@@ -21,9 +21,23 @@
   <link rel="preconnect" href="https://phimimg.com">
   <link rel="dns-prefetch" href="https://phimimg.com">
   <link rel="stylesheet" href="/src/style.css">
+  <style>.sw-toast{position:fixed;bottom:24px;right:24px;background:var(--accent);color:#000;padding:12px 20px;border-radius:8px;font-size:14px;z-index:9999;cursor:pointer;opacity:0;transform:translateY(20px);transition:opacity .3s,transform .3s}.sw-toast.show{opacity:1;transform:translateY(0)}</style>
 </head>
 <body>
   <div id="app"></div>
+  <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js')
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      const t = document.createElement('div')
+      t.className = 'sw-toast'
+      t.textContent = '✓ Đã cập nhật'
+      document.body.appendChild(t)
+      requestAnimationFrame(() => t.classList.add('show'))
+      setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300) }, 3000)
+    })
+  }
+  </script>
   <script type="module" src="/src/main.js"></script>
 </body>
 </html>
