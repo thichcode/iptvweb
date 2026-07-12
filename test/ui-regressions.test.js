@@ -32,9 +32,9 @@ test('home navigation keeps APK download link', () => {
   assert.match(mainSource, />Tải APK</)
 })
 
-test('home uses cinema row instead of animation row', () => {
-  assert.match(homeSource, /phim-chieu-rap/)
-  assert.match(homeSource, /Phim Chiếu Rạp/)
+test('home has tv-shows row instead of cinema row', () => {
+  assert.match(homeSource, /tv-shows/)
+  assert.match(homeSource, /Phim Netflix/)
   assert.doesNotMatch(homeSource, /Hoạt Hình/)
 })
 

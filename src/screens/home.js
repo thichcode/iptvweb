@@ -7,7 +7,7 @@ const HOME_ROWS = [
   { type: 'phim-moi-cap-nhat', label: 'Phim Mới Cập Nhật' },
   { type: 'phim-bo', label: 'Phim Bộ' },
   { type: 'phim-le', label: 'Phim Lẻ' },
-  { type: 'phim-chieu-rap', label: 'Phim Chiếu Rạp' }
+  { type: 'tv-shows', label: 'Phim Netflix' }
 ]
 const ROW_LIMIT = 10
 
@@ -121,7 +121,6 @@ export function renderHome() {
   if (rows.length === 0) {
     html += '<div class="home-loading">Đang tải...</div>'
   } else {
-    html += renderHero(rows[0].items)
     for (const rowData of rows) {
       html += renderHomeRowShell(rowData.type, rowData.label)
     }
