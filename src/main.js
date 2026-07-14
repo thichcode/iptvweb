@@ -305,9 +305,29 @@ function handleKey(e) {
     if (!items.length) return
     let idx = items.findIndex(i => i.classList.contains('focused'))
     if (idx < 0) idx = 0
-    if (key === 'ArrowUp') { idx--; if (idx < 0) idx = items.length - 1 }
-    else if (key === 'ArrowDown') { idx++; if (idx >= items.length) idx = 0 }
-    else if (key === 'Enter') { selectListItem(items, idx); return }
+
+    const grid = $('.movie-grid')
+    const cols = grid ? getComputedStyle(grid).gridTemplateColumns.split(' ').length : 1
+
+    if (key === 'ArrowUp') {
+      if (grid && idx < grid.children.length && idx >= cols) {
+        const gi = idx - cols
+        idx = items.findIndex(i => i === grid.children[gi])
+      } else if (idx <= 0) { idx = items.length - 1 }
+      else { idx-- }
+    } else if (key === 'ArrowDown') {
+      if (grid && idx < grid.children.length && idx + cols < grid.children.length) {
+        const gi = idx + cols
+        idx = items.findIndex(i => i === grid.children[gi])
+      } else { idx++; if (idx >= items.length) idx = 0 }
+    } else if (key === 'ArrowLeft') {
+      if (grid && idx < grid.children.length && idx > 0) { idx-- }
+      else if (idx <= 0) { idx = items.length - 1 }
+      else { idx-- }
+    } else if (key === 'ArrowRight') {
+      if (grid && idx < grid.children.length && idx < grid.children.length - 1) { idx++ }
+      else { idx++; if (idx >= items.length) idx = 0 }
+    } else if (key === 'Enter') { selectListItem(items, idx); return }
     else if (key === 'Escape') { renderHome(); switchScreenLocal('home'); setHeader('WebPhim', ''); window.scrollTo({ top: 0, behavior: 'smooth' }); return }
     else return
     items.forEach(i => i.classList.remove('focused'))
