@@ -134,6 +134,11 @@ export function renderHome() {
   html += '</div>'
   container.innerHTML = html
   setupHomeLazy()
+  resetHomeFocus()
+  requestAnimationFrame(() => {
+    const first = $('.poster-carousel .poster-card')
+    if (first) { first.classList.add('card-focused'); first.scrollIntoView({ block: 'nearest', behavior: 'auto' }) }
+  })
 }
 
 export async function loadHomeData() {
@@ -180,7 +185,10 @@ export function navigateHome(dir) {
     focusedCard = Math.max(focusedCard - 1, 0)
   }
 
-  carousels.forEach((c, ri) => c.classList.toggle('row-focused', ri === focusedRow))
+  carousels.forEach((c, ri) => {
+    c.classList.toggle('row-focused', ri === focusedRow)
+    c.querySelectorAll('.card-focused').forEach(cf => cf.classList.remove('card-focused'))
+  })
   const activeCarousel = carousels[focusedRow]
   if (activeCarousel && !activeCarousel.dataset.mounted) mountRowCarousel(activeCarousel)
   if (activeCarousel) {

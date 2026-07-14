@@ -41,13 +41,14 @@ function focusHomeToolbar(items) {
   items.forEach((el, i) => el.classList.toggle('toolbar-focused', i === homeToolbarIdx))
   const active = items[homeToolbarIdx]
   if (active) {
-    if (active.id === 'header-search-input') active.focus()
-    else active.scrollIntoView({ block: 'nearest', behavior: 'auto' })
+    active.scrollIntoView({ block: 'nearest', behavior: 'auto' })
   }
 }
 
 function clearHomeToolbar(items) {
   items.forEach(el => el.classList.remove('toolbar-focused'))
+  const inp = $('#header-search-input')
+  if (inp && document.activeElement === inp) inp.blur()
 }
 
 function buildShell() {
@@ -109,18 +110,20 @@ function setHeader(title, hint) {
 }
 
 function switchScreenLocal(id) {
-  backFree = false
   switchScreen(id)
   if (id === 'list') {
     requestAnimationFrame(() => {
       const items = $$('.local-item, .page-btn, .sub-item')
-      if (items.length) items[0]?.classList.add('focused')
+      if (items.length) {
+        items.forEach(i => i.classList.remove('focused'))
+        items[0]?.classList.add('focused')
+        items[0]?.scrollIntoView({ block: 'nearest', behavior: 'auto' })
+      }
     })
   }
 }
 
 let backPressTs = 0
-let backFree = false
 function goBack() {
   if ($('#exit-confirm') || $('#update-modal')) {
     removeExitConfirm()
@@ -134,27 +137,24 @@ function goBack() {
   } else if (screen === 'detail') {
     switchScreenLocal(store.prevScreen || 'home')
     setHeader('WebPhim', '')
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  } else if (screen === 'list' && window.history.length > 1) {
-    window.history.back()
+    if (store.prevScreen === 'list' && store._listScrollY != null) {
+      window.scrollTo({ top: store._listScrollY, behavior: 'auto' })
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
   } else if (screen === 'list') {
     switchScreenLocal('home')
     resetHomeFocus()
     setHeader('WebPhim', '')
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    window.scrollTo({ top: 0, behavior: 'auto' })
   } else if (screen === 'home') {
     const now = Date.now()
-    if (backFree) {
+    if (now - backPressTs < 2500) {
       executeExit()
-      return
-    }
-    backFree = true
-    if (now - backPressTs > 2000) {
-      backPressTs = now
-      showToast('Nhấn Back lần nữa để thoát')
     } else {
       backPressTs = now
-      executeExit()
+      showToast('Nhấn Back lần nữa để thoát')
+      setTimeout(() => { backPressTs = 0 }, 2500)
     }
   }
 }
@@ -219,7 +219,7 @@ function selectListItem(items, idx) {
   const item = items[idx]
   if (item.classList.contains('local-item')) {
     const slug = item.dataset.slug
-    if (slug) { loadDetail(slug); setHeader('', '') }
+    if (slug) { store._listScrollY = window.scrollY; loadDetail(slug); setHeader('', '') }
   } else if (item.classList.contains('page-btn')) {
     const page = parseInt(item.dataset.page)
     if (!isNaN(page)) loadMovieList(store.listType, page, store.currentKeyword, store.categorySlug, store.countrySlug)
@@ -236,17 +236,27 @@ function handleKey(e) {
   let handled = false
 
   if (e.target?.id === 'header-search-input') {
-    if (key === 'Enter') { e.preventDefault(); runHeaderSearch() }
+    if (key === 'Escape') { e.preventDefault(); e.target.blur(); homeToolbarIdx = -1; clearHomeToolbar(getHomeToolbarItems()); return }
+    if (key === 'ArrowDown' || key === 'ArrowUp') { e.preventDefault(); e.target.blur(); homeToolbarIdx = -1; clearHomeToolbar(getHomeToolbarItems()); return }
+    if (key === 'Enter') { e.preventDefault(); runHeaderSearch(); return }
     return
   }
 
-  // Close overlay/modal dialog if open — take precedence over everything else
-  if ($('#exit-confirm') || $('#update-modal')) {
-    if (key === 'ArrowLeft' || key === 'ArrowRight' || key === 'Enter' || key === 'Escape') {
+  if ($('#exit-confirm')) {
+    if (key === 'ArrowLeft' || key === 'ArrowRight') {
       e.preventDefault()
-      handleClick(e) // reuse click handler (it knows about these modals)
-      handled = true
+      const btns = $$('#exit-confirm .exit-btn')
+      exitDialogIdx = (exitDialogIdx + (key === 'ArrowRight' ? 1 : -1) + btns.length) % btns.length
+      btns.forEach((b, i) => b.classList.toggle('exit-active', i === exitDialogIdx))
+      return handled
     }
+    if (key === 'Enter') { e.preventDefault(); const btns = $$('#exit-confirm .exit-btn'); btns[exitDialogIdx]?.click(); return handled }
+    if (key === 'Escape') { e.preventDefault(); removeExitConfirm(); return handled }
+    return handled
+  }
+  if ($('#update-modal')) {
+    if (key === 'Escape') { e.preventDefault(); const m = $('#update-modal'); if (m) m.remove(); return handled }
+    if (key === 'Enter') { e.preventDefault(); const dl = $('.update-dl'); if (dl) dl.click(); else { const m = $('#update-modal'); if (m) m.remove() } return handled }
     return handled
   }
 
@@ -265,7 +275,7 @@ function handleKey(e) {
     e.preventDefault()
     if (key === 'ArrowLeft') seek(-10)
     else if (key === 'ArrowRight') seek(10)
-    else if (key === 'PlayPause' || key === 'Space') togglePlay()
+    else if (key === 'PlayPause' || key === 'Space' || key === 'Enter') togglePlay()
     else if (key === 'Escape') exitPlayer()
     return
   }
@@ -278,7 +288,7 @@ function handleKey(e) {
       if (key === 'ArrowRight') { homeToolbarIdx = (homeToolbarIdx + 1) % tbItems.length; focusHomeToolbar(tbItems); return }
       else if (key === 'ArrowLeft') { homeToolbarIdx = (homeToolbarIdx - 1 + tbItems.length) % tbItems.length; focusHomeToolbar(tbItems); return }
       else if (key === 'ArrowDown') { homeToolbarIdx = -1; clearHomeToolbar(tbItems); navigateHome('reset'); return }
-      else if (key === 'Enter') { const el = tbItems[homeToolbarIdx]; if (el.id === 'header-search-input') el.focus(); else el.click(); return }
+      else if (key === 'Enter') { const el = tbItems[homeToolbarIdx]; el.click(); return }
       else if (key === 'Escape') { homeToolbarIdx = -1; clearHomeToolbar(tbItems); return }
       return
     }
@@ -371,12 +381,16 @@ function handleClick(e) {
     return
   }
 
-  // Exit confirm dialog (click)
   if (e.target.closest('#exit-confirm .exit-backdrop')) { removeExitConfirm(); return }
   if (e.target.closest('#exit-confirm .exit-btn')) {
     const action = e.target.closest('.exit-btn').dataset.action
     if (action === 'exit') executeExit()
     else removeExitConfirm()
+    return
+  }
+  if (e.target.closest('#update-modal .update-backdrop, #update-modal .update-close')) {
+    const m = $('#update-modal')
+    if (m) m.remove()
     return
   }
 
@@ -385,6 +399,7 @@ function handleClick(e) {
   const nav = e.target.closest('.top-nav-btn[data-nav]')
   if (nav) {
     handleTopNav(nav.dataset.nav)
+    if ($('#header-search-input').value) $('#header-search-input').value = ''
     return
   }
 
@@ -414,7 +429,7 @@ function handleClick(e) {
   if (screen === 'home') {
     const result = handleHomeClick(e)
     if (result) {
-      if (result.action === 'detail') { loadDetail(result.slug); setHeader('', '') }
+      if (result.action === 'detail') { store._listScrollY = window.scrollY; loadDetail(result.slug); setHeader('', '') }
       else if (result.action === 'menu') {
         if (result.id === 'search') { store.searchMode = true; renderSearchInput(store.currentKeyword); switchScreenLocal('list'); setHeader('Tìm Kiếm', 'Enter để tìm'); return }
         handleActionRow(result.id)
@@ -423,7 +438,7 @@ function handleClick(e) {
   } else if (screen === 'list') {
     const result = handleListClick(e)
     if (result) {
-      if (result.action === 'detail') { loadDetail(result.slug); setHeader('', '') }
+      if (result.action === 'detail') { store._listScrollY = window.scrollY; loadDetail(result.slug); setHeader('', '') }
       else if (result.action === 'page') loadMovieList(store.listType, result.page, store.currentKeyword, store.categorySlug, store.countrySlug)
       else if (result.action === 'subSelect') {
         const label = e.target.textContent
@@ -549,7 +564,6 @@ function init() {
   loadHomeData()
   setHeader('WebPhim', '↑↓ Chọn hàng | ←→ Chọn phim | Enter xem')
   document.addEventListener('keydown', handleKey)
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') goBack() })
   document.addEventListener('click', handleClick)
   document.addEventListener('touchstart', handleTouchStart, { passive: true })
   document.addEventListener('touchend', handleTouch)

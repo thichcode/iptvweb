@@ -1,7 +1,13 @@
 const CACHE = 'webphim-v1'
 const API_HOSTS = ['ophim1.com', 'phimapi.com']
 
-self.addEventListener('install', () => self.skipWaiting())
+self.addEventListener('install', (e) => {
+  self.skipWaiting()
+  e.waitUntil((async () => {
+    const cache = await caches.open(CACHE)
+    await cache.add('/').catch(() => {})
+  })())
+})
 
 self.addEventListener('activate', (e) => {
   e.waitUntil((async () => {
@@ -22,10 +28,14 @@ self.addEventListener('fetch', (e) => {
     e.respondWith(networkFirst(e.request))
     return
   }
-  if (url.origin === location.origin) {
-    if (url.pathname === '/sw.js') return
-    e.respondWith(cacheFirst(e.request))
+  if (url.origin !== location.origin) return
+  if (url.pathname === '/sw.js') return
+  if (url.pathname.startsWith('/api/')) return
+  if (url.pathname === '/' || e.request.mode === 'navigate') {
+    e.respondWith(networkFirst(e.request))
+    return
   }
+  e.respondWith(cacheFirst(e.request))
 })
 
 async function cacheFirst(req) {
@@ -34,8 +44,7 @@ async function cacheFirst(req) {
   try {
     const res = await fetch(req)
     if (res.ok) {
-      const cache = await caches.open(CACHE)
-      cache.put(req, res.clone())
+      caches.open(CACHE).then(c => c.put(req, res.clone()))
     }
     return res
   } catch { return new Response('Offline', { status: 503 }) }
@@ -45,8 +54,7 @@ async function networkFirst(req) {
   try {
     const res = await fetch(req)
     if (res.ok) {
-      const cache = await caches.open(CACHE)
-      cache.put(req, res.clone())
+      caches.open(CACHE).then(c => c.put(req, res.clone()))
     }
     return res
   } catch {

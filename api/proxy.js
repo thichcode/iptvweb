@@ -1,5 +1,4 @@
-const PRIMARY = 'https://ophim1.com'
-const FALLBACK = 'https://phimapi.com'
+const UPSTREAMS = { ophim1: 'https://ophim1.com', phimapi: 'https://phimapi.com' }
 const TIMEOUT = 12000
 const CACHE_TTL = 5 * 60 * 1000
 
@@ -21,8 +20,12 @@ async function fetchWithTimeout(url, ms) {
 export default async function handler(req, res) {
   const url = new URL(req.url, 'http://localhost')
   const path = url.searchParams.get('path') || '/'
-  const cacheKey = path
 
+  if (typeof path !== 'string' || !path.startsWith('/') || path.includes('@')) {
+    return res.status(400).json({ error: 'Invalid path' })
+  }
+
+  const cacheKey = path
   const cached = cache.get(cacheKey)
   if (cached && Date.now() - cached.ts < CACHE_TTL) {
     res.setHeader('Content-Type', 'application/json')
@@ -30,7 +33,7 @@ export default async function handler(req, res) {
     return res.status(200).json(cached.data)
   }
 
-  for (const base of [PRIMARY, FALLBACK]) {
+  for (const base of Object.values(UPSTREAMS)) {
     try {
       const r = await fetchWithTimeout(base + path, TIMEOUT)
       if (!r.ok) continue
