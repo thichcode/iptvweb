@@ -347,7 +347,8 @@ function handleKey(e) {
       else serverRanges[s].end = i
     })
 
-    if (key === 'ArrowUp') { idx--; if (idx < 0) idx = items.length - 1 }
+    if (key === 'ArrowUp' && idx <= 0) { switchScreenLocal(store.prevScreen || 'home'); setHeader('WebPhim', ''); window.scrollTo({ top: 0, behavior: 'smooth' }); return }
+    else if (key === 'ArrowUp') { idx-- }
     else if (key === 'ArrowDown') { idx++; if (idx >= items.length) idx = 0 }
     else if (key === 'ArrowLeft') {
       const s = parseInt(items[idx].dataset.server)
