@@ -236,9 +236,9 @@ function handleKey(e) {
   let handled = false
 
   if (e.target?.id === 'header-search-input') {
-    if (key === 'Escape') { e.preventDefault(); e.target.blur(); homeToolbarIdx = -1; clearHomeToolbar(getHomeToolbarItems()); return }
-    if (key === 'ArrowDown' || key === 'ArrowUp') { e.preventDefault(); e.target.blur(); homeToolbarIdx = -1; clearHomeToolbar(getHomeToolbarItems()); return }
+    if (key === 'ArrowDown') { e.preventDefault(); e.target.blur(); homeToolbarIdx = -1; clearHomeToolbar(getHomeToolbarItems()); return }
     if (key === 'Enter') { e.preventDefault(); runHeaderSearch(); return }
+    if (key === 'Escape') { e.preventDefault(); e.target.blur(); homeToolbarIdx = -1; clearHomeToolbar(getHomeToolbarItems()); return }
     return
   }
 
@@ -261,7 +261,7 @@ function handleKey(e) {
   }
 
   if (store.searchMode) {
-    if (key === 'Enter') {
+    if (key === 'ArrowDown' || key === 'Enter') {
       const inp = $('.search-input')
       if (inp && inp.value.trim()) { e.preventDefault(); doSearch(inp.value.trim()) }
     }
