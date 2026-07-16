@@ -310,11 +310,11 @@ function handleKey(e) {
     const cols = grid ? getComputedStyle(grid).gridTemplateColumns.split(' ').length : 1
 
     if (key === 'ArrowUp') {
-      if (grid && idx < grid.children.length && idx >= cols) {
+      if (idx === 0) { renderHome(); switchScreenLocal('home'); setHeader('WebPhim', ''); window.scrollTo({ top: 0, behavior: 'smooth' }); return }
+      else if (grid && idx < grid.children.length && idx >= cols) {
         const gi = idx - cols
         idx = items.findIndex(i => i === grid.children[gi])
-      } else if (idx <= 0) { idx = items.length - 1 }
-      else { idx-- }
+      } else { idx-- }
     } else if (key === 'ArrowDown') {
       if (grid && idx < grid.children.length && idx + cols < grid.children.length) {
         const gi = idx + cols
@@ -322,7 +322,7 @@ function handleKey(e) {
       } else { idx++; if (idx >= items.length) idx = 0 }
     } else if (key === 'ArrowLeft') {
       if (grid && idx < grid.children.length && idx > 0) { idx-- }
-      else if (idx <= 0) { idx = items.length - 1 }
+      else if (idx <= 0) { renderHome(); switchScreenLocal('home'); setHeader('WebPhim', ''); window.scrollTo({ top: 0, behavior: 'smooth' }); return }
       else { idx-- }
     } else if (key === 'ArrowRight') {
       if (grid && idx < grid.children.length && idx < grid.children.length - 1) { idx++ }
