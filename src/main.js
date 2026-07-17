@@ -160,25 +160,6 @@ function goBack() {
 }
 
 let exitDialogIdx = 1 // default "Không"
-function showExitConfirm() {
-  if ($('#exit-confirm')) return
-  exitDialogIdx = 1
-  const div = document.createElement('div')
-  div.id = 'exit-confirm'
-  div.innerHTML = `
-    <div class="exit-backdrop"></div>
-    <div class="exit-box">
-      <div class="exit-icon">🚪</div>
-      <div class="exit-msg">Thoát ứng dụng?</div>
-      <div class="exit-actions">
-        <button class="exit-btn" data-action="exit">Có</button>
-        <button class="exit-btn exit-active" data-action="cancel">Không</button>
-      </div>
-    </div>`
-  document.body.appendChild(div)
-  const btns = div.querySelectorAll('.exit-btn')
-  btns.forEach((b, i) => b.classList.toggle('exit-active', i === exitDialogIdx))
-}
 function removeExitConfirm() {
   const el = $('#exit-confirm')
   if (el) el.remove()
@@ -194,25 +175,6 @@ function executeExit() {
   window.close()
 }
 
-function selectHomeItem(idx) {
-  const item = HOME_MENU[idx]
-  if (!item) return
-  store.menuIndex = idx
-  store.currentKeyword = ''
-  store.categorySlug = ''
-  store.countrySlug = ''
-
-  switch (item.id) {
-    case 'categories': loadCategories(); setHeader('Thể Loại', ''); break
-    case 'countries': loadCountries(); setHeader('Quốc Gia', ''); break
-    case 'search': store.searchMode = true; renderSearchInput(store.currentKeyword); switchScreenLocal('list'); setHeader('Tìm Kiếm', 'Enter để tìm'); break
-    case 'favorites': loadFavorites(); switchScreenLocal('list'); setHeader('♥ Yêu Thích', ''); window.scrollTo({ top: 0, behavior: 'smooth' }); break
-    case 'history': loadHistory(); switchScreenLocal('list'); setHeader('Đã Xem', ''); window.scrollTo({ top: 0, behavior: 'smooth' }); break
-    default:
-      loadMovieList(item.id, 1, '', '', '')
-      setHeader(item.label, '↑↓ Chọn | Enter xem')
-  }
-}
 
 function selectListItem(items, idx) {
   if (idx < 0 || idx >= items.length) return

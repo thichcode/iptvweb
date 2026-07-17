@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { API_BASE, FALLBACK_API_BASE, apiGet, getMovieLimit, buildMovieUrl, imgSrc, getApiSource, nextApiSource } from '../src/api.js'
+import { API_BASE, apiGet, getMovieLimit, buildMovieUrl, imgSrc, getApiSource, nextApiSource } from '../src/api.js'
 import { limitRenderedItems, renderMovieCard, renderEmptyState } from '../src/screens/list.js'
 
 test('mobile viewport uses 5 movies per page', () => {
@@ -13,9 +13,8 @@ test('API URLs include the requested limit for endpoints that support it', () =>
   assert.equal(buildMovieUrl('search', 1, 'test phim', '', '', 4), '/v1/api/tim-kiem?keyword=test%20phim&page=1&limit=4&sort_field=year&sort_type=desc')
 })
 
-test('API defaults to proxy with direct fallback', () => {
+test('API defaults to proxy', () => {
   assert.equal(API_BASE, '/api/proxy')
-  assert.equal(FALLBACK_API_BASE, '')
 })
 
 test('apiGet falls back when proxy and primary API return errors', async () => {

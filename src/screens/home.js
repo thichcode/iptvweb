@@ -49,19 +49,6 @@ function renderHeroCard(m, large = false) {
   </div>`
 }
 
-function renderHero(items) {
-  if (!items || !items.length) return ''
-  const main = items[0]
-  const side = items.slice(1, 5)
-  return `<section class="home-hero-section">
-    <h2 class="home-section-title">Đề xuất hôm nay</h2>
-    <div class="home-hero-strip">
-      ${renderHeroCard(main, true)}
-      <div class="home-hero-side-grid">${side.map(m => renderHeroCard(m)).join('')}</div>
-    </div>
-    <div class="home-dots"><span class="active"></span><span></span><span></span><span></span><span></span></div>
-  </section>`
-}
 
 function renderHomeRowShell(type, label) {
   return `<div class="home-row">
@@ -159,6 +146,7 @@ export async function loadHomeData() {
       return { type: rowDef.type, label: rowDef.label, items: localMovies.slice(idx * ROW_LIMIT, (idx + 1) * ROW_LIMIT) }
     }
   }))
+  if (store.screen !== 'home') return
   renderHome()
 }
 

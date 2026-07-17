@@ -23,14 +23,3 @@ export function searchLocal(keyword, page = 1, limit = 20) {
   return { items: matched.slice(start, start + limit), totalPages, total: matched.length }
 }
 
-export function getRandomMovies(count = 5) {
-  if (!movies?.length) return []
-  const shuffled = [...movies].sort(() => Math.random() - 0.5)
-  return shuffled.slice(0, count)
-}
-
-export function getMoviesByPage(page = 1, limit = 20) {
-  if (!movies) return { items: [], totalPages: 0 }
-  const start = (page - 1) * limit
-  return { items: movies.slice(start, start + limit), totalPages: Math.ceil(movies.length / limit) }
-}

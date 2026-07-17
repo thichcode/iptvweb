@@ -194,6 +194,3 @@ function showPlayerError(msg) {
   wrap.appendChild(el)
 }
 
-export function handlePlayerClick(e) {
-  return null
-}

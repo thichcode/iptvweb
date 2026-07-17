@@ -7,7 +7,7 @@ const DEFAULT_PROXY_BASE = typeof location !== 'undefined' && location.protocol 
   : '/api/proxy'
 const PROXY_BASE = import.meta.env?.VITE_API_PROXY || DEFAULT_PROXY_BASE
 export const API_BASE = import.meta.env?.VITE_API_BASE || PROXY_BASE
-export const FALLBACK_API_BASE = ''
+
 export const IMAGE_BASE = import.meta.env?.VITE_IMAGE_BASE || 'https://img.ophim.live/uploads/movies'
 const MAX_RETRIES = 2
 const TIMEOUT_MS = 15000

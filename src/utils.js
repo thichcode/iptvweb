@@ -5,7 +5,6 @@ export { imgSrc, store }
 export function $(sel, ctx = document) { return ctx.querySelector(sel) }
 export function $$(sel, ctx = document) { return [...ctx.querySelectorAll(sel)] }
 
-export function empty(el) { el.innerHTML = '' }
 
 export function sanitize(str) {
   if (typeof str !== 'string') return ''
@@ -32,9 +31,6 @@ export function switchScreen(id) {
   if (bar) bar.classList.toggle('show', id !== 'home')
 }
 
-export function scrollTo(el) {
-  if (el) el.scrollIntoView({ block: 'nearest', behavior: 'auto' })
-}
 
 export const HOME_MENU = [
   { id: 'tv-shows', label: 'TV Shows' },
@@ -53,19 +49,6 @@ export function toggleLargeMode() {
   store.largeMode = !store.largeMode
   document.body.classList.toggle('large-mode', store.largeMode)
   try { localStorage.setItem('wp_large', store.largeMode ? '1' : '') } catch {}
-}
-
-export const APP_VER = '1.0.0'
-
-export async function checkUpdate() {
-  try {
-    const r = await fetch('https://api.github.com/repos/thichcode/iptvweb/releases/latest')
-    if (!r.ok) return null
-    const data = await r.json()
-    const tag = data.tag_name || ''
-    const apk = data.assets?.find(a => a.name.endsWith('.apk'))
-    return { tag, url: apk?.browser_download_url || '', notes: data.body || '' }
-  } catch { return null }
 }
 
 function restoreLargeMode() {

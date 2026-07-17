@@ -17,18 +17,6 @@ function renderSkeletonList(count = 6) {
   return html
 }
 
-function renderSkeletonDetail() {
-  return `<div class="detail-layout">
-    <div class="detail-poster"><div class="skeleton skeleton-poster" style="width:260px;height:390px"></div></div>
-    <div class="detail-info">
-      <div class="skeleton skeleton-line skeleton-line-medium" style="height:28px;width:200px;margin-bottom:12px"></div>
-      <div class="skeleton skeleton-line skeleton-line-short" style="height:16px;width:120px;margin-bottom:16px"></div>
-      <div class="skeleton skeleton-line" style="height:14px;width:100%;margin-bottom:8px"></div>
-      <div class="skeleton skeleton-line" style="height:14px;width:90%;margin-bottom:8px"></div>
-      <div class="skeleton skeleton-line" style="height:14px;width:70%"></div>
-    </div>
-  </div>`
-}
 
 export function renderEmptyState(title = 'Chưa có phim', hint = 'Thử chọn mục khác hoặc quay lại sau.') {
   return `<div class="empty-state"><div class="empty-title">${sanitize(title)}</div><div class="empty-hint">${sanitize(hint)}</div></div>`
@@ -104,6 +92,7 @@ export async function loadMovieList(type, page, keyword, category, country) {
   store.listType = type
   try {
     const data = await fetchMovies(type, page, keyword, category, country, limit)
+    if (store.screen !== 'list') return
     const items = data.items || (data.data && data.data.items) || []
     const pagination = data.pagination || (data.data && data.data.params && data.data.params.pagination) || {}
     renderMovieList(limitRenderedItems(items), pagination.currentPage || page, pagination.totalPages || 1, type)
@@ -134,6 +123,7 @@ export async function loadCategories() {
   window.scrollTo({ top: 0, behavior: 'smooth' })
   try {
     const data = await fetchCategories()
+    if (store.screen !== 'list') return
     const items = Array.isArray(data) ? data : (data.data && Array.isArray(data.data) ? data.data : [])
     renderSubList(items, 'category')
   } catch (err) {
@@ -154,6 +144,7 @@ export async function loadCountries() {
   window.scrollTo({ top: 0, behavior: 'smooth' })
   try {
     const data = await fetchCountries()
+    if (store.screen !== 'list') return
     const items = Array.isArray(data) ? data : (data.data && Array.isArray(data.data) ? data.data : [])
     renderSubList(items, 'country')
   } catch (err) {

@@ -24,6 +24,7 @@ export async function loadDetail(slug) {
   store.currentSlug = slug
   try {
     const data = await fetchDetail(slug)
+    if (store.screen !== 'detail') return
     if (!data || !data.movie) { container.innerHTML = '<div class="empty">Không tìm thấy phim</div>'; return }
     renderDetail(data.movie, data.episodes || [])
   } catch (err) {
