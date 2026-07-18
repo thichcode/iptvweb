@@ -86,7 +86,7 @@ function buildShell() {
       <div id="player-ui">
         <div id="player-overlay">
           <div class="p-title" id="p-title"></div>
-          <div class="p-hint">← → Seek  |  Space Play/Pause  |  Esc thoát</div>
+          <div class="p-hint">← → Tua  |  ↓ Menu  |  Enter Play/Pause  |  Back thoát</div>
         </div>
         <div class="p-controls">
           <span class="p-time" id="p-current">0:00</span>
@@ -237,6 +237,7 @@ function handleKey(e) {
     e.preventDefault()
     if (key === 'ArrowLeft') seek(-10)
     else if (key === 'ArrowRight') seek(10)
+    else if (key === 'ArrowDown') showOverlay()
     else if (key === 'PlayPause' || key === 'Space' || key === 'Enter') togglePlay()
     else if (key === 'Escape') exitPlayer()
     return
