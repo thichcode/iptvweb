@@ -1,6 +1,6 @@
 import { $, $$, imgSrc, store, switchScreen, sanitize, sanitizeAttr } from '../utils.js'
 import { fetchDetail } from '../api.js'
-import { isFav, toggleFav } from '../store.js'
+import { getHist, isFav, toggleFav } from '../store.js'
 
 function renderSkeletonDetail() {
   return `<div class="detail-layout">
@@ -83,6 +83,13 @@ function renderDetail(movie, episodes) {
   }
   html += '</div></div>'
   container.innerHTML = html
+
+  const h = getHist()
+  const he = h[movie.slug]
+  if (he) {
+    const ep = container.querySelector(`.episode-btn[data-server="${he.serverIdx}"][data-ep="${he.epIdx}"]`)
+    if (ep) { ep.classList.add('focused'); ep.textContent += ' • Đang xem' }
+  }
 }
 
 export function handleDetailClick(e) {

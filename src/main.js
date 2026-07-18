@@ -14,6 +14,11 @@ import { checkApiHealth, getApiSource, nextApiSource, setApiSource } from './api
 let overlayTimer = null
 let homeToolbarIdx = -1
 
+function announce(msg) {
+  const el = $('#sr-announcer')
+  if (el) { el.textContent = ''; requestAnimationFrame(() => { el.textContent = msg }) }
+}
+
 function showToast(msg) {
   let t = $('#toast-msg')
   if (!t) {
@@ -255,7 +260,7 @@ function handleKey(e) {
       else if (key === 'Escape') { homeToolbarIdx = -1; clearHomeToolbar(tbItems); return }
       return
     }
-    if (key === 'ArrowUp' && focusedRow === 0) { homeToolbarIdx = 0; focusHomeToolbar(tbItems); return }
+    if (key === 'ArrowUp' && focusedRow === 0) { const si = tbItems.findIndex(el => el.id === 'header-search-input'); homeToolbarIdx = si >= 0 ? si : 0; focusHomeToolbar(tbItems); return }
     if (key === 'ArrowUp') { navigateHome('up'); return }
     else if (key === 'ArrowDown') { navigateHome('down'); return }
     else if (key === 'ArrowLeft') { navigateHome('left'); return }
@@ -393,6 +398,7 @@ function handleClick(e) {
   }
 
   if (e.target.closest('#api-toggle-btn')) {
+    const lbl = $('#api-toggle-label'); if (lbl) lbl.textContent = 'API: Kiểm tra...'
     setApiSource(nextApiSource())
     updateApiToggle()
     loadHomeData()
@@ -469,7 +475,7 @@ function updateApiToggle() {
 }
 
 function handleTopNav(id) {
-  $$('.top-nav-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.nav === id))
+  $$('.top-nav-btn').forEach(btn => { const a = btn.dataset.nav === id; btn.classList.toggle('active', a); btn.toggleAttribute('aria-current', a) })
   store.searchMode = false
   store.currentKeyword = ''
   store.categorySlug = ''
@@ -537,6 +543,7 @@ function init() {
   detectTV()
   history.pushState(null, null, location.href)
   window.addEventListener('popstate', e => { e.preventDefault(); goBack() })
+  document.addEventListener('error', e => { const t = e.target; if (t.tagName === 'IMG' && !t.src?.startsWith('data:')) { e.stopPropagation(); const w = t.width || 200; const h = t.height || 300; t.src = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '"><rect width="' + w + '" height="' + h + '" fill="#11100D"/><rect x="' + (w * 0.1) + '" y="' + (h * 0.1) + '" width="' + (w * 0.8) + '" height="' + (h * 0.8) + '" fill="none" stroke="#766F5D" stroke-width="2" rx="4"/><path d="M' + (w * 0.42) + ' ' + (h * 0.4) + ' l0 ' + (h * 0.25) + ' l' + (w * 0.2) + ' -' + (h * 0.125) + 'z" fill="#766F5D"/></svg>') } }, true)
   buildShell()
   $('#header-search-input').addEventListener('keydown', e => {
     e.stopPropagation()

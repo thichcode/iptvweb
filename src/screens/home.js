@@ -37,7 +37,7 @@ function renderHeroCard(m, large = false) {
       <div class="home-hero-shade"></div>
       <div class="home-hero-copy">
         <h2>${title}</h2>
-        <div class="home-hero-meta"><span>★ 8.5</span><span>${year}</span><span>HD</span></div>
+        <div class="home-hero-meta"><span>${year}</span><span>HD</span></div>
         <p>${sanitize(m.origin_name || 'Chọn để xem chi tiết phim.')}</p>
         <div class="home-hero-actions"><button data-slug="${slug}">▶ Xem ngay</button><span>ⓘ Chi tiết</span></div>
       </div>
@@ -45,7 +45,7 @@ function renderHeroCard(m, large = false) {
   }
   return `<div class="home-hero-side" data-slug="${slug}">
     <img src="${thumb}" alt="${sanitizeAttr(m.name || '')}" loading="lazy">
-    <div class="home-hero-side-copy"><h3>${title}</h3><p><span>★ 7.8</span><span>${year}</span><span>HD</span></p></div>
+    <div class="home-hero-side-copy"><h3>${title}</h3><p><span>${year}</span><span>HD</span></p></div>
   </div>`
 }
 

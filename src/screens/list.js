@@ -37,9 +37,11 @@ export function renderMovieList(items, page, totalPages, type) {
   html += '</div>'
   if (totalPages > 1) {
     html += '<div class="pagination">'
+    if (page > 2) html += `<div class="page-btn" data-page="1">« Đầu</div>`
     if (page > 1) html += `<div class="page-btn" data-page="${page - 1}">← Trang trước</div>`
     html += `<span class="page-info">Trang ${page} / ${totalPages}</span>`
     if (page < totalPages) html += `<div class="page-btn" data-page="${page + 1}">Trang sau →</div>`
+    if (page < totalPages - 1) html += `<div class="page-btn" data-page="${totalPages}">Cuối »</div>`
     html += '</div>'
   }
   container.innerHTML = html
