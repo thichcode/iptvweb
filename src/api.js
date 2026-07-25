@@ -76,6 +76,7 @@ export function imgSrc(url) {
   if (!url) return ''
   if (url.startsWith('http://') || url.startsWith('https://')) return url
   if (url.startsWith('upload/')) return 'https://phimimg.com/' + url
+  if (url.startsWith('uploads/')) return 'https://phimimg.com/' + url
   return IMAGE_BASE.replace(/\/$/, '') + '/' + url.replace(/^\//, '')
 }
 

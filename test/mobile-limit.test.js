@@ -88,6 +88,7 @@ test('apiGet uses selected PhimAPI as primary', async () => {
 test('image URLs use live CDN directly', () => {
   assert.equal(imgSrc('poster.jpg'), 'https://img.ophim.live/uploads/movies/poster.jpg')
   assert.equal(imgSrc('upload/vod/poster.jpg'), 'https://phimimg.com/upload/vod/poster.jpg')
+  assert.equal(imgSrc('uploads/movies/20260719/poster.webp'), 'https://phimimg.com/uploads/movies/20260719/poster.webp')
   assert.equal(imgSrc('https://img.ophim.live/uploads/movies/poster.jpg'), 'https://img.ophim.live/uploads/movies/poster.jpg')
 })
 
