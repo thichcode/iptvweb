@@ -432,7 +432,7 @@ body.tv-mode #app {
   padding-right: var(--overscan);
 }
 
-/* TV: 56px min touch targets, Amber Projector focus, reduced motion */
+/* TV: 56px min touch targets, Amber focus, reduced motion */
 body.tv-mode .top-nav-btn,
 body.tv-mode .home-action,
 body.tv-mode .local-item,
@@ -451,6 +451,43 @@ body.tv-mode *:focus-visible {
   outline: none;
   box-shadow: var(--focus-amber);
 }
+
+/* TV: larger everything for 3m viewing distance */
+body.tv-mode .header { padding: 20px max(48px, env(safe-area-inset-left, 0)) 20px max(48px, env(safe-area-inset-right, 0)); min-height: 96px; }
+body.tv-mode .header h1 { font-size: 32px; }
+body.tv-mode .top-nav-btn { font-size: 18px; padding: 16px 24px; }
+
+body.tv-mode .home-row { margin-bottom: 44px; }
+body.tv-mode .home-section-title { font-size: 26px; }
+body.tv-mode .home-section-title::before { height: 28px; }
+body.tv-mode .poster-card { flex-basis: 220px; max-width: none; border-radius: var(--radius-md); }
+body.tv-mode .poster-carousel { gap: 18px; padding: 0 16px 20px; }
+body.tv-mode .poster-title { font-size: 15px; }
+body.tv-mode .poster-overlay { padding: 80px 14px 14px; }
+body.tv-mode .home-hero-main { height: clamp(200px, 22vw, 320px); }
+body.tv-mode .home-hero-copy h2 { font-size: clamp(28px, 3.2vw, 42px); }
+body.tv-mode .home-hero-copy p { font-size: 16px; }
+body.tv-mode .home-hero-side { height: clamp(200px, 22vw, 320px); }
+body.tv-mode .home-hero-side-copy h3 { font-size: 15px; }
+
+body.tv-mode .local-item { padding: 14px 18px; min-height: 64px; gap: 14px; }
+body.tv-mode .local-item .info .title { font-size: 18px; }
+body.tv-mode .local-item .info .meta { font-size: 14px; }
+body.tv-mode .local-item .thumb { width: 72px; height: 104px; border-radius: var(--radius-sm); }
+body.tv-mode .sub-item { font-size: 18px; padding: 14px 24px; min-height: 56px; }
+body.tv-mode .page-btn { font-size: 17px; padding: 14px 22px; min-height: 56px; }
+body.tv-mode .page-info { font-size: 16px; }
+
+body.tv-mode .detail-info h2 { font-size: clamp(36px, 3.5vw, 52px); }
+body.tv-mode .desc { font-size: 18px; line-height: 1.8; }
+body.tv-mode .tags span { font-size: 15px; padding: 8px 14px; }
+body.tv-mode .episode-btn { font-size: 19px; padding: 18px 26px; min-height: 64px; }
+body.tv-mode .episode-grid { gap: 12px; }
+
+body.tv-mode .search-input { font-size: 18px; min-height: 56px; padding: 14px 18px; }
+body.tv-mode .search-btn { font-size: 18px; min-height: 56px; padding: 14px 28px; }
+
+body.tv-mode .bottom-bar, body.tv-mode .bottom-bar.show { display: none !important; }
 
 @media (prefers-reduced-motion: reduce) {
   body.tv-mode *,
