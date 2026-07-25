@@ -102,7 +102,9 @@ function buildShell() {
     </div>
     <div class="bottom-bar" id="bottom-bar">
       <div class="nav-btn" id="nav-back" role="button" aria-label="Quay lại">← <span class="label">Quay lại</span></div>
-      <div class="nav-btn" id="nav-home" role="button" aria-label="Trang chủ"><span class="label">Trang chủ</span></div>
+      <div class="nav-btn" id="nav-search-btn" role="button" aria-label="Tìm kiếm">⌕ <span class="label">Tìm</span></div>
+      <div class="nav-btn" id="nav-home" role="button" aria-label="Trang chủ">⌂ <span class="label">Trang chủ</span></div>
+      <div class="nav-btn" id="nav-fav" role="button" aria-label="Yêu thích">♥ <span class="label">Yêu thích</span></div>
     </div>`
 }
 
@@ -561,6 +563,28 @@ function init() {
   $('#header-back').addEventListener('click', goBack)
   $('#nav-back').addEventListener('click', goBack)
   $('#nav-home').addEventListener('click', () => { if (store.screen !== 'home') goHome() })
+  $('#nav-search-btn').addEventListener('click', () => {
+    if (store.screen === 'home' && !store.searchMode || store.screen === 'detail') {
+      store.searchMode = true
+      renderSearchInput(store.currentKeyword)
+      switchScreenLocal('list')
+      setHeader('Tìm Kiếm', 'Enter để tìm')
+    } else {
+      const inp = $('.search-input')
+      if (inp) inp.focus()
+      else {
+        store.searchMode = true
+        renderSearchInput(store.currentKeyword)
+        switchScreenLocal('list')
+        setHeader('Tìm Kiếm', 'Enter để tìm')
+      }
+    }
+  })
+  $('#nav-fav').addEventListener('click', () => {
+    loadFavorites()
+    switchScreenLocal('list')
+    setHeader('Yêu Thích', '')
+  })
   // ponytail: Capacitor backButton — overlays goBack handles, double-press already in goBack
   try { window.Capacitor?.Plugins?.App?.addListener?.('backButton', () => goBack()) } catch {}
   setTimeout(updateApiToggle, 100)

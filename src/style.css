@@ -1058,12 +1058,19 @@ body.large-mode #player-fs-btn { font-size: 36px; }
 .exit-btn.exit-active { border-color: var(--accent); background: rgba(255,212,90,0.12); color: var(--accent); }
 @media (min-width: 1200px) { .exit-btn { font-size: 20px; padding: 16px 48px; } }
 @media (max-width: 700px) {
-  .header { flex-wrap: wrap; }
-  .header h1 { width: 100%; }
-  .header-search { order: 3; width: calc(100% - 58px); }
-  .settings-btn { order: 4; }
-  #screen-home { padding: 0 14px 72px; }
-  .home-hero-copy { left: 18px; right: 18px; }
+  .header { flex-wrap: wrap; gap: 8px; padding: 10px 12px; min-height: auto; }
+  .header h1 { width: 100%; font-size: 20px; }
+  .top-nav { display: none; }
+  .header-search { order: 3; width: 100%; }
+  .api-toggle-btn, .settings-btn { display: none; }
+  #screen-home { padding: 0 12px 72px; }
+  .home-hero-copy { left: 14px; right: 14px; }
   .home-hero-side-grid { display: none; }
-  .poster-card { flex-basis: 42vw; }
+  .poster-card { flex-basis: 40vw; }
+  .home-rows { padding: 16px 0 64px; }
+}
+@media (max-width: 700px) {
+  .bottom-bar { height: 56px; }
+  .nav-btn { font-size: 18px; flex-direction: column; gap: 2px; }
+  .nav-btn .label { font-size: 10px; }
 }
