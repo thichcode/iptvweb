@@ -82,7 +82,7 @@ var LS=[
   {t:'phim-moi-cap-nhat',l:'Phim Mới Cập Nhật'},
   {t:'phim-bo',l:'Phim Bộ'},
   {t:'phim-le',l:'Phim Lẻ'},
-  {t:'tv-shows',l:'TV Shows'}
+  {t:'phim-le',l:'Top 10 IMDb'}
 ]
 
 function hm() {
@@ -98,7 +98,7 @@ function hm() {
 }
 
 function lr(i) {
-  var p=LS[i].t==='phim-moi-cap-nhat'?'/danh-sach/phim-moi-cap-nhat?page=1&limit=10':'/v1/api/danh-sach/'+LS[i].t+'?page=1&limit=10'
+  var p=LS[i].t==='phim-moi-cap-nhat'?'/danh-sach/phim-moi-cap-nhat?page=1&limit=10':'/v1/api/danh-sach/'+LS[i].t+'?page=1&limit=10&sort_field=view&sort_type=desc'
   xhr('https://ophim1.com'+p,function(e,d){
     var el=document.getElementById('r'+i);if(!el)return
     if(e||!d){el.innerHTML='<div class="err">Lỗi tải</div>';return}
@@ -118,7 +118,7 @@ function search(q) {
   document.getElementById('det').innerHTML=''
   document.getElementById('det').className=''
   document.getElementById('lst').innerHTML='<h2>Tìm: '+es(q)+'</h2><div class="row" id="sr-results"><div class="loading">Đang tìm...</div></div>'
-  xhr('https://ophim1.com/v1/api/tim-kiem?keyword='+encodeURIComponent(q),function(e,d){
+  xhr('https://ophim1.com/v1/api/tim-kiem?keyword='+encodeURIComponent(q)+'&sort_field=view&sort_type=desc',function(e,d){
     var el=document.getElementById('sr-results');if(!el)return
     if(e||!d){el.innerHTML='<div class="err">Lỗi tìm kiếm</div>';return}
     var it=d.items||(d.data&&d.data.items)||[]
