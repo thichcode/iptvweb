@@ -5,191 +5,142 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>WebPhim TV</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#0b0b09;color:#fff8e6;font-family:Arial,Helvetica,sans-serif;padding:0 0 60px}
-h1{background:#111;padding:16px 20px;color:#ffd45a;font-size:24px;border-bottom:1px solid #333}
+*{margin:0;padding:0}
+body{background:#0b0b09;color:#fff8e6;font-family:Arial,Helvetica,sans-serif;padding:0 0 50px}
+h1{background:#111;padding:16px 20px;color:#ffd45a;font-size:22px}
 h1 span{color:#fff}
-.section{padding:16px 14px 8px}
-.section h2{color:#ffd45a;font-size:18px;margin-bottom:10px;padding-left:4px;border-left:3px solid #ffd45a}
-.row{white-space:nowrap;overflow-x:auto;padding:0 4px 12px;-webkit-overflow-scrolling:touch}
-.row::-webkit-scrollbar{display:none}
-.card{display:inline-block;width:140px;margin-right:10px;vertical-align:top;cursor:pointer}
-.card img{width:100%;aspect-ratio:2/3;object-fit:cover;border-radius:6px;background:#222;display:block}
-.card .nm{font-size:13px;color:#fff8e6;margin-top:6px;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.card .yr{font-size:11px;color:#ffd45a;margin-top:2px}
-.loading{text-align:center;padding:40px 20px;color:#888;font-size:15px}
-#detail{display:none;padding:14px}
-#detail.show{display:block}
-#detail .back{display:inline-block;color:#ffd45a;font-size:16px;padding:10px 0;cursor:pointer;margin-bottom:10px}
-#detail .poster{width:clamp(120px,40vw,200px);border-radius:6px;float:left;margin:0 16px 12px 0;background:#222}
-#detail h2{font-size:20px;margin-bottom:6px;color:#ffd45a}
-#detail .meta{color:#b9ad91;font-size:13px;margin-bottom:10px}
-#detail .desc{color:#b9ad91;font-size:13px;line-height:1.6;margin-bottom:14px;clear:both}
-#detail .tags{margin-bottom:12px}
-#detail .tags span{display:inline-block;background:rgba(255,255,255,0.08);padding:4px 10px;border-radius:12px;font-size:12px;color:#b9ad91;margin:2px 3px 2px 0}
-.srv{color:#ffd45a;font-size:15px;font-weight:700;margin:10px 0 6px}
-.eps{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
-.ep{padding:10px 14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:#fff8e6;font-size:13px;cursor:pointer;min-height:42px;display:flex;align-items:center}
-.ep:active{background:rgba(255,212,90,0.15);border-color:#ffd45a}
-#player-wrap{display:none;position:fixed;inset:0;z-index:100;background:#000}
-#player-wrap.show{display:flex;align-items:center;justify-content:center}
-#player{width:100%;height:100%;object-fit:contain}
-#player-exit{position:fixed;top:12px;left:12px;font-size:28px;color:#fff;cursor:pointer;padding:10px 14px;background:rgba(0,0,0,0.6);border-radius:6px;z-index:110;line-height:1}
-.err{text-align:center;padding:40px 20px;color:#ff6868;font-size:14px}
+h2{color:#ffd45a;font-size:17px;margin:14px 0 8px 14px}
+.row{white-space:nowrap;overflow-x:auto;padding:0 10px 12px}
+.card{display:inline-block;width:130px;margin-right:8px;vertical-align:top;cursor:pointer;text-decoration:none;color:#fff8e6}
+.card img{width:100%;height:195px;object-fit:cover;border-radius:4px;background:#222;display:block}
+.card .nm{font-size:12px;margin-top:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.card .yr{font-size:11px;color:#ffd45a}
+.loading,.err{text-align:center;padding:30px 20px;color:#888;font-size:14px}
+.err{color:#ff6868}
+#det{display:none;padding:10px 14px}
+#det.show{display:block}
+#det .bk{color:#ffd45a;font-size:15px;padding:8px 0;cursor:pointer;margin-bottom:8px}
+#det .ps{width:130px;border-radius:4px;float:left;margin:0 14px 10px 0;background:#222}
+#det h2{font-size:18px;margin:0 0 4px;color:#ffd45a;padding:0}
+#det .mt{color:#b9ad91;font-size:12px;margin-bottom:10px}
+#det .dc{color:#b9ad91;font-size:12px;line-height:1.5;margin-bottom:12px;clear:both}
+#det .tg{margin-bottom:10px}
+#det .tg span{display:inline-block;background:rgba(255,255,255,0.08);padding:3px 8px;border-radius:10px;font-size:11px;color:#b9ad91;margin:2px 2px 2px 0}
+.sv{color:#ffd45a;font-size:14px;font-weight:700;margin:8px 0 4px}
+.eg{overflow:hidden;margin-bottom:10px}
+.eg a{display:block;float:left;min-width:60px;padding:8px 12px;margin:3px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:4px;color:#fff8e6;font-size:12px;text-align:center;text-decoration:none}
+#pw{display:none;position:fixed;inset:0;z-index:100;background:#000}
+#pw.show{display:block}
+#pw video{width:100%;height:100%;object-fit:contain}
+#px{position:fixed;top:10px;left:10px;font-size:24px;color:#fff;cursor:pointer;padding:8px 12px;background:rgba(0,0,0,0.6);border-radius:4px;z-index:110}
+img{display:block}
 </style>
 </head>
 <body>
 <h1><span>Web</span>Phim</h1>
-<div id="list"></div>
-<div id="detail"></div>
-<div id="player-wrap"><video id="player" playsinline></video><div id="player-exit" onclick="exitPlayer()">✕</div></div>
+<div id="lst"></div>
+<div id="det"></div>
+<div id="pw"><video id="pl" playsinline></video><div id="px" onclick="xp()">✕</div></div>
 <script>
-var PROXY = '/api/proxy'
-
-function xhr(url, cb) {
-  var r = new XMLHttpRequest()
-  r.open('GET', url, true)
-  r.onreadystatechange = function() {
-    if (r.readyState === 4) {
-      if (r.status === 200) cb(null, JSON.parse(r.responseText))
-      else cb(new Error('HTTP ' + r.status))
+function g(url, cb) {
+  try {
+    var r = new XMLHttpRequest()
+    r.open('GET', url, true)
+    r.onreadystatechange = function() {
+      if (r.readyState === 4) {
+        if (r.status === 200) try { cb(null, JSON.parse(r.responseText)) } catch(e) { cb(e) }
+        else cb(new Error('HTTP ' + r.status))
+      }
     }
-  }
-  r.send()
+    r.send()
+  } catch(e) { cb(e) }
 }
 
-function apiGet(path, cb) {
-  xhr(PROXY + '?path=' + encodeURIComponent(path), cb)
+function im(u) {
+  if (!u) return ''
+  if (u.indexOf('http://')===0||u.indexOf('https://')===0) return u
+  if (u.indexOf('upload/')===0||u.indexOf('uploads/')===0) return 'https://phimimg.com/'+u
+  return 'https://img.ophim.live/uploads/movies/'+u.replace(/^\//,'')
 }
 
-function imgSrc(url) {
-  if (!url) return ''
-  if (url.indexOf('http://') === 0 || url.indexOf('https://') === 0) return url
-  if (url.indexOf('upload/') === 0) return 'https://phimimg.com/' + url
-  if (url.indexOf('uploads/') === 0) return 'https://phimimg.com/' + url
-  return 'https://img.ophim.live/uploads/movies/' + url.replace(/^\//, '')
+function es(s) {
+  if (typeof s!=='string') return ''
+  return s.replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c]})
 }
 
-function renderMovie(m) {
-  var thumb = imgSrc(m.poster_url || m.thumb_url || m.thumb || m.poster)
-  return '<div class="card" onclick="openDetail(\'' + m.slug + '\')">' +
-    '<img src="' + thumb + '" alt="" onerror="this.style.display=\'none\'">' +
-    '<div class="nm">' + esc(m.name || '') + '</div>' +
-    '<div class="yr">' + (m.year || '') + '</div></div>'
-}
-
-function esc(s) { return String(s).replace(/[&<>"]/g, function(c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c] }) }
-
-var ROWS = [
-  { type: 'phim-moi-cap-nhat', label: 'Phim Mới Cập Nhật' },
-  { type: 'phim-bo', label: 'Phim Bộ' },
-  { type: 'phim-le', label: 'Phim Lẻ' },
-  { type: 'tv-shows', label: 'TV Shows' }
+var LS=[
+  {t:'phim-moi-cap-nhat',l:'Phim Mới'},
+  {t:'phim-bo',l:'Phim Bộ'},
+  {t:'phim-le',l:'Phim Lẻ'},
+  {t:'tv-shows',l:'TV Shows'}
 ]
 
-function loadHome() {
-  document.getElementById('detail').innerHTML = ''
-  document.getElementById('detail').className = ''
-  document.getElementById('list').innerHTML = ''
-  for (var i = 0; i < ROWS.length; i++) {
-    var el = document.getElementById('list')
-    el.innerHTML += '<div class="section" id="sec-' + i + '"><h2>' + esc(ROWS[i].label) + '</h2><div class="row" id="row-' + i + '"><div class="loading">Đang tải...</div></div></div>'
-    loadRow(i)
+function hm() {
+  document.getElementById('det').innerHTML=''
+  document.getElementById('lst').innerHTML=''
+  for(var i=0;i<LS.length;i++) {
+    document.getElementById('lst').innerHTML+='<h2>'+es(LS[i].l)+'</h2><div class="row" id="r'+i+'"><div class="loading">Đang tải...</div></div>'
+    lr(i)
   }
 }
 
-function parseItems(data) {
-  if (data && data.items) return data.items
-  if (data && data.data && data.data.items) return data.data.items
-  return []
-}
-
-function parsePagination(data) {
-  var p = data && data.pagination
-  if (p) return p
-  if (data && data.data && data.data.params && data.data.params.pagination) return data.data.params.pagination
-  return {}
-}
-
-function loadRow(i) {
-  var url = ROWS[i].type === 'phim-moi-cap-nhat'
-    ? '/danh-sach/phim-moi-cap-nhat?page=1&limit=10'
-    : '/v1/api/danh-sach/' + ROWS[i].type + '?page=1&limit=10'
-  apiGet(url, function(err, data) {
-    var el = document.getElementById('row-' + i)
-    if (!el) return
-    if (err || !data) { el.innerHTML = '<div class="err">Không thể tải</div>'; return }
-    var items = parseItems(data)
-    if (!items.length) { el.innerHTML = ''; return }
-    el.innerHTML = items.map(renderMovie).join('')
+function lr(i) {
+  var p=LS[i].t==='phim-moi-cap-nhat'?'/danh-sach/phim-moi-cap-nhat?page=1&limit=10':'/v1/api/danh-sach/'+LS[i].t+'?page=1&limit=10'
+  g('https://ophim1.com'+p,function(e,d){
+    var el=document.getElementById('r'+i);if(!el)return
+    if(e||!d){el.innerHTML='<div class="err">Lỗi tải</div>';return}
+    var it=d.items||(d.data&&d.data.items)||[]
+    if(!it.length){el.innerHTML='';return}
+    el.innerHTML=it.map(function(m){
+      var th=im(m.poster_url||m.thumb_url||m.thumb||m.poster)
+      return '<div class="card" onclick="od(\''+es(m.slug)+'\')"><img src="'+th+'" onerror="this.style.display=\'none\'"><div class="nm">'+es(m.name||'')+'</div><div class="yr">'+(m.year||'')+'</div></div>'
+    }).join('')
   })
 }
 
-function openDetail(slug) {
-  document.getElementById('list').innerHTML = '<div class="loading">Đang tải...</div>'
-  apiGet('/phim/' + slug, function(err, data) {
-    if (err || !data || !data.movie) {
-      document.getElementById('list').innerHTML = '<div class="err">Không thể tải thông tin phim</div>'
-      return
+function od(s) {
+  document.getElementById('lst').innerHTML='<div class="loading">Đang tải...</div>'
+  g('https://ophim1.com/phim/'+s,function(e,d){
+    if(e||!d||!d.movie){
+      document.getElementById('lst').innerHTML='<div class="err">Lỗi tải phim</div>';return
     }
-    renderDetail(data.movie, data.episodes || [])
+    rd(d.movie,d.episodes||[])
   })
 }
 
-function renderDetail(movie, episodes) {
-  var poster = imgSrc(movie.poster_url || movie.thumb_url || movie.poster || movie.thumb)
-  var tags = [movie.year]
-  if (movie.quality) tags.push(movie.quality)
-  if (movie.lang) tags.push(movie.lang)
-  if (movie.time) tags.push(movie.time)
-
-  var html = '<div id="detail" class="show">' +
-    '<div class="back" onclick="loadHome()">← Quay lại</div>' +
-    '<img class="poster" src="' + poster + '" alt="" onerror="this.style.display=\'none\'">' +
-    '<h2>' + esc(movie.name || '') + '</h2>' +
-    '<div class="meta">' + esc(movie.origin_name || '') + ' • ' + (movie.year || '') + '</div>' +
-    '<div class="tags">' + tags.filter(Boolean).map(function(t) { return '<span>' + esc(t) + '</span>' }).join('') + '</div>' +
-    '<div class="desc">' + esc(movie.content || movie.description || 'Chưa có mô tả') + '</div>'
-
-  if (episodes.length) {
-    for (var s = 0; s < episodes.length; s++) {
-      var ep = episodes[s]
-      var data = ep.server_data || []
-      html += '<div class="srv">' + esc(ep.server_name || 'Server ' + (s + 1)) + '</div>'
-      html += '<div class="eps">'
-      for (var e = 0; e < data.length; e++) {
-        html += '<div class="ep" onclick="playEpisode(\'' + data[e].link_m3u8 + '\',\'' + esc(data[e].name || 'Tập ' + (e + 1)) + '\')">' + esc(data[e].name || 'Tập ' + (e + 1)) + '</div>'
+function rd(m,e) {
+  var p=im(m.poster_url||m.thumb_url||m.poster||m.thumb)
+  var tg=[m.year]
+  if(m.quality)tg.push(m.quality)
+  if(m.lang)tg.push(m.lang)
+  if(m.time)tg.push(m.time)
+  var h='<div id="det" class="show"><div class="bk" onclick="hm()">← Quay lại</div>'+
+    '<img class="ps" src="'+p+'" onerror="this.style.display=\'none\'">'+
+    '<h2>'+es(m.name||'')+'</h2><div class="mt">'+es(m.origin_name||'')+' • '+(m.year||'')+'</div>'+
+    '<div class="tg">'+tg.filter(Boolean).map(function(t){return '<span>'+es(String(t))+'</span>'}).join('')+'</div>'+
+    '<div class="dc">'+es(m.content||m.description||'')+'</div>'
+  if(e.length) {
+    for(var s=0;s<e.length;s++) {
+      var d=e[s].server_data||[]
+      h+='<div class="sv">'+es(e[s].server_name||'Server '+(s+1))+'</div><div class="eg">'
+      for(var i=0;i<d.length;i++) {
+        h+='<a href="'+es(d[i].link_m3u8)+'" target="_blank" rel="noopener">'+es(d[i].name||'Tập '+(i+1))+'</a>'
       }
-      html += '</div>'
+      h+='</div>'
     }
   } else {
-    html += '<div style="color:#888;padding:20px 0;font-size:14px">Chưa có tập phim</div>'
+    h+='<div style="clear:both;color:#888;padding:16px 0;font-size:13px">Chưa có tập</div>'
   }
-  html += '</div>'
-
-  document.getElementById('list').innerHTML = html
+  h+='</div>'
+  document.getElementById('lst').innerHTML=h
 }
 
-function playEpisode(url, name) {
-  if (!url) return
-  document.title = name + ' — WebPhim TV'
-  var wrap = document.getElementById('player-wrap')
-  var player = document.getElementById('player')
-  wrap.className = 'show'
-  player.src = url
-  player.play()
+function xp() {
+  var w=document.getElementById('pw'),v=document.getElementById('pl')
+  v.pause();v.removeAttribute('src');w.className=''
 }
 
-function exitPlayer() {
-  var wrap = document.getElementById('player-wrap')
-  var player = document.getElementById('player')
-  player.pause()
-  player.removeAttribute('src')
-  wrap.className = ''
-  document.title = 'WebPhim TV'
-}
-
-loadHome()
+hm()
 </script>
 </body>
 </html>
