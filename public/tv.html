@@ -285,15 +285,23 @@ function goBack() {
 }
 
 document.addEventListener('keydown',function(e){
-  var k=e.key
+  var k=e.key,pw=document.getElementById('pw'),pl=document.getElementById('pl')
+
+  // When player active: arrows = seek
+  if(pw&&pw.className==='show'){
+    if(k==='ArrowRight'||k==='Right'){e.preventDefault();pl.currentTime=Math.min(pl.duration||0,pl.currentTime+10);return}
+    if(k==='ArrowLeft'||k==='Left'){e.preventDefault();pl.currentTime=Math.max(0,pl.currentTime-10);return}
+    if(k==='Escape'||k==='Backspace'){e.preventDefault();xp();return}
+    if(k==='Enter'){if(pl.paused)pl.play();else pl.pause();return}
+    return
+  }
+
   if(k==='ArrowRight'||k==='Right'){e.preventDefault();focusNext();return}
   if(k==='ArrowLeft'||k==='Left'){e.preventDefault();focusPrev();return}
   if(k==='ArrowDown'||k==='Down'){e.preventDefault();focusDown();return}
   if(k==='ArrowUp'||k==='Up'){e.preventDefault();focusUp();return}
   if(k==='Enter'){
-    // If search input focused, trigger search
     if(F.items[F.idx]&&F.items[F.idx].id==='sq'){document.getElementById('sb').click();return}
-    // Otherwise click focused
     if(F.items[F.idx]&&F.items[F.idx].el){F.items[F.idx].el.click();return}
   }
   if(k==='Escape'||k==='Backspace'){e.preventDefault();goBack();return}
