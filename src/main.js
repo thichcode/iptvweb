@@ -36,7 +36,7 @@ function showToast(msg) {
 function getHomeToolbarItems() {
   const items = []
   $$('.top-nav-btn').forEach(el => items.push(el))
-  ;['header-search-input', 'header-search-btn', 'api-toggle-btn', 'mode-btn'].forEach(id => {
+  ;['header-search-input', 'header-search-btn', 'api-toggle-btn', 'thumb-btn', 'mode-btn'].forEach(id => {
     const el = $(`#${id}`)
     if (el) items.push(el)
   })
@@ -78,6 +78,7 @@ function buildShell() {
       </div>
       
       <button class="api-toggle-btn" id="api-toggle-btn" aria-label="Chọn API"><span class="api-dot pending"></span><span id="api-toggle-label">API: Proxy</span></button>
+      <button class="settings-btn" id="thumb-btn" aria-label="Bật/tắt ảnh">🖼</button>
       <button class="settings-btn" id="mode-btn" aria-label="Chế độ chữ">⚙</button>
       <span class="hint" id="header-hint"></span>
     </div>
@@ -413,6 +414,15 @@ function handleClick(e) {
     return
   }
 
+  if (e.target.closest('#thumb-btn')) {
+    const thumbsOn = !store.noThumb
+    store.noThumb = thumbsOn
+    document.body.classList.toggle('text-mode', thumbsOn)
+    try { localStorage.setItem('wp_thumbs_on', thumbsOn ? '' : '1') } catch {}
+    showToast(thumbsOn ? 'Đã tắt ảnh' : 'Đã bật ảnh')
+    return
+  }
+
   if (e.target.closest('.search-btn')) {
     const inp = $('.search-input')
     if (inp && inp.value.trim()) doSearch(inp.value.trim())
@@ -543,6 +553,11 @@ function detectTV() {  const ua = navigator.userAgent
 
 function init() {
   detectTV()
+  // ponytail: images off by default for everyone; a user who toggles them on is saved
+  let thumbsOn = false
+  try { thumbsOn = localStorage.getItem('wp_thumbs_on') === '1' } catch {}
+  store.noThumb = !thumbsOn
+  document.body.classList.toggle('text-mode', !thumbsOn)
   history.pushState(null, null, location.href)
   window.addEventListener('popstate', e => { e.preventDefault(); goBack() })
   document.addEventListener('error', e => { const t = e.target; if (t.tagName === 'IMG' && !t.src?.startsWith('data:')) { e.stopPropagation(); imgFailCount++; if (imgFailCount >= 3) { document.body.classList.add('text-mode'); return } const w = t.width || 200; const h = t.height || 300; t.src = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '"><rect width="' + w + '" height="' + h + '" fill="#11100D"/><rect x="' + (w * 0.1) + '" y="' + (h * 0.1) + '" width="' + (w * 0.8) + '" height="' + (h * 0.8) + '" fill="none" stroke="#766F5D" stroke-width="2" rx="4"/><path d="M' + (w * 0.42) + ' ' + (h * 0.4) + ' l0 ' + (h * 0.25) + ' l' + (w * 0.2) + ' -' + (h * 0.125) + 'z" fill="#766F5D"/></svg>') } }, true)
