@@ -67,15 +67,23 @@ function renderDetail(movie, episodes) {
 
   if (episodes.length) {
     html += '<div class="episode-section"><div class="episode-panel">'
+    if (episodes.length > 1) {
+      html += '<select id="server-select" aria-label="Chọn server">'
+      for (let s = 0; s < episodes.length; s++) {
+        html += `<option value="${s}">${sanitize(episodes[s].server_name || 'Server ' + (s + 1))}</option>`
+      }
+      html += '</select>'
+    }
     for (let s = 0; s < episodes.length; s++) {
       const ep = episodes[s]
       const data = ep.server_data || []
+      html += `<div class="server-block${s === 0 ? ' active' : ''}" data-server="${s}">`
       html += `<div class="server-name" data-server="${s}">${sanitize(ep.server_name || 'Server ' + (s + 1))}</div>`
       html += '<div class="episode-grid">'
       for (let e = 0; e < data.length; e++) {
         html += `<div class="episode-btn" data-server="${s}" data-ep="${e}">${sanitize(data[e].name || 'Tập ' + (e + 1))}</div>`
       }
-      html += '</div>'
+      html += '</div></div>'
     }
     html += '</div></div>'
   } else {
@@ -83,6 +91,16 @@ function renderDetail(movie, episodes) {
   }
   html += '</div></div>'
   container.innerHTML = html
+
+  const serverSel = container.querySelector('#server-select')
+  if (serverSel) {
+    serverSel.addEventListener('change', () => {
+      const sel = serverSel.value
+      container.querySelectorAll('.server-block').forEach(b => {
+        b.classList.toggle('active', b.dataset.server === sel)
+      })
+    })
+  }
 
   const h = getHist()
   const he = h[movie.slug]
