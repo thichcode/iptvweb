@@ -845,6 +845,54 @@ body.large-mode #player-fs-btn { font-size: 36px; }
   .poster-card { flex-basis: 42vw; max-width: 190px; }
 }
 
+/* Text-only fallback when image CDN is down */
+body.text-mode .poster-img,
+body.text-mode .movie-card .thumb,
+body.text-mode .home-hero-main img,
+body.text-mode .home-hero-side img,
+body.text-mode .detail-poster img { display: none !important; }
+body.text-mode .poster-card {
+  background: linear-gradient(135deg, var(--surface-strong), var(--surface));
+}
+body.text-mode .poster-overlay {
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background: none;
+  padding: 10px;
+}
+body.text-mode .poster-title {
+  font-size: 14px;
+  -webkit-line-clamp: 4;
+}
+body.text-mode .home-hero-main,
+body.text-mode .home-hero-side {
+  background: linear-gradient(135deg, var(--surface-strong), #111);
+}
+body.text-mode .home-hero-copy { right: 22px; }
+body.text-mode .detail-poster {
+  background: var(--surface-strong);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  aspect-ratio: 2 / 3;
+}
+body.text-mode .detail-poster::after {
+  content: attr(data-name);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 20px;
+  font-weight: 700;
+  color: var(--text);
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+
 /* Image reference redesign: dark streaming dashboard */
 .header {
   gap: 28px;
