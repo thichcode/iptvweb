@@ -131,23 +131,25 @@ export function renderHome() {
 export async function loadHomeData() {
   rows = []
   renderHome()
-  // ponytail: prefer API; only touch the 7.5MB local index when an API row fails
-  rows = await Promise.all(HOME_ROWS.map(async rowDef => {
+  const local = await loadMovies()
+  if (local.length) {
+    rows = HOME_ROWS.map((rowDef, idx) => ({
+      type: rowDef.type,
+      label: rowDef.label,
+      items: local.slice(idx * ROW_LIMIT, (idx + 1) * ROW_LIMIT)
+    }))
+    if (store.screen === 'home') renderHome()
+  }
+  for (const rowDef of HOME_ROWS) {
     try {
       const data = await fetchMovies(rowDef.type, 1, '', '', '', ROW_LIMIT)
       const items = data.items || (data.data && data.data.items) || []
-      if (items.length) return { type: rowDef.type, label: rowDef.label, items }
-      const localMovies = await loadMovies()
+      if (!items.length) continue
       const idx = HOME_ROWS.findIndex(row => row.type === rowDef.type)
-      return { type: rowDef.type, label: rowDef.label, items: localMovies.slice(idx * ROW_LIMIT, (idx + 1) * ROW_LIMIT) }
-    } catch {
-      const localMovies = await loadMovies()
-      const idx = HOME_ROWS.findIndex(row => row.type === rowDef.type)
-      return { type: rowDef.type, label: rowDef.label, items: localMovies.slice(idx * ROW_LIMIT, (idx + 1) * ROW_LIMIT) }
-    }
-  }))
-  if (store.screen !== 'home') return
-  renderHome()
+      rows[idx] = { type: rowDef.type, label: rowDef.label, items }
+      if (store.screen === 'home') renderHome()
+    } catch { /* keep static data for this row */ }
+  }
 }
 
 export let focusedRow = 0

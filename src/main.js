@@ -8,7 +8,7 @@ import {
 import { loadDetail, handleDetailClick } from './screens/detail.js'
 import { playEpisode, exitPlayer, togglePlay, seek, seekTo, showOverlay } from './screens/player.js'
 import { checkUpdate, showUpdateModal, initUpdateChecker } from './update.js'
-import { loadMovies, searchLocal } from './data.js'
+import { searchLocal } from './data.js'
 import { checkApiHealth, getApiSource, nextApiSource, setApiSource } from './api.js'
 
 let overlayTimer = null
@@ -566,9 +566,6 @@ function init() {
     e.stopPropagation()
     if (e.key === 'Enter') { e.preventDefault(); runHeaderSearch() }
   })
-  // ponytail: don't block startup on the 7.5MB local index; preload when idle
-  if ('requestIdleCallback' in window) requestIdleCallback(() => loadMovies())
-  else setTimeout(loadMovies, 2500)
   loadHomeData()
   setHeader('WebPhim', '↑↓ Chọn hàng | ←→ Chọn phim | Enter xem')
   document.addEventListener('keydown', handleKey)
