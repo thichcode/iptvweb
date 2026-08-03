@@ -68,6 +68,7 @@ function buildShell() {
         <button class="top-nav-btn" data-nav="phim-le">Phim Lẻ</button>
         <button class="top-nav-btn" data-nav="phim-bo">Phim Bộ</button>
         <button class="top-nav-btn" data-nav="categories">Thể Loại</button>
+        <button class="top-nav-btn" data-nav="countries">Quốc Gia</button>
         <button class="top-nav-btn" data-nav="favorites">Yêu Thích</button>
         <button class="top-nav-btn" data-nav="history">Lịch Sử</button>
         <a class="top-nav-btn apk-nav-link" href="https://github.com/thichcode/iptvweb/releases/latest/download/WebPhim.apk" target="_blank" rel="noopener">Tải APK</a>
@@ -495,6 +496,7 @@ function handleTopNav(id) {
   store.countrySlug = ''
   if (id === 'home') { goHome(); return }
   if (id === 'categories') { loadCategories(); setHeader('Thể Loại', ''); return }
+  if (id === 'countries') { loadCountries(); setHeader('Quốc Gia', ''); return }
   if (id === 'favorites') { loadFavorites(); switchScreenLocal('list'); setHeader('Yêu Thích', ''); return }
   if (id === 'history') { loadHistory(); switchScreenLocal('list'); setHeader('Lịch Sử', ''); return }
   loadMovieList(id, 1, '', '', '')
