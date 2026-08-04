@@ -10,6 +10,7 @@ import { playEpisode, exitPlayer, togglePlay, seek, seekTo, showOverlay } from '
 import { checkUpdate, showUpdateModal, initUpdateChecker } from './update.js'
 import { searchLocal } from './data.js'
 import { checkApiHealth, getApiSource, nextApiSource, setApiSource } from './api.js'
+import { showKeyboard, hideKeyboard } from './keyboard.js'
 
 let overlayTimer = null
 let homeToolbarIdx = -1
@@ -209,7 +210,12 @@ function handleKey(e) {
 
   if (e.target?.id === 'header-search-input') {
     if (key === 'ArrowDown') { e.preventDefault(); e.target.blur(); homeToolbarIdx = -1; clearHomeToolbar(getHomeToolbarItems()); return }
-    if (key === 'Enter') { e.preventDefault(); runHeaderSearch(); return }
+    if (key === 'Enter') {
+      e.preventDefault()
+      if (e.target.value.trim()) runHeaderSearch()
+      else showKeyboard() // PITFALL Android TV: ô rỗng + Enter phải mở bàn phím, không search rỗng
+      return
+    }
     if (key === 'Escape') { e.preventDefault(); e.target.blur(); homeToolbarIdx = -1; clearHomeToolbar(getHomeToolbarItems()); return }
     return
   }
@@ -247,7 +253,7 @@ function handleKey(e) {
       if (inp && inp.value.trim()) { e.preventDefault(); doSearch(inp.value.trim()) }
     }
     if (key === 'Escape') {
-      e.preventDefault(); store.searchMode = false; renderHome(); switchScreenLocal('home'); setHeader('WebPhim', '')
+      e.preventDefault(); store.searchMode = false; hideKeyboard(); renderHome(); switchScreenLocal('home'); setHeader('WebPhim', '')
     }
     return
   }
@@ -468,6 +474,7 @@ function handleClick(e) {
 function doSearch(keyword) {
   if (!keyword) return
   store.searchMode = false
+  hideKeyboard()
   setHeader('Tìm: ' + keyword, '')
   const local = searchLocal(keyword, 1, 20)
   if (local.items.length) {
@@ -573,10 +580,19 @@ function init() {
   window.addEventListener('popstate', e => { e.preventDefault(); goBack() })
   document.addEventListener('error', e => { const t = e.target; if (t.tagName === 'IMG' && !t.src?.startsWith('data:')) { e.stopPropagation(); imgFailCount++; if (imgFailCount >= 3) { document.body.classList.add('text-mode'); return } const w = t.width || 200; const h = t.height || 300; t.src = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '"><rect width="' + w + '" height="' + h + '" fill="#11100D"/><rect x="' + (w * 0.1) + '" y="' + (h * 0.1) + '" width="' + (w * 0.8) + '" height="' + (h * 0.8) + '" fill="none" stroke="#766F5D" stroke-width="2" rx="4"/><path d="M' + (w * 0.42) + ' ' + (h * 0.4) + ' l0 ' + (h * 0.25) + ' l' + (w * 0.2) + ' -' + (h * 0.125) + 'z" fill="#766F5D"/></svg>') } }, true)
   buildShell()
-  $('#header-search-input').addEventListener('keydown', e => {
+  const headerSearchInput = $('#header-search-input')
+  headerSearchInput.addEventListener('keydown', e => {
     e.stopPropagation()
-    if (e.key === 'Enter') { e.preventDefault(); runHeaderSearch() }
+    const key = KEY_MAP[e.keyCode] || e.key
+    if (key === 'Enter') {
+      e.preventDefault()
+      if (e.target.value.trim()) runHeaderSearch()
+      else showKeyboard() // PITFALL Android TV: ô rỗng + Enter phải mở bàn phím
+    }
   })
+  // PITFALL Android TV: D-pad focus không mở IME — phải gọi Keyboard.show() khi input được focus
+  headerSearchInput.addEventListener('focus', () => showKeyboard())
+  headerSearchInput.addEventListener('blur', () => hideKeyboard())
   loadHomeData()
   setHeader('WebPhim', '↑↓ Chọn hàng | ←→ Chọn phim | Enter xem')
   document.addEventListener('keydown', handleKey)

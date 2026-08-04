@@ -1,6 +1,7 @@
 import { $, $$, imgSrc, switchScreen, sanitize, sanitizeAttr } from '../utils.js'
 import { fetchMovies, fetchCategories, fetchCountries, getMovieLimit, isMobileViewport } from '../api.js'
 import { store, getFavs, getHist } from '../store.js'
+import { showKeyboard, hideKeyboard } from '../keyboard.js'
 
 function renderSkeletonList(count = 6) {
   let html = '<div class="local-list">'
@@ -72,10 +73,11 @@ export function renderSearchInput(keyword = '') {
     <button class="search-btn">Tìm</button>
   </div>`
   // PITFALL Android TV: autofocus attribute không hoạt động trong Capacitor WebView.
-  // Phải focus bằng JS sau khi screen-list đã active (switchScreenLocal chạy sau đó).
+  // Phải focus bằng JS sau khi screen-list đã active (switchScreenLocal chạy sau đó),
+  // và gọi Keyboard.show() — input.focus() bằng JS KHÔNG mở IME trên Android.
   requestAnimationFrame(() => {
     const inp = container.querySelector('.search-input')
-    if (inp) inp.focus()
+    if (inp) { inp.focus(); showKeyboard() }
   })
 }
 
