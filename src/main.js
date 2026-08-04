@@ -233,8 +233,17 @@ function handleKey(e) {
   }
 
   if (store.searchMode) {
+    const inp = $('.search-input')
+    // PITFALL Android TV: nếu input chưa được focus (autofocus fail trong WebView),
+    // mọi phím chữ sẽ bị nuốt. Focus input khi user bấm ký tự nhập được.
+    if (inp && document.activeElement !== inp && key && key.length === 1 && /^[\p{L}\p{N}]$/u.test(key)) {
+      e.preventDefault()
+      inp.focus()
+      inp.value += key
+      inp.setSelectionRange(inp.value.length, inp.value.length)
+      return
+    }
     if (key === 'ArrowDown' || key === 'Enter') {
-      const inp = $('.search-input')
       if (inp && inp.value.trim()) { e.preventDefault(); doSearch(inp.value.trim()) }
     }
     if (key === 'Escape') {

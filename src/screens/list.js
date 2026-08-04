@@ -68,9 +68,15 @@ export function renderSubList(items, type) {
 export function renderSearchInput(keyword = '') {
   const container = $('#screen-list')
   container.innerHTML = `<div class="search-wrap">
-    <input class="search-input" type="text" placeholder="Nhập tên phim..." value="${sanitizeAttr(keyword)}" autofocus>
+    <input class="search-input" type="text" placeholder="Nhập tên phim..." value="${sanitizeAttr(keyword)}">
     <button class="search-btn">Tìm</button>
   </div>`
+  // PITFALL Android TV: autofocus attribute không hoạt động trong Capacitor WebView.
+  // Phải focus bằng JS sau khi screen-list đã active (switchScreenLocal chạy sau đó).
+  requestAnimationFrame(() => {
+    const inp = container.querySelector('.search-input')
+    if (inp) inp.focus()
+  })
 }
 
 export function renderLocalList(items, title) {
