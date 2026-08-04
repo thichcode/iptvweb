@@ -943,7 +943,7 @@ body.text-mode .detail-poster::after {
 #header-search-btn.toolbar-focused,
 #check-update-btn.toolbar-focused,
 #api-toggle-btn.toolbar-focused,
-#mode-btn.toolbar-focused {
+#thumb-btn.toolbar-focused {
   outline: 3px solid var(--accent);
   outline-offset: 3px;
   background: rgba(255,212,90,0.12);

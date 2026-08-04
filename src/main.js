@@ -1,4 +1,4 @@
-import { $, $$, HOME_MENU, KEY_MAP, store, switchScreen, toggleLargeMode } from './utils.js'
+import { $, $$, HOME_MENU, KEY_MAP, store, switchScreen } from './utils.js'
 import { renderHome, handleHomeClick, loadHomeData, resetHomeFocus, navigateHome, selectHomeFocused, handleActionRow, focusedRow } from './screens/home.js'
 import {
   renderMovieList, renderSubList, renderSearchInput, renderLocalList,
@@ -37,7 +37,7 @@ function showToast(msg) {
 function getHomeToolbarItems() {
   const items = []
   $$('.top-nav-btn').forEach(el => items.push(el))
-  ;['header-search-input', 'header-search-btn', 'api-toggle-btn', 'thumb-btn', 'mode-btn'].forEach(id => {
+  ;['header-search-input', 'header-search-btn', 'api-toggle-btn', 'thumb-btn'].forEach(id => {
     const el = $(`#${id}`)
     if (el) items.push(el)
   })
@@ -81,7 +81,6 @@ function buildShell() {
       
       <button class="api-toggle-btn" id="api-toggle-btn" aria-label="Chọn API"><span class="api-dot pending"></span><span id="api-toggle-label">API: Proxy</span></button>
       <button class="settings-btn" id="thumb-btn" aria-label="Bật/tắt ảnh">🖼</button>
-      <button class="settings-btn" id="mode-btn" aria-label="Chế độ chữ">⚙</button>
       <span class="hint" id="header-hint"></span>
     </div>
     <div id="screen-home" class="screen active"></div>
@@ -422,11 +421,6 @@ function handleClick(e) {
     setApiSource(nextApiSource())
     updateApiToggle()
     loadHomeData()
-    return
-  }
-
-  if (e.target.closest('#mode-btn')) {
-    toggleLargeMode()
     return
   }
 
