@@ -158,14 +158,7 @@ function goBack() {
     setHeader('WebPhim', '')
     window.scrollTo({ top: 0, behavior: 'auto' })
   } else if (screen === 'home') {
-    const now = Date.now()
-    if (now - backPressTs < 2500) {
-      executeExit()
-    } else {
-      backPressTs = now
-      showToast('Nhấn Back lần nữa để thoát')
-      setTimeout(() => { backPressTs = 0 }, 2500)
-    }
+    showExitConfirm()
   }
 }
 
@@ -173,6 +166,14 @@ let exitDialogIdx = 1 // default "Không"
 function removeExitConfirm() {
   const el = $('#exit-confirm')
   if (el) el.remove()
+}
+function showExitConfirm() {
+  removeExitConfirm()
+  exitDialogIdx = 1
+  const el = document.createElement('div')
+  el.id = 'exit-confirm'
+  el.innerHTML = `<div class="exit-backdrop"></div><div class="exit-box"><div class="exit-icon">🚪</div><div class="exit-msg">Thoát ứng dụng?</div><div class="exit-actions"><button class="exit-btn" data-action="exit">Thoát</button><button class="exit-btn exit-active" data-action="cancel">Không</button></div></div>`
+  document.body.appendChild(el)
 }
 function executeExit() {
   try {
