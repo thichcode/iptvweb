@@ -36,7 +36,7 @@ function showToast(msg) {
 
 function getHomeToolbarItems() {
   const items = []
-  $$('.top-nav-btn').forEach(el => items.push(el))
+  $$('.top-nav-btn').forEach(el => { if (el.offsetParent !== null) items.push(el) })
   ;['header-search-input', 'header-search-btn', 'api-toggle-btn', 'thumb-btn'].forEach(id => {
     const el = $(`#${id}`)
     if (el) items.push(el)
@@ -261,8 +261,9 @@ function handleKey(e) {
     e.preventDefault()
     if (key === 'ArrowLeft') seek(-10)
     else if (key === 'ArrowRight') seek(10)
-    else if (key === 'ArrowDown') showOverlay()
+    else if (key === 'ArrowDown' || key === 'ArrowUp') showOverlay()
     else if (key === 'PlayPause' || key === 'Space' || key === 'Enter') togglePlay()
+    else if (key === 'f' || key === 'F') { document.documentElement.requestFullscreen?.().catch(() => {}) }
     else if (key === 'Escape') exitPlayer()
     return
   }
