@@ -267,6 +267,16 @@ function handleKey(e) {
     return
   }
 
+  if (key === '/' && !store.searchMode) {
+    e.preventDefault()
+    if (store.screen !== 'home') {
+      renderHome(); switchScreenLocal('home'); setHeader('WebPhim', '')
+    }
+    const inp = $('#header-search-input')
+    if (inp) { inp.focus() }
+    return
+  }
+
   const screen = store.screen
   if (screen === 'home') {
     e.preventDefault()
@@ -275,7 +285,12 @@ function handleKey(e) {
       if (key === 'ArrowRight') { homeToolbarIdx = (homeToolbarIdx + 1) % tbItems.length; focusHomeToolbar(tbItems); return }
       else if (key === 'ArrowLeft') { homeToolbarIdx = (homeToolbarIdx - 1 + tbItems.length) % tbItems.length; focusHomeToolbar(tbItems); return }
       else if (key === 'ArrowDown') { homeToolbarIdx = -1; clearHomeToolbar(tbItems); navigateHome('reset'); return }
-      else if (key === 'Enter') { const el = tbItems[homeToolbarIdx]; el.click(); return }
+      else if (key === 'Enter') {
+        const el = tbItems[homeToolbarIdx]
+        if (el.id === 'header-search-input') { el.focus() }
+        else { el.click() }
+        return
+      }
       else if (key === 'Escape') { homeToolbarIdx = -1; clearHomeToolbar(tbItems); return }
       return
     }

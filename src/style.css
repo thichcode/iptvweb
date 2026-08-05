@@ -494,6 +494,7 @@ body.tv-mode .search-input { font-size: 18px; min-height: 56px; padding: 14px 18
 body.tv-mode .search-btn { font-size: 18px; min-height: 56px; padding: 14px 28px; }
 
 body.tv-mode .bottom-bar, body.tv-mode .bottom-bar.show { display: none !important; }
+body.tv-mode .top-nav { display: none !important; }
 
 @media (prefers-reduced-motion: reduce) {
   body.tv-mode *,

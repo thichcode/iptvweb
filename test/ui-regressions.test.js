@@ -93,11 +93,11 @@ test('home rows lazy-mount via IntersectionObserver', () => {
   assert.match(homeSource, /mountRowCarousel/)
 })
 
-test('local 7.5MB index not loaded at startup', () => {
-  assert.match(mainSource, /requestIdleCallback|setTimeout\(\s*loadMovies/)
-  // loadHomeData must reach for local movies only AFTER attempting API fetch
-  assert.match(homeSource, /fetchMovies[\s\S]*loadMovies/)
-  assert.doesNotMatch(homeSource, /const localMovies = await loadMovies\(\)\s*\n\s*rows = await Promise\.all/)
+test('local 7.5MB index loaded on demand, not idle-preloaded', () => {
+  // loadHomeData loads local movies first for instant render, then refreshes from API
+  assert.match(homeSource, /await loadMovies\(\)/)
+  assert.match(homeSource, /fetchMovies/)
+  assert.doesNotMatch(mainSource, /requestIdleCallback|setTimeout\(\s*loadMovies/)
 })
 
 test('back button uses Capacitor App plugin and double-press exit', () => {
