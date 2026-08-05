@@ -31,7 +31,6 @@ jobs:
           cp assets/app-icon.png android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
           cp assets/app-icon.png android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
           cp assets/app-icon.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
-          # Also copy as foreground for adaptive icons
           cp assets/app-icon.png android/app/src/main/res/mipmap-hdpi/ic_launcher_foreground.png
           cp assets/app-icon.png android/app/src/main/res/mipmap-xhdpi/ic_launcher_foreground.png
           cp assets/app-icon.png android/app/src/main/res/mipmap-xxhdpi/ic_launcher_foreground.png
@@ -45,14 +44,10 @@ jobs:
       - name: Patch for Android TV
         run: |
           M="android/app/src/main/AndroidManifest.xml"
-          # TV features
           sed -i 's|</manifest>|  <uses-feature android:name="android.hardware.touchscreen" android:required="false" />\n  <uses-feature android:name="android.software.leanback" android:required="false" />\n  <uses-feature android:name="android.hardware.screen.landscape" android:required="false" />\n</manifest>|' "$M"
-          # Banner
           sed -i 's|android:supportsRtl="true"|android:supportsRtl="true"\n        android:banner="@drawable/tv_banner"|' "$M"
-          # Resizeable + LEANBACK_LAUNCHER
           sed -i 's|android:exported="true"|android:exported="true"\n            android:resizeableActivity="true"|' "$M"
           sed -i 's|<category android:name="android.intent.category.LAUNCHER" />|<category android:name="android.intent.category.LAUNCHER" />\n                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />|' "$M"
-          # Copy banner as PNG into drawable (Android TV expects concrete PNG, not mipmap)
           cp assets/tv_banner.png android/app/src/main/res/drawable/tv_banner.png
       - name: Patch build.gradle with signing config
         run: |
@@ -62,6 +57,74 @@ jobs:
         run: cd android && chmod +x gradlew && ./gradlew assembleDebug --no-daemon
       - name: Rename APK
         run: cp android/app/build/outputs/apk/debug/app-debug.apk WebPhim.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: webphim-apk
+          path: WebPhim.apk
+
+  build-tv:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: 'temurin', java-version: '21' }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - uses: android-actions/setup-android@v3
+      - run: npm ci
+      - name: Build TV web assets
+        run: |
+          mkdir -p dist-tv
+          cp public/tv.html dist-tv/index.html
+          cp public/hls.min.js dist-tv/hls.min.js
+          cp public/sw.js dist-tv/sw.js
+      - name: Add Android TV platform
+        run: node node_modules/.bin/cap add android --config capacitor.config.tv.json
+      - name: Sync web to Android TV
+        run: node node_modules/.bin/cap sync android --config capacitor.config.tv.json
+      - name: Copy app icon
+        run: |
+          R=android-tv/app/src/main/res
+          for dir in mipmap-hdpi mipmap-mdpi mipmap-xhdpi mipmap-xxhdpi mipmap-xxxhdpi; do
+            cp assets/app-icon.png $R/$dir/ic_launcher.png
+            cp assets/app-icon.png $R/$dir/ic_launcher_foreground.png
+          done
+          rm -f $R/mipmap-anydpi-v26/ic_launcher_foreground.xml
+      - name: Copy TV banner
+        run: |
+          R=android-tv/app/src/main/res
+          for dir in mipmap-hdpi mipmap-mdpi mipmap-xhdpi mipmap-xxhdpi mipmap-xxxhdpi; do
+            cp assets/tv_banner.png $R/$dir/tv_banner.png
+          done
+          cp assets/tv_banner.png $R/drawable/tv_banner.png
+      - name: Patch for Android TV
+        run: |
+          M="android-tv/app/src/main/AndroidManifest.xml"
+          sed -i 's|</manifest>|  <uses-feature android:name="android.hardware.touchscreen" android:required="false" />\n  <uses-feature android:name="android.software.leanback" android:required="false" />\n  <uses-feature android:name="android.hardware.screen.landscape" android:required="false" />\n</manifest>|' "$M"
+          sed -i 's|android:supportsRtl="true"|android:supportsRtl="true"\n        android:banner="@drawable/tv_banner"|' "$M"
+          sed -i 's|android:exported="true"|android:exported="true"\n            android:resizeableActivity="true"|' "$M"
+          sed -i 's|<category android:name="android.intent.category.LAUNCHER" />|<category android:name="android.intent.category.LAUNCHER" />\n                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />|' "$M"
+      - name: Patch build.gradle with signing config
+        run: |
+          G=android-tv/app/build.gradle
+          sed -i '/^android {/a\    signingConfigs {\n        debug {\n            storeFile file("../../certs/debug.keystore")\n            storePassword "android"\n            keyAlias "androiddebugkey"\n            keyPassword "android"\n        }\n    }' "$G"
+          sed -i '/buildTypes {/a\        debug {\n            signingConfig signingConfigs.debug\n        }' "$G"
+      - name: Build TV APK
+        run: cd android-tv && chmod +x gradlew && ./gradlew assembleDebug --no-daemon
+      - name: Rename TV APK
+        run: cp android-tv/app/build/outputs/apk/debug/app-debug.apk WebPhimTV.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: webphim-tv-apk
+          path: WebPhimTV.apk
+
+  release:
+    needs: [build, build-tv]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
       - name: Set tag
         id: tag
         run: |
@@ -71,6 +134,6 @@ jobs:
       - uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.tag.outputs.tag }}
-          files: WebPhim.apk
+          files: artifacts/*/*.apk
           generate_release_notes: true
           make_latest: true

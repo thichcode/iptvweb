@@ -6,26 +6,29 @@
 <title>WebPhim TV</title>
 <script src="hls.min.js"></script>
 <style>
-*{margin:0;padding:0}
-body{background:#0b0b09;color:#fff8e6;font-family:Arial,Helvetica,sans-serif;padding:0 0 50px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0b0b09;color:#fff8e6;font-family:Arial,Helvetica,sans-serif;padding:0 0 50px;min-height:100vh}
 h1{background:#111;padding:16px 20px;color:#ffd45a;font-size:22px}
 h1 span{color:#fff}
-#sr{display:flex;margin:10px 14px;position:relative}
-#sr input{flex:1;padding:12px 16px;font-size:16px;border:2px solid #444;border-radius:6px;background:#1a1a18;color:#fff8e6;outline:none}
-#sr input:focus,#sr input.focused{border-color:#ffd45a}
-#sr button{padding:12px 20px;margin-left:8px;font-size:16px;border:none;border-radius:6px;background:#ffd45a;color:#0b0b09;cursor:pointer}
-#sr button.focused{outline:3px solid #fff8e6;outline-offset:2px}
+#sr{display:flex;margin:10px 14px;position:relative;gap:8px}
+#sr input{flex:1;padding:12px 16px;font-size:16px;border:2px solid #444;border-radius:6px;background:#1a1a18;color:#fff8e6;outline:none;transition:border-color .15s,box-shadow .15s}
+#sr input:focus,#sr input.focused{border-color:#ffd45a;box-shadow:0 0 0 3px rgba(255,212,90,.3)}
+#sr button{padding:12px 20px;font-size:16px;border:none;border-radius:6px;background:#ffd45a;color:#0b0b09;cursor:pointer;font-weight:700;transition:box-shadow .15s}
+#sr button:focus,#sr button.focused{outline:none;box-shadow:0 0 0 3px #fff8e6,0 0 0 6px #ffd45a}
 h2{color:#ffd45a;font-size:17px;margin:14px 0 8px 14px}
-.row{white-space:nowrap;overflow-x:auto;padding:0 10px 12px}
-.card{display:inline-block;width:130px;margin-right:8px;vertical-align:top;color:#fff8e6;outline:none}
+.row{white-space:nowrap;overflow-x:auto;padding:0 10px 12px;scroll-behavior:auto}
+.card{display:inline-block;width:130px;margin-right:8px;vertical-align:top;color:#fff8e6;outline:none;cursor:pointer;transition:transform .15s,border-color .15s;border-radius:4px;border:3px solid transparent}
+.card:focus,.card.focused{transform:scale(1.08);border-color:#ffd45a;border-radius:6px}
 .card img{width:100%;height:195px;object-fit:cover;border-radius:4px;background:#222;display:block}
 .card .nm{font-size:12px;margin-top:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .card .yr{font-size:11px;color:#ffd45a}
 .loading,.err{text-align:center;padding:30px 20px;color:#888;font-size:14px}
 .err{color:#ff6868}
 #det{display:none;padding:10px 14px}
-#det.show{display:block}
-#det .bk{color:#ffd45a;font-size:15px;padding:8px 0;cursor:pointer;margin-bottom:8px;outline:none}
+#det.show{display:block;animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+#det .bk{color:#ffd45a;font-size:15px;padding:8px 0;cursor:pointer;margin-bottom:8px;outline:none;display:inline-block;border:2px solid transparent;border-radius:4px;transition:box-shadow .15s}
+#det .bk:focus{box-shadow:0 0 0 3px #ffd45a}
 #det .ps{width:130px;border-radius:4px;float:left;margin:0 14px 10px 0;background:#222}
 #det h2{font-size:18px;margin:0 0 4px;color:#ffd45a;padding:0}
 #det .mt{color:#b9ad91;font-size:12px;margin-bottom:10px}
@@ -34,12 +37,14 @@ h2{color:#ffd45a;font-size:17px;margin:14px 0 8px 14px}
 #det .tg span{display:inline-block;background:rgba(255,255,255,0.08);padding:3px 8px;border-radius:10px;font-size:11px;color:#b9ad91;margin:2px 2px 2px 0}
 .sv{color:#ffd45a;font-size:14px;font-weight:700;margin:12px 0 4px}
 .eg{overflow:hidden;margin-bottom:10px}
-.ep{display:block;float:left;min-width:60px;padding:9px 14px;margin:3px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:4px;color:#fff8e6;font-size:12px;text-align:center;outline:none;cursor:pointer}
+.ep{display:block;float:left;min-width:60px;padding:9px 14px;margin:3px;background:rgba(255,255,255,0.05);border:2px solid rgba(255,255,255,0.1);border-radius:4px;color:#fff8e6;font-size:12px;text-align:center;outline:none;cursor:pointer;transition:transform .15s,border-color .15s}
+.ep:focus,.ep.focused{transform:scale(1.06);border-color:#ffd45a;background:rgba(255,212,90,.12)}
 .focused{outline:3px solid #ffd45a !important;outline-offset:2px !important}
 #pw{display:none;position:fixed;inset:0;z-index:100;background:#000}
 #pw.show{display:block}
 #pw video{width:100%;height:100%;object-fit:contain}
-#px{position:fixed;top:10px;left:10px;font-size:24px;color:#fff;cursor:pointer;padding:8px 12px;background:rgba(0,0,0,0.6);border-radius:4px;z-index:110;line-height:1;outline:none}
+#px{position:fixed;top:10px;left:10px;font-size:24px;color:#fff;cursor:pointer;padding:8px 12px;background:rgba(0,0,0,0.6);border-radius:4px;z-index:110;line-height:1;outline:none;border:2px solid transparent;transition:box-shadow .15s}
+#px:focus{box-shadow:0 0 0 3px #ffd45a}
 </style>
 </head>
 <body>
@@ -47,7 +52,7 @@ h2{color:#ffd45a;font-size:17px;margin:14px 0 8px 14px}
 <div id="sr"><input type="text" id="sq" placeholder="Tìm phim..." value=""><button id="sb">Tìm</button></div>
 <div id="lst"></div>
 <div id="det"></div>
-<div id="pw"><video id="pl" playsinline></video><div id="px" onclick="xp()">✕</div></div>
+<div id="pw"><video id="pl" playsinline></video><div id="px" tabindex="-1" onclick="xp()">✕</div></div>
 <script>
 var _hls = null
 var F = { items: [], idx: -1 }
@@ -56,12 +61,15 @@ function xhr(url, cb) {
   try {
     var r = new XMLHttpRequest()
     r.open('GET', url, true)
+    r.timeout = 15000
     r.onreadystatechange = function() {
       if (r.readyState === 4) {
         if (r.status === 200) try { cb(null, JSON.parse(r.responseText)) } catch(e) { cb(e) }
         else cb(new Error('HTTP ' + r.status))
       }
     }
+    r.onerror = function() { cb(new Error('Network error')) }
+    r.ontimeout = function() { cb(new Error('Timeout')) }
     r.send()
   } catch(e) { cb(e) }
 }
@@ -101,7 +109,7 @@ function lr(i) {
   var p=LS[i].t==='phim-moi-cap-nhat'?'/danh-sach/phim-moi-cap-nhat?page=1&limit=10':'/v1/api/danh-sach/'+LS[i].t+'?page=1&limit=10&sort_field=view&sort_type=desc'
   xhr('https://ophim1.com'+p,function(e,d){
     var el=document.getElementById('r'+i);if(!el)return
-    if(e||!d){el.innerHTML='<div class="err">Lỗi tải</div>';return}
+    if(e||!d){el.innerHTML='<div class="err">Lỗi tải <span style="color:#668;font-size:11px">('+es(e.message||'unknown')+')</span></div>';return}
     var it=d.items||(d.data&&d.data.items)||[]
     if(!it.length){el.innerHTML='';return}
     el.innerHTML=it.map(function(m){return mkCard(m)}).join('')
