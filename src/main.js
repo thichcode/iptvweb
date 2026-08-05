@@ -573,9 +573,9 @@ function handleTouch(e) {
   }
 }
 
-function detectTV() {  const ua = navigator.userAgent
-  const isTV = /Android TV|Google TV|SmartTV|Tizen|Web0S|(?:CrKey|AFT)/.test(ua) ||
-    (screen.width >= 1920 && screen.height >= 1080 && !navigator.maxTouchPoints)
+function detectTV() {
+  const ua = navigator.userAgent
+  const isTV = /Android TV|Google TV|SmartTV|Tizen|Web0S|CrKey|AFT|Roku|AppleTV|PlayStation|Xbox|(?:^|\s)TV(?:\s|$)/i.test(ua)
   if (isTV) document.body.classList.add('tv-mode')
 }
 
