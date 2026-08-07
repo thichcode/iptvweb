@@ -67,6 +67,7 @@ async function _doApiGet(url, retries = MAX_RETRIES) {
       }
     }
   }
+  throw new Error('All API targets failed for ' + url)
 }
 
 export async function checkApiHealth(source = getApiSource()) {

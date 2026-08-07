@@ -48,7 +48,7 @@ function renderDetail(movie, episodes) {
   const poster = imgSrc(movie.poster_url || movie.thumb_url || movie.poster || movie.thumb)
   const favStar = isFav(movie.slug) ? '★' : '☆'
   const tags = [movie.year]
-  if (movie.country) movie.country.forEach(c => tags.push(c.name))
+  if (Array.isArray(movie.country)) movie.country.forEach(c => tags.push(c.name))
   if (movie.quality) tags.push(movie.quality)
   if (movie.lang) tags.push(movie.lang)
   if (movie.time) tags.push(movie.time)
