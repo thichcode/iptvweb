@@ -44,7 +44,15 @@ function targetUrl(target, url) {
   return target.proxy ? target.base + '?path=' + encodeURIComponent(url) : target.base + url
 }
 
+const _inFlight = new Map()
 export async function apiGet(url, retries = MAX_RETRIES) {
+  if (_inFlight.has(url)) return _inFlight.get(url)
+  const p = _doApiGet(url, retries)
+  _inFlight.set(url, p)
+  try { return await p } finally { _inFlight.delete(url) }
+}
+
+async function _doApiGet(url, retries = MAX_RETRIES) {
   for (const target of apiTargetsForSource()) {
     for (let attempt = 0; attempt <= retries; attempt++) {
       try {

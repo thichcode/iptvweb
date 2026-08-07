@@ -109,7 +109,15 @@ function lr(i) {
   var p=LS[i].t==='phim-moi-cap-nhat'?'/danh-sach/phim-moi-cap-nhat?page=1&limit=10':'/v1/api/danh-sach/'+LS[i].t+'?page=1&limit=10&sort_field=view&sort_type=desc'
   xhr('https://ophim1.com'+p,function(e,d){
     var el=document.getElementById('r'+i);if(!el)return
-    if(e||!d){el.innerHTML='<div class="err">Lỗi tải <span style="color:#668;font-size:11px">('+es(e.message||'unknown')+')</span></div>';return}
+    if(e||!d){
+      el.innerHTML='<div class="err">Lỗi tải</div>'
+      var span=document.createElement('span')
+      span.style.color='#668'
+      span.style.fontSize='11px'
+      span.textContent='('+(e.message||'unknown')+')'
+      el.querySelector('.err').appendChild(span)
+      return
+    }
     var it=d.items||(d.data&&d.data.items)||[]
     if(!it.length){el.innerHTML='';return}
     el.innerHTML=it.map(function(m){return mkCard(m)}).join('')
@@ -118,7 +126,7 @@ function lr(i) {
 }
 
 function mkCard(m) {
-  return '<div class="card" tabindex="-1" onclick="od(\''+es(m.slug)+'\')"><img src="'+im(m.poster_url||m.thumb_url||m.thumb||m.poster)+'" onerror="this.style.display=\'none\'"><div class="nm">'+es(m.name||'')+'</div><div class="yr">'+(m.year||'')+'</div></div>'
+  return '<div class="card" tabindex="-1" onclick="od(\''+es(m.slug)+'\')"><img src="'+im(m.poster_url||m.thumb_url||m.thumb||m.poster)+'" onerror="this.style.display=\'none\'"><div class="nm">'+es(m.name||'')+'</div><div class="yr">'+es(String(m.year||''))+'</div></div>'
 }
 
 function search(q) {

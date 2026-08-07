@@ -4,7 +4,6 @@ import Hls from 'hls.js'
 
 let hlsInstance = null
 let overlayTimer = null
-let progressTimer = null
 
 function showPlayerBtns(show) {
   const els = ['#player-center-btn', '#player-exit-btn', '#player-fs-btn']
@@ -21,6 +20,8 @@ export function playEpisode(serverIdx, epIdx) {
 
   store.serverIdx = serverIdx
   store.epIdx = epIdx
+  store.prePlayerScreen = store.screen
+  store.prePlayerScrollY = window.scrollY
   const player = $('#player')
   const wrap = $('#player-wrap')
   const pTitle = $('#p-title')
@@ -79,13 +80,25 @@ function autoNext() {
   let s = store.serverIdx
   let e = store.epIdx + 1
   if (store.episodes[s] && store.episodes[s].server_data && store.episodes[s].server_data[e]) {
-    playEpisode(s, e); return
+    const src = store.episodes[s].server_data[e].link_m3u8
+    if (src) { playEpisode(s, e); return }
   }
   s++
   if (store.episodes[s] && store.episodes[s].server_data && store.episodes[s].server_data.length > 0) {
-    playEpisode(s, 0); return
+    const src = store.episodes[s].server_data[0].link_m3u8
+    if (src) { playEpisode(s, 0); return }
   }
-  showOverlay()
+  const wrap = $('#player-wrap')
+  if (wrap) {
+    const old = wrap.querySelector('.playlist-end')
+    if (old) old.remove()
+    const el = document.createElement('div')
+    el.className = 'playlist-end'
+    el.innerHTML = '<div class="player-error-icon">✓</div><div class="player-error-msg">Hết danh sách phát</div>'
+    wrap.appendChild(el)
+    showOverlay()
+    setTimeout(() => { if (wrap.classList.contains('active')) exitPlayer() }, 2000)
+  }
 }
 
 function formatTime(t) {
@@ -96,6 +109,8 @@ function formatTime(t) {
 }
 
 function updateProgress() {
+  const wrap = $('#player-wrap')
+  if (!wrap || !wrap.classList.contains('active')) return
   const player = $('#player')
   if (!player) return
   const current = $('#p-current')
@@ -125,9 +140,15 @@ export function exitPlayer() {
   if (overlayTimer) { clearTimeout(overlayTimer); overlayTimer = null }
   showPlayerBtns(false)
   $$('.screen').forEach(s => s.classList.remove('active'))
-  const detail = $('#screen-detail')
-  if (detail) detail.classList.add('active')
-  store.screen = 'detail'
+  const targetScreen = store.prePlayerScreen || 'detail'
+  const target = $('#screen-' + targetScreen)
+  if (target) target.classList.add('active')
+  store.screen = targetScreen
+  if (store.prePlayerScrollY != null) {
+    window.scrollTo({ top: store.prePlayerScrollY, behavior: 'auto' })
+  }
+  store.prePlayerScreen = null
+  store.prePlayerScrollY = null
 }
 
 export function togglePlay() {

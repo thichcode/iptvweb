@@ -20,7 +20,7 @@ function renderPosterCard(m) {
   return `<div class="poster-card" data-slug="${sanitizeAttr(m.slug || '')}">
     <img class="poster-img" src="${thumb}" alt="${title}" loading="lazy" decoding="async" onerror="this.style.display='none'">
     <div class="poster-overlay">
-      <div class="poster-year">${year}</div>
+      <div class="poster-year">${sanitize(String(year || ''))}</div>
       <div class="poster-title">${title}</div>
     </div>
   </div>`
@@ -83,18 +83,22 @@ function setupHomeLazy() {
     carousels.forEach(mountRowCarousel)
     return
   }
-  homeObserver = new IntersectionObserver((entries) => {
-    for (const e of entries) {
-      if (e.isIntersecting) {
-        setTimeout(() => mountRowCarousel(e.target), 100)
-        homeObserver.unobserve(e.target)
+  try {
+    homeObserver = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (e.isIntersecting) {
+          setTimeout(() => mountRowCarousel(e.target), 100)
+          homeObserver.unobserve(e.target)
+        }
       }
-    }
-  }, { rootMargin: '100px 0px' })
-  carousels.forEach((c, i) => {
-    if (i < 1) mountRowCarousel(c)
-    else homeObserver.observe(c)
-  })
+    }, { rootMargin: '100px 0px' })
+    carousels.forEach((c, i) => {
+      if (i < 1) mountRowCarousel(c)
+      else homeObserver.observe(c)
+    })
+  } catch {
+    carousels.forEach(mountRowCarousel)
+  }
 }
 
 export function renderHome() {
@@ -212,7 +216,7 @@ export function handleHomeClick(e) {
 }
 
 export async function handleActionRow(id) {
-  const labelMap = { 'phim-bo':'Phim Bộ', 'phim-le':'Phim Lẻ', 'phim-chieu-rap':'Phim Chiếu Rạp', 'phim-moi-cap-nhat':'Phim Mới' }
+  const labelMap = { 'phim-bo':'Phim Bộ', 'phim-le':'Phim Lẻ', 'phim-moi-cap-nhat':'Phim Mới' }
   const label = labelMap[id] || id
   try {
     const data = await fetchMovies(id, 1, '', '', '', ROW_LIMIT)

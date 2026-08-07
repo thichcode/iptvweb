@@ -29,22 +29,25 @@ export function showUpdateModal(info) {
   if ($('#update-modal')) return
   const modal = document.createElement('div')
   modal.id = 'update-modal'
-  const notesDiv = info.notes ? `<div class="update-notes"></div>` : ''
   modal.innerHTML = `
     <div class="update-backdrop"></div>
     <div class="update-box">
       <div class="update-head">Có phiên bản mới!</div>
-      <div class="update-ver">${info.version}</div>
-      ${notesDiv}
+      <div class="update-ver"></div>
+      <div class="update-notes" style="display:none"></div>
       <div class="update-actions">
-        <a class="update-btn update-dl" href="${info.downloadUrl}" target="_blank" rel="noopener">Tải APK</a>
+        <a class="update-btn update-dl" target="_blank" rel="noopener">Tải APK</a>
         <button class="update-btn update-close">Để sau</button>
       </div>
     </div>`
   document.body.appendChild(modal)
+  const verEl = modal.querySelector('.update-ver')
+  if (verEl) verEl.textContent = info.version
+  const dlEl = modal.querySelector('.update-dl')
+  if (dlEl) { dlEl.href = info.downloadUrl; dlEl.textContent = 'Tải APK' }
   if (info.notes) {
-    const el = modal.querySelector('.update-notes')
-    if (el) el.textContent = info.notes.slice(0, 500)
+    const notesEl = modal.querySelector('.update-notes')
+    if (notesEl) { notesEl.textContent = info.notes.slice(0, 500); notesEl.style.display = 'block' }
   }
   modal.querySelector('.update-close').onclick = () => modal.remove()
   modal.querySelector('.update-backdrop').onclick = () => modal.remove()

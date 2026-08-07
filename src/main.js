@@ -28,10 +28,14 @@ function showToast(msg) {
     t.id = 'toast-msg'
     document.body.appendChild(t)
   }
-  t.textContent = msg
-  t.classList.add('show')
   clearTimeout(t._hide)
-  t._hide = setTimeout(() => t.classList.remove('show'), 2000)
+  t.textContent = msg
+  t.classList.remove('show')
+  requestAnimationFrame(() => t.classList.add('show'))
+  t._hide = setTimeout(() => {
+    t.classList.remove('show')
+    setTimeout(() => { if (t.parentNode && !t.classList.contains('show')) t.remove() }, 300)
+  }, 2500)
 }
 
 function getHomeToolbarItems() {
@@ -164,6 +168,7 @@ function goBack() {
 
 let exitDialogIdx = 1 // default "Không"
 function removeExitConfirm() {
+  exitDialogIdx = 1
   const el = $('#exit-confirm')
   if (el) el.remove()
 }
@@ -339,7 +344,7 @@ function handleKey(e) {
     items[idx].scrollIntoView({ block: 'nearest' })
   } else if (screen === 'detail') {
     e.preventDefault()
-    const items = $$('.episode-btn')
+    const items = $$('.episode-btn, .fav-btn, .fav-fab, #server-select')
     if (!items.length) return
     let idx = items.findIndex(i => i.classList.contains('focused'))
     if (idx < 0) idx = 0
@@ -356,26 +361,33 @@ function handleKey(e) {
     else if (key === 'ArrowDown') { idx++; if (idx >= items.length) idx = 0 }
     else if (key === 'ArrowLeft') {
       const s = parseInt(items[idx].dataset.server)
-      const range = serverRanges[s]
-      if (idx > range.start) idx--
+      if (isNaN(s)) { if (idx > 0) idx--; else idx = items.length - 1 }
       else {
-        const prev = s - 1
-        if (serverRanges[prev]) idx = serverRanges[prev].end
-        else idx = items.length - 1
+        const range = serverRanges[s]
+        if (idx > range.start) idx--
+        else {
+          const prev = s - 1
+          if (serverRanges[prev]) idx = serverRanges[prev].end
+          else idx = items.length - 1
+        }
       }
     }
     else if (key === 'ArrowRight') {
       const s = parseInt(items[idx].dataset.server)
-      const range = serverRanges[s]
-      if (idx < range.end) idx++
+      if (isNaN(s)) { if (idx < items.length - 1) idx++; else idx = 0 }
       else {
-        const next = s + 1
-        if (serverRanges[next]) idx = serverRanges[next].start
-        else idx = 0
+        const range = serverRanges[s]
+        if (idx < range.end) idx++
+        else {
+          const next = s + 1
+          if (serverRanges[next]) idx = serverRanges[next].start
+          else idx = 0
+        }
       }
     }
     else if (key === 'Enter') {
       const el = items[idx]
+      if (el.id === 'server-select') { el.focus(); return }
       const serverIdx = parseInt(el.dataset.server)
       const epIdx = parseInt(el.dataset.ep)
       if (!isNaN(serverIdx) && !isNaN(epIdx)) { store.episodeFocusIdx = idx; playEpisode(serverIdx, epIdx) }
@@ -388,9 +400,11 @@ function handleKey(e) {
     items[idx].scrollIntoView({ block: 'nearest' })
 
     const focusedServer = parseInt(items[idx].dataset.server)
-    $$('.server-name').forEach(el => {
-      el.classList.toggle('server-focused', parseInt(el.dataset.server) === focusedServer)
-    })
+    if (!isNaN(focusedServer)) {
+      $$('.server-name').forEach(el => {
+        el.classList.toggle('server-focused', parseInt(el.dataset.server) === focusedServer)
+      })
+    }
   }
 }
 
@@ -602,8 +616,9 @@ function init() {
     }
   })
   // PITFALL Android TV: D-pad focus không mở IME — phải gọi Keyboard.show() khi input được focus
-  headerSearchInput.addEventListener('focus', () => showKeyboard())
-  headerSearchInput.addEventListener('blur', () => hideKeyboard())
+  let keyboardVisible = false
+  headerSearchInput.addEventListener('focus', () => { if (!keyboardVisible) { keyboardVisible = true; showKeyboard() } })
+  headerSearchInput.addEventListener('blur', () => { keyboardVisible = false; hideKeyboard() })
   loadHomeData()
   setHeader('WebPhim', '↑↓ Chọn hàng | ←→ Chọn phim | Enter xem')
   document.addEventListener('keydown', handleKey)
