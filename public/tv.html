@@ -56,6 +56,8 @@ h2{color:#ffd45a;font-size:17px;margin:14px 0 8px 14px}
 <script>
 var _hls = null
 var F = { items: [], idx: -1 }
+var _backTs = 0
+var _backGuardTs = 0
 
 function xhr(url, cb) {
   try {
@@ -296,9 +298,24 @@ function focusUp() {
 }
 
 function goBack() {
+  // guard: same physical press may fire both keydown AND Capacitor backButton
+  var now=Date.now()
+  if(now-_backGuardTs<350){return}
+  _backGuardTs=now
   if(document.getElementById('pw').className==='show'){xp();return}
   if(document.getElementById('det').className==='show'){hm();return}
+  // on home: double-press back within 2s to exit
+  if(now-_backTs<2000){doExit()}else{_backTs=now}
 }
+
+function doExit() {
+  try {
+    if(window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.App){window.Capacitor.Plugins.App.exitApp();return}
+  }catch(e){}
+  try { window.close() } catch(e){}
+}
+
+function onCapBack() { goBack() }
 
 document.addEventListener('keydown',function(e){
   var k=e.key,pw=document.getElementById('pw'),pl=document.getElementById('pl')
@@ -320,8 +337,16 @@ document.addEventListener('keydown',function(e){
     if(F.items[F.idx]&&F.items[F.idx].id==='sq'){document.getElementById('sb').click();return}
     if(F.items[F.idx]&&F.items[F.idx].el){F.items[F.idx].el.click();return}
   }
-  if(k==='Escape'||k==='Backspace'){e.preventDefault();goBack();return}
+  if(k==='Escape'||k==='Backspace'||e.keyCode===4||k==='GoBack'){e.preventDefault();goBack();return}
 })
+
+/* Capacitor: Android TV remote Back (KEYCODE_BACK) is native — must register listener */
+try {
+  var cap=window.Capacitor
+  if(cap&&cap.Plugins&&cap.Plugins.App&&cap.Plugins.App.addListener){
+    cap.Plugins.App.addListener('backButton',onCapBack)
+  }
+}catch(e){}
 
 /* Search enter button */
 document.getElementById('sq').addEventListener('keydown',function(e){
