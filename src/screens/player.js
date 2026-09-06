@@ -26,7 +26,6 @@ export function playEpisode(serverIdx, epIdx) {
   const wrap = $('#player-wrap')
   const pTitle = $('#p-title')
   wrap.classList.add('active')
-  document.body.classList.add('player-active')
 
   const movie = store.currentMovie
   pTitle.textContent = (movie ? movie.name : '') + ' - ' + (data[epIdx].name || 'Tập ' + (epIdx + 1))
@@ -138,7 +137,6 @@ export function exitPlayer() {
   if (hlsInstance) { hlsInstance.destroy(); hlsInstance = null }
   if (player) { player.pause(); player.onended = null; player.ontimeupdate = null; player.removeAttribute('src'); player.load() }
   wrap.classList.remove('active')
-  document.body.classList.remove('player-active')
   if (overlayTimer) { clearTimeout(overlayTimer); overlayTimer = null }
   showPlayerBtns(false)
   $$('.screen').forEach(s => s.classList.remove('active'))
