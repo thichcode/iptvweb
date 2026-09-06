@@ -59,6 +59,8 @@ var F = { items: [], idx: -1 }
 var _backTs = 0
 var _backGuardTs = 0
 
+var API_BASES = ['https://ophim1.com', 'https://phimapi.com']
+
 function xhr(url, cb) {
   try {
     var r = new XMLHttpRequest()
@@ -74,6 +76,17 @@ function xhr(url, cb) {
     r.ontimeout = function() { cb(new Error('Timeout')) }
     r.send()
   } catch(e) { cb(e) }
+}
+
+// ponytail: ophim1 dies sometimes, fall back to phimapi (same schema)
+function apiGet(path, cb) {
+  var i = 0
+  function next() {
+    if (i >= API_BASES.length) { cb(new Error('API unavailable')); return }
+    var base = API_BASES[i++]
+    xhr(base + path, function(e, d) { if (e || !d) { next(); return } cb(null, d) })
+  }
+  next()
 }
 
 function im(u) {
@@ -109,7 +122,7 @@ function hm() {
 
 function lr(i) {
   var p=LS[i].t==='phim-moi-cap-nhat'?'/danh-sach/phim-moi-cap-nhat?page=1&limit=10':'/v1/api/danh-sach/'+LS[i].t+'?page=1&limit=10&sort_field=view&sort_type=desc'
-  xhr('https://ophim1.com'+p,function(e,d){
+  apiGet(p,function(e,d){
     var el=document.getElementById('r'+i);if(!el)return
     if(e||!d){
       el.innerHTML='<div class="err">Lỗi tải</div>'
@@ -136,7 +149,7 @@ function search(q) {
   document.getElementById('det').innerHTML=''
   document.getElementById('det').className=''
   document.getElementById('lst').innerHTML='<h2>Tìm: '+es(q)+'</h2><div class="row" id="sr-results"><div class="loading">Đang tìm...</div></div>'
-  xhr('https://ophim1.com/v1/api/tim-kiem?keyword='+encodeURIComponent(q)+'&sort_field=view&sort_type=desc',function(e,d){
+  apiGet('/v1/api/tim-kiem?keyword='+encodeURIComponent(q)+'&sort_field=view&sort_type=desc',function(e,d){
     var el=document.getElementById('sr-results');if(!el)return
     if(e||!d){el.innerHTML='<div class="err">Lỗi tìm kiếm</div>';return}
     var it=d.items||(d.data&&d.data.items)||[]
@@ -155,7 +168,7 @@ function findFirstCard() {
 
 function od(s) {
   document.getElementById('lst').innerHTML='<div class="loading">Đang tải...</div>'
-  xhr('https://ophim1.com/phim/'+s,function(e,d){
+  apiGet('/phim/'+s,function(e,d){
     if(e||!d||!d.movie){
       document.getElementById('lst').innerHTML='<div class="err">Lỗi tải phim</div>';return
     }
