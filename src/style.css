@@ -1151,10 +1151,11 @@ body.text-mode .detail-poster::after {
 @media (min-width: 1200px) { .exit-btn { font-size: 20px; padding: 16px 48px; } }
 @media (max-width: 700px) {
   .header { flex-wrap: wrap; gap: 8px; padding: 10px 12px; min-height: auto; }
-  .header h1 { width: 100%; font-size: 20px; }
+  .header h1 { flex: 1; min-width: 0; font-size: 20px; }
   .top-nav { display: none; }
   .header-search { order: 3; width: 100%; }
-  .api-toggle-btn, .settings-btn { display: none; }
+  .api-toggle-btn { min-height: 40px; padding: 0 10px; font-size: 12px; }
+  .settings-btn { min-height: 40px; width: 40px; height: 40px; font-size: 20px; }
   #screen-home { padding: 0 12px 72px; }
   .home-hero-copy { left: 14px; right: 14px; }
   .home-hero-side-grid { display: none; }
