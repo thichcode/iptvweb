@@ -6,7 +6,7 @@ import {
   handleListClick, limitRenderedItems
 } from './screens/list.js'
 import { loadDetail, handleDetailClick } from './screens/detail.js'
-import { playEpisode, exitPlayer, togglePlay, seek, seekTo, showOverlay } from './screens/player.js'
+import { playEpisode, exitPlayer, togglePlay, seek, seekTo, showOverlay, openWatchPanel, isWatchPanelOpen, watchPanelMove, watchPanelSelect } from './screens/player.js'
 import { checkUpdate, showUpdateModal, initUpdateChecker } from './update.js'
 import { searchLocal } from './data.js'
 import { checkApiHealth, getApiSource, nextApiSource, setApiSource } from './api.js'
@@ -265,12 +265,20 @@ function handleKey(e) {
 
   if ($('#player-wrap').classList.contains('active')) {
     e.preventDefault()
+    // ponytail: watch-mode panel owns D-pad while open; Back closes player only on 2nd press
+    if (isWatchPanelOpen()) {
+      if (key === 'ArrowDown' || key === 'ArrowRight') watchPanelMove(1)
+      else if (key === 'ArrowUp' || key === 'ArrowLeft') watchPanelMove(-1)
+      else if (key === 'PlayPause' || key === 'Space' || key === 'Enter') watchPanelSelect()
+      else if (key === 'Escape') exitPlayer()
+      return
+    }
     if (key === 'ArrowLeft') seek(-10)
     else if (key === 'ArrowRight') seek(10)
     else if (key === 'ArrowDown' || key === 'ArrowUp') showOverlay()
     else if (key === 'PlayPause' || key === 'Space' || key === 'Enter') togglePlay()
     else if (key === 'f' || key === 'F') { document.documentElement.requestFullscreen?.().catch(() => {}) }
-    else if (key === 'Escape') exitPlayer()
+    else if (key === 'Escape') openWatchPanel()
     return
   }
 
@@ -410,6 +418,8 @@ function handleKey(e) {
 
 function handleClick(e) {
   if ($('#player-wrap').classList.contains('active')) {
+    const wpItem = e.target.closest('#watch-panel .wp-item')
+    if (wpItem) { watchPanelSelect(wpItem); return }
     if (e.target.closest('#player-exit-btn')) { exitPlayer(); return }
     if (e.target.closest('.player-error-close')) { exitPlayer(); return }
     if (e.target.closest('#player-fs-btn')) { document.documentElement.requestFullscreen?.().catch(() => {}); return }

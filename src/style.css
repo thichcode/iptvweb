@@ -320,6 +320,21 @@ body.large-mode .update-msg { font-size: 18px; }
 .p-seekbar { flex: 1; height: 7px; background: rgba(255,255,255,0.25); border-radius: 999px; cursor: pointer; position: relative; }
 .p-seekbar:hover { height: 9px; }
 
+/* Watch-mode panel: Back opens browse panel, video keeps playing, auto-hides 10s */
+#watch-panel { display: none; position: absolute; top: 0; right: 0; bottom: 0; width: min(360px, 86vw); background: rgba(11,11,9,0.96); border-left: 1px solid var(--line-strong); z-index: 30; overflow-y: auto; padding: 14px 12px 40px; }
+#watch-panel.show { display: block; }
+.wp-sec-title { color: var(--accent); font-size: 13px; font-weight: 700; margin: 14px 4px 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+.wp-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.wp-item { padding: 9px 10px; border-radius: var(--radius-sm); font-size: 14px; cursor: pointer; border: 1px solid transparent; }
+.wp-chip { border-color: var(--line-strong); }
+.wp-item .wp-sub { font-size: 12px; opacity: 0.65; margin-top: 2px; }
+.wp-item.wp-active { border-color: var(--accent); background: rgba(255,212,90,0.12); }
+.wp-item.wp-current { color: var(--accent); }
+.wp-loading, .wp-err { padding: 16px 10px; font-size: 14px; color: #b9ad91; }
+.wp-err { color: #ff6868; }
+body.large-mode #watch-panel { width: min(440px, 90vw); }
+body.large-mode .wp-item { font-size: 17px; padding: 12px; }
+
 /* Mobile: tăng vùng chạm ảo của seekbar (không đổi visual height) để
    ngón cái dễ rê chính xác hơn khi cầm máy 1 tay */
 @media (max-width: 600px) {

@@ -110,3 +110,23 @@ test('back button uses Capacitor App plugin and double-press exit', () => {
 test('theme avoids pure black color values', () => {
   assert.doesNotMatch(css, /#[0]{3,6}\b/i)
 })
+
+test('watch-mode: Back opens panel instead of exiting player', () => {
+  assert.match(mainSource, /isWatchPanelOpen\(\)/)
+  assert.match(mainSource, /openWatchPanel\(\)/)
+  assert.match(playerSource, /watch-panel/)
+  assert.match(playerSource, /WATCH_HIDE_MS\s*=\s*10000/)
+  assert.match(css, /#watch-panel/)
+})
+
+test('watch-mode panel covers episodes + history + favs + cached browse', () => {
+  assert.match(playerSource, /getHist/)
+  assert.match(playerSource, /getFavs/)
+  assert.match(playerSource, /getHomeRows/)
+  assert.match(homeSource, /getHomeRows/)
+})
+
+test('watch-mode movie pick plays first episode immediately', () => {
+  assert.match(playerSource, /fetchDetail/)
+  assert.match(playerSource, /playEpisode\(0,\s*0\)/)
+})

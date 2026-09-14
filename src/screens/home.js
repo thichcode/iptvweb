@@ -13,6 +13,9 @@ const ROW_LIMIT = 10
 
 let rows = []
 
+// ponytail: watch-mode panel reuses already-loaded home rows, never fetches
+export function getHomeRows() { return rows }
+
 function renderPosterCard(m) {
   const thumb = imgSrc(m.poster_url || m.thumb_url || m.thumb || m.poster)
   const title = sanitizeAttr(m.name || '')
