@@ -182,8 +182,65 @@ export function loadHistory() {
   renderLocalList(items, 'Đã Xem')
 }
 
+export function renderExploreScreen(categories = [], countries = []) {
+  const container = $('#screen-list')
+  const defaultTypes = [
+    { slug: 'phim-moi-cap-nhat', name: 'Phim Mới' },
+    { slug: 'phim-le', name: 'Phim Lẻ' },
+    { slug: 'phim-bo', name: 'Phim Bộ' },
+    { slug: 'tv-shows', name: 'Phim Netflix / TV' }
+  ]
+  let html = `<div class="explore-wrap">
+    <div class="explore-section">
+      <h2 class="explore-title">🎬 Danh Mục Phim</h2>
+      <div class="chip-grid">
+        ${defaultTypes.map(t => `<button class="explore-chip type-chip" data-type="${t.slug}">${sanitize(t.name)}</button>`).join('')}
+      </div>
+    </div>`
+
+  if (categories && categories.length) {
+    html += `<div class="explore-section">
+      <h2 class="explore-title">🎭 Thể Loại Phim</h2>
+      <div class="chip-grid">
+        ${categories.map(c => `<button class="explore-chip sub-item" data-slug="${sanitizeAttr(c.slug)}">${sanitize(c.name)}</button>`).join('')}
+      </div>
+    </div>`
+  }
+
+  if (countries && countries.length) {
+    html += `<div class="explore-section">
+      <h2 class="explore-title">🌍 Quốc Gia</h2>
+      <div class="chip-grid">
+        ${countries.map(c => `<button class="explore-chip sub-item" data-slug="${sanitizeAttr(c.slug)}">${sanitize(c.name)}</button>`).join('')}
+      </div>
+    </div>`
+  }
+  html += '</div>'
+  container.innerHTML = html
+  store.listType = 'explore'
+}
+
+export async function loadExplore() {
+  const container = $('#screen-list')
+  container.innerHTML = renderSkeletonSubList()
+  switchScreen('list')
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+  try {
+    const [catData, countryData] = await Promise.all([
+      fetchCategories().catch(() => []),
+      fetchCountries().catch(() => [])
+    ])
+    const categories = Array.isArray(catData) ? catData : (catData?.data && Array.isArray(catData.data) ? catData.data : [])
+    const countries = Array.isArray(countryData) ? countryData : (countryData?.data && Array.isArray(countryData.data) ? countryData.data : [])
+    renderExploreScreen(categories, countries)
+  } catch (err) {
+    console.error(err)
+    loadCategories()
+  }
+}
+
 export function handleListClick(e) {
-  const item = e.target.closest('.page-btn, .sub-item, .local-item')
+  const item = e.target.closest('.page-btn, .sub-item, .local-item, .type-chip')
   if (!item) return null
   if (item.classList.contains('local-item')) {
     return { action: 'detail', slug: item.dataset.slug }
@@ -195,5 +252,9 @@ export function handleListClick(e) {
   if (item.classList.contains('sub-item')) {
     return { action: 'subSelect', slug: item.dataset.slug, type: store.listType }
   }
+  if (item.classList.contains('type-chip')) {
+    return { action: 'typeSelect', type: item.dataset.type }
+  }
   return null
 }
+

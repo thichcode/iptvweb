@@ -140,3 +140,12 @@ test('mobile bottom bar has 4 modern tabs: home, explore, search, profile', () =
   assert.match(css, /env\(safe-area-inset-top/)
 })
 
+test('explore screen renders chip categories and desktop hero banner has slide support', async () => {
+  const listModule = await import('../src/screens/list.js')
+  assert.equal(typeof listModule.renderExploreScreen, 'function')
+  assert.match(homeSource, /home-hero-strip/)
+  assert.match(css, /\.explore-chip/)
+  assert.match(css, /\.chip-grid/)
+})
+
+

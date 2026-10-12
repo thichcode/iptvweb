@@ -4,7 +4,7 @@ import { renderHome, handleHomeClick, loadHomeData, resetHomeFocus, navigateHome
 import {
   renderMovieList, renderSubList, renderSearchInput, renderLocalList,
   loadMovieList, loadCategories, loadCountries, loadFavorites, loadHistory,
-  handleListClick, limitRenderedItems
+  loadExplore, handleListClick, limitRenderedItems
 } from './screens/list.js'
 import { loadDetail, handleDetailClick } from './screens/detail.js'
 import { playEpisode, exitPlayer, togglePlay, seek, seekTo, showOverlay, openWatchPanel, isWatchPanelOpen, watchPanelMove, watchPanelSelect } from './screens/player.js'
@@ -497,8 +497,11 @@ function handleClick(e) {
       else if (result.action === 'page') loadMovieList(store.listType, result.page, store.currentKeyword, store.categorySlug, store.countrySlug)
       else if (result.action === 'subSelect') {
         const label = e.target.textContent
-        if (result.type === 'category') { store.categorySlug = result.slug; loadMovieList('category', 1, '', result.slug, ''); setHeader(label, '↑↓ Chọn | Enter xem') }
-        else if (result.type === 'country') { store.countrySlug = result.slug; loadMovieList('country', 1, '', '', result.slug); setHeader(label, '↑↓ Chọn | Enter xem') }
+        if (result.type === 'country') { store.countrySlug = result.slug; loadMovieList('country', 1, '', '', result.slug); setHeader(label, '↑↓ Chọn | Enter xem') }
+        else { store.categorySlug = result.slug; loadMovieList('category', 1, '', result.slug, ''); setHeader(label, '↑↓ Chọn | Enter xem') }
+      } else if (result.action === 'typeSelect') {
+        loadMovieList(result.type, 1, '', '', '')
+        setHeader(e.target.textContent || 'WebPhim', '')
       }
     }
   } else if (screen === 'detail') {
@@ -639,8 +642,7 @@ function init() {
   $('#header-back')?.addEventListener('click', goBack)
   $('#nav-home')?.addEventListener('click', () => { if (store.screen !== 'home') goHome(); updateBottomNav('home') })
   $('#nav-explore')?.addEventListener('click', () => {
-    loadCategories()
-    switchScreenLocal('list')
+    loadExplore()
     setHeader('Khám Phá', 'Chọn thể loại hoặc quốc gia')
     updateBottomNav('explore')
   })

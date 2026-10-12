@@ -111,7 +111,21 @@ export function renderHome() {
   store.favItems = Object.entries(getFavs()).map(([slug, v]) => ({ slug, name: v.name, thumb: v.thumb, year: v.year, origin: v.origin }))
   store.histItems = Object.entries(getHist()).sort((a, b) => (b[1].at || 0) - (a[1].at || 0)).map(([slug, v]) => ({ slug, name: v.name, thumb: v.thumb, year: v.year, origin: v.origin }))
 
-  let html = '<div class="home-rows">'
+  let html = ''
+  const heroMovies = (rows[0] && rows[0].items) || []
+  if (heroMovies.length >= 2) {
+    const mainHero = heroMovies[0]
+    const sideHeroes = heroMovies.slice(1, 5)
+    html += `<div class="home-hero-section">
+      <div class="home-hero-strip">
+        ${renderHeroCard(mainHero, true)}
+        <div class="home-hero-side-grid">
+          ${sideHeroes.map(m => renderHeroCard(m, false)).join('')}
+        </div>
+      </div>
+    </div>`
+  }
+  html += '<div class="home-rows">'
   if (rows.length === 0) {
     html += '<div class="home-loading">Đang tải...</div>'
   } else {
