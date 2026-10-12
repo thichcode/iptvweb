@@ -1,4 +1,5 @@
 import { $, $$, HOME_MENU, KEY_MAP, store, switchScreen } from './utils.js'
+import { initPlatform, isPC, isMobile, isTV } from './platform.js'
 import { renderHome, handleHomeClick, loadHomeData, resetHomeFocus, navigateHome, selectHomeFocused, handleActionRow, focusedRow } from './screens/home.js'
 import {
   renderMovieList, renderSubList, renderSearchInput, renderLocalList,
@@ -108,10 +109,10 @@ function buildShell() {
       </div>
     </div>
     <div class="bottom-bar" id="bottom-bar">
-      <div class="nav-btn" id="nav-back" role="button" aria-label="Quay lại">← <span class="label">Quay lại</span></div>
-      <div class="nav-btn" id="nav-search-btn" role="button" aria-label="Tìm kiếm">⌕ <span class="label">Tìm</span></div>
-      <div class="nav-btn" id="nav-home" role="button" aria-label="Trang chủ">⌂ <span class="label">Trang chủ</span></div>
-      <div class="nav-btn" id="nav-fav" role="button" aria-label="Yêu thích">♥ <span class="label">Yêu thích</span></div>
+      <div class="nav-btn active" id="nav-home" data-nav="home" role="button" aria-label="Trang chủ">⌂ <span class="label">Trang chủ</span></div>
+      <div class="nav-btn" id="nav-explore" data-nav="explore" role="button" aria-label="Khám phá">🧭 <span class="label">Khám phá</span></div>
+      <div class="nav-btn" id="nav-search" data-nav="search" role="button" aria-label="Tìm kiếm">⌕ <span class="label">Tìm kiếm</span></div>
+      <div class="nav-btn" id="nav-profile" data-nav="profile" role="button" aria-label="Cá nhân">👤 <span class="label">Cá nhân</span></div>
     </div>`
 }
 
@@ -605,7 +606,7 @@ function detectTV() {
 }
 
 function init() {
-  detectTV()
+  initPlatform()
   // ponytail: images off by default for everyone; a user who toggles them on is saved
   let thumbsOn = false
   try { thumbsOn = localStorage.getItem('wp_thumbs_on') === '1' } catch {}
@@ -635,35 +636,51 @@ function init() {
   document.addEventListener('click', handleClick)
   document.addEventListener('touchstart', handleTouchStart, { passive: true })
   document.addEventListener('touchend', handleTouch)
-  $('#header-back').addEventListener('click', goBack)
-  $('#nav-back').addEventListener('click', goBack)
-  $('#nav-home').addEventListener('click', () => { if (store.screen !== 'home') goHome() })
-  $('#nav-search-btn').addEventListener('click', () => {
-    if (store.screen === 'home' && !store.searchMode || store.screen === 'detail') {
-      store.searchMode = true
-      renderSearchInput(store.currentKeyword)
-      switchScreenLocal('list')
-      setHeader('Tìm Kiếm', 'Enter để tìm')
-    } else {
-      const inp = $('.search-input')
-      if (inp) inp.focus()
-      else {
-        store.searchMode = true
-        renderSearchInput(store.currentKeyword)
-        switchScreenLocal('list')
-        setHeader('Tìm Kiếm', 'Enter để tìm')
+  $('#header-back')?.addEventListener('click', goBack)
+  $('#nav-home')?.addEventListener('click', () => { if (store.screen !== 'home') goHome(); updateBottomNav('home') })
+  $('#nav-explore')?.addEventListener('click', () => {
+    loadCategories()
+    switchScreenLocal('list')
+    setHeader('Khám Phá', 'Chọn thể loại hoặc quốc gia')
+    updateBottomNav('explore')
+  })
+  $('#nav-search')?.addEventListener('click', () => {
+    store.searchMode = true
+    renderSearchInput(store.currentKeyword)
+    switchScreenLocal('list')
+    setHeader('Tìm Kiếm', 'Enter để tìm')
+    updateBottomNav('search')
+    const inp = $('.search-input')
+    if (inp) inp.focus()
+  })
+  $('#nav-profile')?.addEventListener('click', () => {
+    loadFavorites()
+    switchScreenLocal('list')
+    setHeader('Yêu Thích & Lịch Sử', '')
+    updateBottomNav('profile')
+  })
+
+  // PC quick search hotkey '/'
+  window.addEventListener('keydown', e => {
+    if (e.key === '/' && document.activeElement?.tagName !== 'INPUT' && !$('#player-wrap')?.classList.contains('active')) {
+      const inp = $('#header-search-input')
+      if (inp && inp.offsetParent !== null) {
+        e.preventDefault()
+        inp.focus()
       }
     }
   })
-  $('#nav-fav').addEventListener('click', () => {
-    loadFavorites()
-    switchScreenLocal('list')
-    setHeader('Yêu Thích', '')
-  })
+
   // ponytail: Capacitor backButton — overlays goBack handles, double-press already in goBack
   try { window.Capacitor?.Plugins?.App?.addListener?.('backButton', () => goBack()) } catch {}
   setTimeout(updateApiToggle, 100)
   initUpdateChecker()
+}
+
+function updateBottomNav(navId) {
+  $$('.bottom-bar .nav-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.nav === navId)
+  })
 }
 
 function goHome() {
@@ -673,6 +690,7 @@ function goHome() {
   // No need to renderHome here if data is already loaded
   switchScreenLocal('home')
   $$('.top-nav-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.nav === 'home'))
+  updateBottomNav('home')
   resetHomeFocus()
   setHeader('WebPhim', '')
   window.scrollTo({ top: 0, behavior: 'smooth' })

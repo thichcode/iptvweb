@@ -130,3 +130,13 @@ test('watch-mode movie pick plays first episode immediately', () => {
   assert.match(playerSource, /fetchDetail/)
   assert.match(playerSource, /playEpisode\(0,\s*0\)/)
 })
+
+test('mobile bottom bar has 4 modern tabs: home, explore, search, profile', () => {
+  assert.match(mainSource, /id="nav-home"[\s\S]*data-nav="home"/)
+  assert.match(mainSource, /id="nav-explore"[\s\S]*data-nav="explore"/)
+  assert.match(mainSource, /id="nav-search"[\s\S]*data-nav="search"/)
+  assert.match(mainSource, /id="nav-profile"[\s\S]*data-nav="profile"/)
+  assert.match(css, /env\(safe-area-inset-bottom/)
+  assert.match(css, /env\(safe-area-inset-top/)
+})
+

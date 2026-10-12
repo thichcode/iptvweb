@@ -28,7 +28,7 @@ export function switchScreen(id) {
   const back = $('#header-back')
   if (back) back.style.display = (id === 'home') ? 'none' : ''
   const bar = $('#bottom-bar')
-  if (bar) bar.classList.toggle('show', id !== 'home')
+  if (bar) bar.classList.toggle('show', id !== 'player')
 }
 
 
