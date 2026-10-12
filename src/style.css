@@ -746,6 +746,12 @@ body.platform-tv .bottom-bar,
 body.tv-mode .bottom-bar,
 #player-wrap.active ~ .bottom-bar { display: none !important; }
 
+@media (max-width: 900px) and (orientation: landscape) {
+  .bottom-bar { height: 42px; }
+  .nav-btn { flex-direction: row; font-size: 16px; gap: 4px; }
+  .nav-btn .label { font-size: 10px; }
+}
+
 .nav-btn {
   flex: 1;
   display: flex;

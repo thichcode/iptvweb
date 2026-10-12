@@ -47,3 +47,28 @@ test('DOM synchronization: initPlatform sets data-platform and body classes', ()
   assert.equal(isMobile(), false)
   assert.equal(isTV(), false)
 })
+
+test('Platform engine: does not switch mobile to TV on physical keyboard arrow keys', () => {
+  const mockClassList = new Set()
+  const mockDoc = {
+    documentElement: { dataset: {} },
+    body: {
+      classList: {
+        add: (c) => mockClassList.add(c),
+        remove: (c) => mockClassList.delete(c),
+        contains: (c) => mockClassList.has(c)
+      }
+    }
+  }
+
+  const p = initPlatform({
+    doc: mockDoc,
+    env: { width: 390, isCoarse: true, userAgent: 'Mozilla/5.0 (iPhone)' }
+  })
+
+  assert.equal(p, 'mobile')
+  assert.equal(getPlatform(), 'mobile')
+  assert.equal(isMobile(), true)
+  assert.equal(isTV(), false)
+})
+

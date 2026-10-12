@@ -126,6 +126,7 @@ function setHeader(title, hint) {
 
 function switchScreenLocal(id) {
   switchScreen(id)
+  if (id === 'home') updateBottomNav('home')
   if (id === 'list') {
     requestAnimationFrame(() => {
       const items = $$('.local-item, .page-btn, .sub-item')

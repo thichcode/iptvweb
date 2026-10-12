@@ -72,7 +72,8 @@ export function initPlatform(options = {}) {
   if (typeof window !== 'undefined') {
     const handleDpadSwitch = (e) => {
       if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
-        if (currentPlatform !== 'tv' && currentPlatform !== 'pc') {
+        // Do not auto-switch to TV if user is on a mobile/touch device with physical keyboard
+        if (currentPlatform !== 'tv' && currentPlatform !== 'mobile') {
           currentPlatform = 'tv'
           applyPlatformClasses(document, currentPlatform)
         }

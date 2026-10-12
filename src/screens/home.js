@@ -36,7 +36,7 @@ function renderHeroCard(m, large = false) {
   const slug = sanitizeAttr(m.slug || '')
   if (large) {
     return `<div class="home-hero-main" data-slug="${slug}">
-      <img src="${thumb}" alt="${sanitizeAttr(m.name || '')}" loading="eager">
+      <img src="${thumb}" alt="${sanitizeAttr(m.name || '')}" loading="eager" onerror="this.style.display='none'">
       <div class="home-hero-shade"></div>
       <div class="home-hero-copy">
         <h2>${title}</h2>
@@ -47,7 +47,7 @@ function renderHeroCard(m, large = false) {
     </div>`
   }
   return `<div class="home-hero-side" data-slug="${slug}">
-    <img src="${thumb}" alt="${sanitizeAttr(m.name || '')}" loading="lazy">
+    <img src="${thumb}" alt="${sanitizeAttr(m.name || '')}" loading="lazy" onerror="this.style.display='none'">
     <div class="home-hero-side-copy"><h3>${title}</h3><p><span>${year}</span><span>HD</span></p></div>
   </div>`
 }
