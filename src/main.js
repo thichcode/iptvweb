@@ -148,7 +148,12 @@ function goBack() {
   }
   const screen = store.screen
   if ($('#player-wrap').classList.contains('active')) {
-    exitPlayer()
+    if (isWatchPanelOpen()) {
+      exitPlayer()
+    } else {
+      openWatchPanel()
+    }
+    return
   } else if (screen === 'detail') {
     switchScreenLocal(store.prevScreen || 'home')
     setHeader('WebPhim', '')
@@ -163,7 +168,17 @@ function goBack() {
     setHeader('WebPhim', '')
     window.scrollTo({ top: 0, behavior: 'auto' })
   } else if (screen === 'home') {
-    showExitConfirm()
+    const now = Date.now()
+    if (now - backPressTs < 2000) {
+      if (window.Capacitor?.Plugins?.App?.exitApp) {
+        window.Capacitor.Plugins.App.exitApp()
+      } else {
+        showExitConfirm()
+      }
+    } else {
+      backPressTs = now
+      showToast('Nhấn Back lần nữa để thoát')
+    }
   }
 }
 
@@ -273,6 +288,7 @@ function handleKey(e) {
       else if (key === 'PlayPause' || key === 'Space' || key === 'Enter') watchPanelSelect()
       else if (key === 'Escape') exitPlayer()
       return
+    }
     const playerEl = $('#player')
     if (key === 'ArrowLeft' || key === 'j' || key === 'J') seek(-10)
     else if (key === 'ArrowRight' || key === 'l' || key === 'L') seek(10)

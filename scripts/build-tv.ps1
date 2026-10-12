@@ -5,14 +5,17 @@ param([string]$Version = "")
 
 $ErrorActionPreference = "Stop"
 
-# --- Build TV web assets to dist-tv/ ---
+# --- Build TV web assets to dist-tv/ from main codebase ---
 $tvDir = "dist-tv"
-if (-not (Test-Path $tvDir)) { New-Item -ItemType Directory -Path $tvDir | Out-Null }
-Copy-Item public/tv.html "$tvDir/index.html" -Force
-Copy-Item public/hls.min.js "$tvDir/hls.min.js" -Force
-Copy-Item public/sw.js "$tvDir/sw.js" -Force
-Copy-Item assets/app-icon.png "$tvDir/app-icon.png" -Force
-Write-Host "TV web assets → $tvDir/"
+if (Test-Path $tvDir) { Remove-Item -Recurse -Force $tvDir }
+npm run build:tv
+if (-not $?) { exit 1 }
+
+# Patch dist-tv/index.html to inject TV mode default flag
+(Get-Content "$tvDir/index.html" -Raw) `
+  -replace '<head>', '<head><script>window.__PLATFORM__="tv"</script>' |
+  Set-Content "$tvDir/index.html" -NoNewline
+Write-Host "TV web assets built from main codebase → $tvDir/"
 
 # --- Add/sync Android platform ---
 if (-not (Test-Path android-tv)) {
