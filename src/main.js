@@ -273,12 +273,34 @@ function handleKey(e) {
       else if (key === 'PlayPause' || key === 'Space' || key === 'Enter') watchPanelSelect()
       else if (key === 'Escape') exitPlayer()
       return
+    const playerEl = $('#player')
+    if (key === 'ArrowLeft' || key === 'j' || key === 'J') seek(-10)
+    else if (key === 'ArrowRight' || key === 'l' || key === 'L') seek(10)
+    else if (key === 'PlayPause' || key === 'Space' || key === 'Enter' || key === 'k' || key === 'K') togglePlay()
+    else if (key === 'f' || key === 'F') {
+      if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {})
+      else document.documentElement.requestFullscreen?.().catch(() => {})
     }
-    if (key === 'ArrowLeft') seek(-10)
-    else if (key === 'ArrowRight') seek(10)
-    else if (key === 'ArrowDown' || key === 'ArrowUp') showOverlay()
-    else if (key === 'PlayPause' || key === 'Space' || key === 'Enter') togglePlay()
-    else if (key === 'f' || key === 'F') { document.documentElement.requestFullscreen?.().catch(() => {}) }
+    else if (key === 'm' || key === 'M') {
+      if (playerEl) {
+        playerEl.muted = !playerEl.muted
+        showToast(playerEl.muted ? '🔇 Tắt tiếng' : '🔊 Bật tiếng')
+      }
+    }
+    else if (key === 'ArrowUp') {
+      if (isTV()) showOverlay()
+      else if (playerEl) {
+        playerEl.volume = Math.min(1, Math.round((playerEl.volume + 0.1) * 10) / 10)
+        showToast('Âm lượng: ' + Math.round(playerEl.volume * 100) + '%')
+      }
+    }
+    else if (key === 'ArrowDown') {
+      if (isTV()) showOverlay()
+      else if (playerEl) {
+        playerEl.volume = Math.max(0, Math.round((playerEl.volume - 0.1) * 10) / 10)
+        showToast('Âm lượng: ' + Math.round(playerEl.volume * 100) + '%')
+      }
+    }
     else if (key === 'Escape') openWatchPanel()
     return
   }
@@ -423,7 +445,16 @@ function handleClick(e) {
     if (wpItem) { watchPanelSelect(wpItem); return }
     if (e.target.closest('#player-exit-btn')) { exitPlayer(); return }
     if (e.target.closest('.player-error-close')) { exitPlayer(); return }
-    if (e.target.closest('#player-fs-btn')) { document.documentElement.requestFullscreen?.().catch(() => {}); return }
+    if (e.target.closest('#player-fs-btn')) {
+      if (document.fullscreenElement) {
+        document.exitFullscreen?.().catch(() => {})
+      } else {
+        document.documentElement.requestFullscreen?.().then(() => {
+          try { screen.orientation?.lock?.('landscape').catch(() => {}) } catch {}
+        }).catch(() => {})
+      }
+      return
+    }
     if (e.target.closest('#player-center-btn')) { togglePlay(); return }
     if (e.target.closest('#p-seekbar')) { seekTo(e); return }
     if (e.target === $('#player')) togglePlay()

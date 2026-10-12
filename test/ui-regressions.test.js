@@ -148,4 +148,11 @@ test('explore screen renders chip categories and desktop hero banner has slide s
   assert.match(css, /\.chip-grid/)
 })
 
+test('player supports PC shortcuts (K, Mute, Volume) and mobile fullscreen orientation lock', () => {
+  assert.match(mainSource, /key === 'k' \|\| key === 'K'/)
+  assert.match(mainSource, /key === 'm' \|\| key === 'M'/)
+  assert.match(mainSource, /orientation\?\.lock/)
+})
+
+
 
