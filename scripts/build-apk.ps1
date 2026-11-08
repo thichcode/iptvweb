@@ -3,9 +3,31 @@ param([string]$Version = "")
 #   .\scripts\build-apk.ps1              # just build, outputs WebPhim.apk
 #   .\scripts\build-apk.ps1 v1.0.0       # build + create GitHub Release
 
-if (-not (Test-Path android)) { npx cap add android; if (-not $?) { exit 1 } }
-npm run build; if (-not $?) { exit 1 }
-npx cap sync android; if (-not $?) { exit 1 }
+$ErrorActionPreference = "Stop"
+
+# Auto-detect Android SDK if not already set
+if (-not $env:ANDROID_HOME -and (Test-Path "D:\pupeteer\sdk")) {
+  $env:ANDROID_HOME = "D:\pupeteer\sdk"
+}
+
+# Ensure Android platform project is scaffolded
+if (-not (Test-Path "android/app/build.gradle")) {
+  if (Test-Path android) { Remove-Item -Recurse -Force android }
+  npx cap add android
+  if ($LASTEXITCODE -ne 0) { exit 1 }
+}
+
+npm run build
+if ($LASTEXITCODE -ne 0) { exit 1 }
+
+npx cap sync android
+if ($LASTEXITCODE -ne 0) { exit 1 }
+
+# Set sdk.dir in local.properties
+if ($env:ANDROID_HOME) {
+  $sdkEscaped = $env:ANDROID_HOME.Replace("\", "\\")
+  Set-Content "android/local.properties" "sdk.dir=$sdkEscaped"
+}
 
 # --- TV patches (mirror release-apk.yml) ---
 $res = "android/app/src/main/res"
@@ -56,14 +78,23 @@ $providerXml = "        <provider`n            android:name=`"androidx.core.cont
 
 # Patch build.gradle with debug signing config
 $gradle = "android/app/build.gradle"
-(Get-Content $gradle -Raw) `
-  -replace '^android \{', "android {`n    signingConfigs {`n        debug {`n            storeFile file(`"../../certs/debug.keystore`")`n            storePassword `"android`"`n            keyAlias `"androiddebugkey`"`n            keyPassword `"android`"`n        }`n    }" `
-  -replace 'buildTypes \{', "buildTypes {`n        debug {`n            signingConfig signingConfigs.debug`n        }" |
-  Set-Content $gradle -NoNewline
+$gradleContent = Get-Content $gradle -Raw
+if (-not $gradleContent.Contains("signingConfigs {")) {
+  $gradleContent = $gradleContent `
+    -replace 'android \{', "android {`n    signingConfigs {`n        debug {`n            storeFile file(`"../../certs/debug.keystore`")`n            storePassword `"android`"`n            keyAlias `"androiddebugkey`"`n            keyPassword `"android`"`n        }`n    }" `
+    -replace 'buildTypes \{', "buildTypes {`n        debug {`n            signingConfig signingConfigs.debug`n        }"
+  Set-Content $gradle $gradleContent -NoNewline
+}
 
 # --- Build ---
 Push-Location android
-./gradlew assembleDebug; if (-not $?) { Pop-Location; exit 1 }
+if ($IsWindows -or $env:OS -like "*Windows*") {
+  cmd /c "gradlew.bat assembleDebug"
+} else {
+  chmod +x gradlew
+  ./gradlew assembleDebug
+}
+if ($LASTEXITCODE -ne 0) { Pop-Location; exit 1 }
 Pop-Location
 Copy-Item android/app/build/outputs/apk/debug/app-debug.apk WebPhim.apk -Force
 Write-Host "APK: WebPhim.apk"

@@ -11,3 +11,4 @@ docs/*
 agency-agents/
 .worktrees/
 crawl-*.txt
+*.apk

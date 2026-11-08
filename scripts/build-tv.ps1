@@ -5,11 +5,16 @@ param([string]$Version = "")
 
 $ErrorActionPreference = "Stop"
 
+# Auto-detect Android SDK if not already set
+if (-not $env:ANDROID_HOME -and (Test-Path "D:\pupeteer\sdk")) {
+  $env:ANDROID_HOME = "D:\pupeteer\sdk"
+}
+
 # --- Build TV web assets to dist-tv/ from main codebase ---
 $tvDir = "dist-tv"
 if (Test-Path $tvDir) { Remove-Item -Recurse -Force $tvDir }
 npm run build:tv
-if (-not $?) { exit 1 }
+if ($LASTEXITCODE -ne 0) { exit 1 }
 
 # Patch dist-tv/index.html to inject TV mode default flag
 (Get-Content "$tvDir/index.html" -Raw) `
@@ -17,17 +22,42 @@ if (-not $?) { exit 1 }
   Set-Content "$tvDir/index.html" -NoNewline
 Write-Host "TV web assets built from main codebase → $tvDir/"
 
-# --- Add/sync Android platform ---
-if (-not (Test-Path android-tv)) {
-  npx cap add android --config capacitor.config.tv.json
-  if (-not $?) { exit 1 }
+# --- Add/sync Android platform with TV config ---
+$pkgDir = "android/app/src/main/java/com/webphim/tv"
+$needReAdd = -not (Test-Path "android/app/build.gradle") -or -not (Test-Path $pkgDir)
+
+$hasOriginalConfig = Test-Path "capacitor.config.json"
+if ($hasOriginalConfig) {
+  Copy-Item "capacitor.config.json" "capacitor.config.json.bak" -Force
 }
-npx cap sync android --config capacitor.config.tv.json
-if (-not $?) { exit 1 }
+Copy-Item "capacitor.config.tv.json" "capacitor.config.json" -Force
+
+try {
+  if ($needReAdd) {
+    if (Test-Path android) { Remove-Item -Recurse -Force android }
+    npx cap add android
+    if ($LASTEXITCODE -ne 0) { exit 1 }
+  }
+
+  npx cap sync android
+  if ($LASTEXITCODE -ne 0) { exit 1 }
+} finally {
+  if ($hasOriginalConfig) {
+    Move-Item "capacitor.config.json.bak" "capacitor.config.json" -Force
+  } else {
+    Remove-Item "capacitor.config.json" -Force -ErrorAction SilentlyContinue
+  }
+}
+
+# Set sdk.dir in local.properties
+if ($env:ANDROID_HOME) {
+  $sdkEscaped = $env:ANDROID_HOME.Replace("\", "\\")
+  Set-Content "android/local.properties" "sdk.dir=$sdkEscaped"
+}
 
 # --- TV patches ---
-$res = "android-tv/app/src/main/res"
-$manifest = "android-tv/app/src/main/AndroidManifest.xml"
+$res = "android/app/src/main/res"
+$manifest = "android/app/src/main/AndroidManifest.xml"
 
 # App icon
 foreach ($dir in @("mipmap-hdpi","mipmap-mdpi","mipmap-xhdpi","mipmap-xxhdpi","mipmap-xxxhdpi")) {
@@ -47,7 +77,6 @@ $xmlDir = "$res/xml"
 if (-not (Test-Path $xmlDir)) { New-Item -ItemType Directory -Path $xmlDir -Force | Out-Null }
 Copy-Item "android-template/res/xml/file_paths.xml" "$xmlDir/file_paths.xml" -Force
 
-$pkgDir = "android-tv/app/src/main/java/com/webphim/tv"
 if (-not (Test-Path $pkgDir)) { New-Item -ItemType Directory -Path $pkgDir -Force | Out-Null }
 (Get-Content "android-template/UpdatePlugin.java" -Raw) `
   -replace '__PACKAGE_NAME__', 'package com.webphim.tv;' |
@@ -73,17 +102,26 @@ $providerXml = "        <provider`n            android:name=`"androidx.core.cont
   Set-Content $manifest -NoNewline
 
 # Patch build.gradle with signing config
-$gradle = "android-tv/app/build.gradle"
-(Get-Content $gradle -Raw) `
-  -replace '^android \{', "android {`n    signingConfigs {`n        debug {`n            storeFile file(`"../../certs/debug.keystore`")`n            storePassword `"android`"`n            keyAlias `"androiddebugkey`"`n            keyPassword `"android`"`n        }`n    }" `
-  -replace 'buildTypes \{', "buildTypes {`n        debug {`n            signingConfig signingConfigs.debug`n        }" |
-  Set-Content $gradle -NoNewline
+$gradle = "android/app/build.gradle"
+$gradleContent = Get-Content $gradle -Raw
+if (-not $gradleContent.Contains("signingConfigs {")) {
+  $gradleContent = $gradleContent `
+    -replace 'android \{', "android {`n    signingConfigs {`n        debug {`n            storeFile file(`"../../certs/debug.keystore`")`n            storePassword `"android`"`n            keyAlias `"androiddebugkey`"`n            keyPassword `"android`"`n        }`n    }" `
+    -replace 'buildTypes \{', "buildTypes {`n        debug {`n            signingConfig signingConfigs.debug`n        }"
+  Set-Content $gradle $gradleContent -NoNewline
+}
 
 # --- Build ---
-Push-Location android-tv
-./gradlew assembleDebug; if (-not $?) { Pop-Location; exit 1 }
+Push-Location android
+if ($IsWindows -or $env:OS -like "*Windows*") {
+  cmd /c "gradlew.bat assembleDebug"
+} else {
+  chmod +x gradlew
+  ./gradlew assembleDebug
+}
+if ($LASTEXITCODE -ne 0) { Pop-Location; exit 1 }
 Pop-Location
-Copy-Item android-tv/app/build/outputs/apk/debug/app-debug.apk WebPhimTV.apk -Force
+Copy-Item android/app/build/outputs/apk/debug/app-debug.apk WebPhimTV.apk -Force
 Write-Host "TV APK: WebPhimTV.apk"
 
 if ($Version) {
