@@ -5,7 +5,8 @@ android/
 android-tv/
 .gradle/
 build/
-docs/
+docs/*
+!docs/superpowers/
 .vercel
 agency-agents/
 .worktrees/
