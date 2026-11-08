@@ -1223,16 +1223,18 @@ body.text-mode .detail-poster::after {
   .home-hero-strip { grid-template-columns: 1fr; }
   .home-hero-side-grid { grid-template-columns: repeat(2, minmax(110px, 1fr)); }
 }
-#update-modal { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; }
+#update-modal, #update-install-modal { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; }
 .update-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.7); }
-.update-box { position: relative; background: var(--surface-strong); border: 1px solid var(--line-strong); border-radius: var(--radius-md); padding: 28px 32px; max-width: 420px; width: 90%; text-align: center; }
-.update-head { font-size: 20px; font-weight: 800; color: var(--accent); margin-bottom: 6px; }
-.update-ver { font-size: 15px; color: var(--muted); margin-bottom: 14px; }
-.update-notes { font-size: 13px; color: var(--faint); text-align: left; max-height: 120px; overflow-y: auto; margin-bottom: 18px; line-height: 1.5; white-space: pre-wrap; }
-.update-actions { display: flex; gap: 12px; justify-content: center; }
-.update-btn { display: inline-block; padding: 10px 24px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 700; cursor: pointer; border: none; text-decoration: none; }
-.update-dl { background: var(--accent); color: #0f0f0d; }
-.update-close { background: var(--surface); color: var(--muted); border: 1px solid var(--line); }
+.update-box, .update-install-box { position: relative; background: var(--surface-strong); border: 1px solid var(--line-strong); border-radius: var(--radius-md); padding: 28px 32px; max-width: 440px; width: 90%; text-align: center; }
+.update-badge { display: inline-block; padding: 3px 10px; border-radius: 999px; background: rgba(255, 212, 90, 0.15); color: var(--accent); font-size: 11px; font-weight: 800; letter-spacing: 0.08em; margin-bottom: 10px; border: 1px solid rgba(255, 212, 90, 0.3); }
+.update-head, .update-install-head { font-size: 20px; font-weight: 800; color: var(--accent); margin-bottom: 6px; }
+.update-ver, .update-install-ver { font-size: 15px; color: var(--muted); margin-bottom: 14px; }
+.update-notes, .update-install-notes { font-size: 13px; color: var(--faint); text-align: left; max-height: 120px; overflow-y: auto; margin-bottom: 18px; line-height: 1.5; white-space: pre-wrap; }
+.update-actions, .update-install-actions { display: flex; gap: 12px; justify-content: center; }
+.update-btn { display: inline-block; padding: 10px 24px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 700; cursor: pointer; border: 2px solid transparent; text-decoration: none; transition: transform 0.15s, border-color 0.15s; outline: none; }
+.update-dl, .update-btn-primary { background: var(--accent); color: #0f0f0d; border-color: var(--accent); }
+.update-close, .update-btn-secondary { background: var(--surface); color: var(--muted); border: 1px solid var(--line); }
+.update-btn:focus, .update-btn.focused { border-color: #ffffff; box-shadow: 0 0 0 3px rgba(255, 212, 90, 0.4); transform: scale(1.04); }
 #toast-msg { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); z-index: 99999; background: rgba(0,0,0,0.85); color: #fff; padding: 12px 24px; border-radius: 8px; font-size: 15px; opacity: 0; transition: opacity 0.2s; pointer-events: none; white-space: nowrap; }
 #toast-msg.show { opacity: 1; }
 #exit-confirm { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; }
