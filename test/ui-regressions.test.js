@@ -156,3 +156,8 @@ test('player supports PC shortcuts (K, Mute, Volume) and mobile fullscreen orien
 
 
 
+
+test('update-install-modal is supported in key navigation and back button', () => {
+  assert.match(mainSource, /update-install-modal/)
+  assert.match(mainSource, /btn-install-now|btn-install-later/)
+})

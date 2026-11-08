@@ -141,10 +141,10 @@ function switchScreenLocal(id) {
 
 let backPressTs = 0
 function goBack() {
-  if ($('#exit-confirm') || $('#update-modal')) {
+  if ($('#exit-confirm') || $('#update-modal') || $('#update-install-modal')) {
     removeExitConfirm()
-    const um = $('#update-modal')
-    if (um) um.remove()
+    $('#update-modal')?.remove()
+    $('#update-install-modal')?.remove()
     return
   }
   const screen = store.screen
@@ -254,9 +254,31 @@ function handleKey(e) {
     if (key === 'Escape') { e.preventDefault(); removeExitConfirm(); return handled }
     return handled
   }
-  if ($('#update-modal')) {
-    if (key === 'Escape') { e.preventDefault(); const m = $('#update-modal'); if (m) m.remove(); return handled }
-    if (key === 'Enter') { e.preventDefault(); const dl = $('.update-dl'); if (dl) dl.click(); else { const m = $('#update-modal'); if (m) m.remove() } return handled }
+  const updateModal = $('#update-modal') || $('#update-install-modal')
+  if (updateModal) {
+    if (key === 'Escape' || key === 'Back') { e.preventDefault(); updateModal.remove(); return handled }
+    if (key === 'ArrowLeft' || key === 'ArrowRight') {
+      e.preventDefault()
+      const btns = Array.from(updateModal.querySelectorAll('.update-btn'))
+      if (btns.length > 1) {
+        const idx = btns.findIndex(b => b === document.activeElement)
+        const nextIdx = idx <= 0 ? 1 : 0
+        btns[nextIdx]?.focus()
+      }
+      return handled
+    }
+    if (key === 'Enter') {
+      e.preventDefault()
+      const focusedBtn = updateModal.querySelector('.update-btn:focus')
+      if (focusedBtn) {
+        focusedBtn.click()
+      } else {
+        const primary = updateModal.querySelector('.update-btn-primary, .update-dl, #btn-install-now')
+        if (primary) primary.click()
+        else updateModal.remove()
+      }
+      return handled
+    }
     return handled
   }
 
@@ -486,9 +508,9 @@ function handleClick(e) {
     else removeExitConfirm()
     return
   }
-  if (e.target.closest('#update-modal .update-backdrop, #update-modal .update-close')) {
-    const m = $('#update-modal')
-    if (m) m.remove()
+  if (e.target.closest('#update-modal .update-backdrop, #update-modal .update-close, #update-install-modal .update-backdrop, #btn-install-later')) {
+    $('#update-modal')?.remove()
+    $('#update-install-modal')?.remove()
     return
   }
 
