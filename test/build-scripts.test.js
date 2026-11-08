@@ -17,4 +17,6 @@ test('build-apk.ps1 and build-tv.ps1 include update plugin patching', () => {
   assert.ok(workflow.includes('UpdatePlugin.java'), 'release-apk.yml must patch UpdatePlugin.java')
   assert.ok(workflow.includes('REQUEST_INSTALL_PACKAGES'), 'release-apk.yml must add REQUEST_INSTALL_PACKAGES')
   assert.ok(workflow.includes('file_paths.xml'), 'release-apk.yml must copy file_paths.xml')
+  assert.ok(workflow.includes('npm run build:tv'), 'release-apk.yml must use npm run build:tv for TV')
+  assert.ok(!workflow.includes('cp public/tv.html'), 'release-apk.yml must not use obsolete public/tv.html')
 })

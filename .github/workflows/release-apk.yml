@@ -88,9 +88,8 @@ jobs:
       - run: npm ci
       - name: Build TV web assets
         run: |
-          mkdir -p dist-tv
-          cp public/tv.html dist-tv/index.html
-          cp public/hls.min.js dist-tv/hls.min.js
+          npm run build:tv
+          sed -i 's|<head>|<head><script>window.__PLATFORM__="tv"</script>|' dist-tv/index.html
       - name: Use TV config
         run: cp capacitor.config.tv.json capacitor.config.json
       - name: Add Android TV platform

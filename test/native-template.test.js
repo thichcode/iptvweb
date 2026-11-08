@@ -13,4 +13,7 @@ test('native-template files exist and contain required methods', () => {
   assert.ok(java.includes('startDownload'), 'must implement startDownload')
   assert.ok(java.includes('installApk'), 'must implement installApk')
   assert.ok(java.includes('ACTION_DOWNLOAD_COMPLETE'), 'must handle download complete broadcast')
+  assert.ok(java.includes('STATUS_SUCCESSFUL'), 'must verify download status is successful before emitting complete')
+  assert.ok(java.includes('ActivityNotFoundException'), 'must handle ActivityNotFoundException for unknown app sources')
+  assert.ok(java.includes('downloaded_version'), 'must track and verify downloaded version')
 })

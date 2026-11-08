@@ -1,12 +1,15 @@
 __PACKAGE_NAME__
 
 import android.app.DownloadManager;
+import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -38,9 +41,30 @@ public class UpdatePlugin extends Plugin {
                 String action = intent.getAction();
                 if (DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(action)) {
                     long downloadId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
-                    JSObject ret = new JSObject();
-                    ret.put("downloadId", downloadId);
-                    notifyListeners("apkDownloadComplete", ret);
+                    if (downloadId == -1) return;
+
+                    DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+                    boolean successful = false;
+                    if (downloadManager != null) {
+                        DownloadManager.Query query = new DownloadManager.Query();
+                        query.setFilterById(downloadId);
+                        Cursor cursor = downloadManager.query(query);
+                        if (cursor != null) {
+                            if (cursor.moveToFirst()) {
+                                int statusIdx = cursor.getColumnIndex(DownloadManager.COLUMN_STATUS);
+                                if (statusIdx != -1 && cursor.getInt(statusIdx) == DownloadManager.STATUS_SUCCESSFUL) {
+                                    successful = true;
+                                }
+                            }
+                            cursor.close();
+                        }
+                    }
+
+                    if (successful) {
+                        JSObject ret = new JSObject();
+                        ret.put("downloadId", downloadId);
+                        notifyListeners("apkDownloadComplete", ret);
+                    }
                 }
             }
         };
@@ -75,6 +99,7 @@ public class UpdatePlugin extends Plugin {
     @PluginMethod
     public void isApkDownloaded(PluginCall call) {
         String fileName = call.getString("fileName");
+        String version = call.getString("version");
         if (fileName == null || fileName.isEmpty()) {
             call.reject("fileName is required");
             return;
@@ -82,6 +107,46 @@ public class UpdatePlugin extends Plugin {
 
         try {
             Context context = getContext();
+            SharedPreferences prefs = context.getSharedPreferences("wp_updates", Context.MODE_PRIVATE);
+            String savedVer = prefs.getString("downloaded_version_" + fileName, "");
+
+            // If a specific version is queried, verify it matches
+            if (version != null && !version.isEmpty() && !version.equals(savedVer)) {
+                JSObject ret = new JSObject();
+                ret.put("downloaded", false);
+                ret.put("reason", "version_mismatch");
+                call.resolve(ret);
+                return;
+            }
+
+            // Check if still actively downloading
+            long downloadId = prefs.getLong("download_id_" + fileName, -1);
+            if (downloadId != -1) {
+                DownloadManager dm = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+                if (dm != null) {
+                    DownloadManager.Query q = new DownloadManager.Query();
+                    q.setFilterById(downloadId);
+                    Cursor c = dm.query(q);
+                    if (c != null) {
+                        if (c.moveToFirst()) {
+                            int statusIdx = c.getColumnIndex(DownloadManager.COLUMN_STATUS);
+                            if (statusIdx != -1) {
+                                int status = c.getInt(statusIdx);
+                                if (status == DownloadManager.STATUS_RUNNING || status == DownloadManager.STATUS_PENDING) {
+                                    c.close();
+                                    JSObject ret = new JSObject();
+                                    ret.put("downloaded", false);
+                                    ret.put("downloading", true);
+                                    call.resolve(ret);
+                                    return;
+                                }
+                            }
+                        }
+                        c.close();
+                    }
+                }
+            }
+
             File downloadDir = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
             File apkFile = new File(downloadDir, fileName);
             boolean exists = apkFile.exists() && apkFile.isFile() && apkFile.length() > 1024 * 1024; // > 1MB
@@ -100,6 +165,7 @@ public class UpdatePlugin extends Plugin {
     public void startDownload(PluginCall call) {
         String url = call.getString("url");
         String fileName = call.getString("fileName");
+        String version = call.getString("version", "");
         String title = call.getString("title", "Cập nhật ứng dụng WebPhim");
 
         if (url == null || url.isEmpty() || fileName == null || fileName.isEmpty()) {
@@ -128,6 +194,13 @@ public class UpdatePlugin extends Plugin {
             request.setAllowedOverRoaming(true);
 
             long downloadId = downloadManager.enqueue(request);
+
+            // Record downloaded version and downloadId
+            SharedPreferences prefs = context.getSharedPreferences("wp_updates", Context.MODE_PRIVATE);
+            prefs.edit()
+                .putString("downloaded_version_" + fileName, version)
+                .putLong("download_id_" + fileName, downloadId)
+                .apply();
 
             JSObject ret = new JSObject();
             ret.put("downloadId", downloadId);
@@ -162,7 +235,13 @@ public class UpdatePlugin extends Plugin {
                     Intent manageIntent = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES);
                     manageIntent.setData(Uri.parse("package:" + context.getPackageName()));
                     manageIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    context.startActivity(manageIntent);
+                    try {
+                        context.startActivity(manageIntent);
+                    } catch (ActivityNotFoundException anf) {
+                        try {
+                            context.startActivity(new Intent(Settings.ACTION_SECURITY_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+                        } catch (Exception ignored) {}
+                    }
                     JSObject ret = new JSObject();
                     ret.put("needsPermission", true);
                     call.resolve(ret);

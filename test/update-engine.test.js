@@ -76,3 +76,32 @@ test('showReadyToInstallModal creates modal with install and cancel buttons', ()
   assert.strictEqual(appended.id, 'update-install-modal')
   assert.ok(appended.innerHTML.includes('Bản cập nhật đã sẵn sàng!'))
 })
+
+test('checkUpdate skips if native installed version is already equal or newer', async () => {
+  const { checkUpdate } = await import('../src/update.js')
+
+  global.window = {
+    Capacitor: {
+      isNativePlatform: () => true,
+      Plugins: {
+        AppUpdate: {
+          getAppVersion: async () => ({ versionName: '1.5.0', versionCode: 15 })
+        }
+      }
+    }
+  }
+
+  // Mock global fetch to return build-10 (older than installed version 1.5.0 / build-15)
+  const origFetch = global.fetch
+  global.fetch = async () => ({
+    ok: true,
+    json: async () => ({ tag_name: 'v1.2.0', assets: [{ name: 'WebPhim.apk', browser_download_url: 'http://test/WebPhim.apk' }] })
+  })
+
+  try {
+    const res = await checkUpdate()
+    assert.strictEqual(res, null, 'Should return null when installed app is already newer than release')
+  } finally {
+    global.fetch = origFetch
+  }
+})

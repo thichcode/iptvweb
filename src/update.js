@@ -30,8 +30,24 @@ export async function checkUpdate() {
     if (!res.ok) return null
     const data = await res.json()
     const tag = data.tag_name || ''
+    if (!tag || tag === _lastTag) return null
+
+    const tagBuildNum = parseBuildNum(tag)
+
+    // Check installed version on native Android first
+    const native = getNativeAppUpdate()
+    if (native) {
+      try {
+        const appInfo = await native.getAppVersion()
+        if (appInfo) {
+          const installedVerNum = parseBuildNum(appInfo.versionName) || Number(appInfo.versionCode) || 0
+          if (tagBuildNum <= installedVerNum) return null
+        }
+      } catch {}
+    }
+
     const currentStoredTag = localStorage.getItem('wp_last_update_tag') || ''
-    if (!tag || tag === _lastTag || parseBuildNum(tag) <= parseBuildNum(currentStoredTag)) return null
+    if (tagBuildNum <= parseBuildNum(currentStoredTag)) return null
 
     _lastTag = tag
     const targetFileName = selectTargetApk(isTV())
@@ -113,11 +129,12 @@ export function showReadyToInstallModal(info) {
           if (res?.needsPermission) {
             btnInstall.textContent = 'Cấp quyền & Cài đặt'
           } else {
+            try { localStorage.setItem('wp_last_update_tag', info.tag) } catch {}
             modal.remove()
           }
         } catch (e) {
           console.error('Install failed:', e)
-          window.location.href = info.downloadUrl
+          try { window.open(info.downloadUrl, '_system') } catch {}
         }
       } else {
         window.open(info.downloadUrl, '_blank')
@@ -149,16 +166,31 @@ export function initUpdateChecker() {
           return
         }
 
+        if (checkRes?.downloading) {
+          // Already downloading in background, just wait for event
+          native.addListener('apkDownloadComplete', async () => {
+            const recheck = await native.isApkDownloaded({ fileName: info.fileName, version: info.version })
+            if (recheck?.downloaded) {
+              showReadyToInstallModal(info)
+            }
+          })
+          return
+        }
+
         // Trigger background download
         await native.startDownload({
           url: info.downloadUrl,
           fileName: info.fileName,
+          version: info.version,
           title: `Cập nhật WebPhim ${info.version}`
         })
 
         // Listen for download completion event
-        native.addListener('apkDownloadComplete', () => {
-          showReadyToInstallModal(info)
+        native.addListener('apkDownloadComplete', async () => {
+          const recheck = await native.isApkDownloaded({ fileName: info.fileName, version: info.version })
+          if (recheck?.downloaded) {
+            showReadyToInstallModal(info)
+          }
         })
       } catch (err) {
         console.warn('Native update check failed, fallback to modal:', err)
