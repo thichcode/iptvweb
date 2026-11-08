@@ -17,7 +17,8 @@ jobs:
         with: { distribution: 'temurin', java-version: '21' }
       - uses: actions/setup-node@v4
         with: { node-version: 22, cache: npm }
-      - uses: android-actions/setup-android@v3
+      - name: Accept Android SDK licenses
+        run: yes | sdkmanager --licenses || true
       - run: npm ci
       - run: npm run build
       - name: Add Android platform
@@ -84,7 +85,8 @@ jobs:
         with: { distribution: 'temurin', java-version: '21' }
       - uses: actions/setup-node@v4
         with: { node-version: 22, cache: npm }
-      - uses: android-actions/setup-android@v3
+      - name: Accept Android SDK licenses
+        run: yes | sdkmanager --licenses || true
       - run: npm ci
       - name: Build TV web assets
         run: |
