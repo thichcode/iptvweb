@@ -49,6 +49,20 @@ jobs:
           sed -i 's|android:exported="true"|android:exported="true"\n            android:resizeableActivity="true"|' "$M"
           sed -i 's|<category android:name="android.intent.category.LAUNCHER" />|<category android:name="android.intent.category.LAUNCHER" />\n                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />|' "$M"
           cp assets/tv_banner.png android/app/src/main/res/drawable/tv_banner.png
+      - name: Patch UpdatePlugin and FileProvider
+        run: |
+          mkdir -p android/app/src/main/res/xml
+          cp android-template/res/xml/file_paths.xml android/app/src/main/res/xml/file_paths.xml
+          mkdir -p android/app/src/main/java/com/webphim/app
+          sed 's/__PACKAGE_NAME__/package com.webphim.app;/' android-template/UpdatePlugin.java > android/app/src/main/java/com/webphim/app/UpdatePlugin.java
+          ACT="android/app/src/main/java/com/webphim/app/MainActivity.java"
+          if [ -f "$ACT" ]; then
+            sed -i 's/public class MainActivity extends BridgeActivity {/public class MainActivity extends BridgeActivity {\n    @Override\n    public void onCreate(android.os.Bundle savedInstanceState) {\n        registerPlugin(UpdatePlugin.class);\n        super.onCreate(savedInstanceState);\n    }/' "$ACT"
+          fi
+          M="android/app/src/main/AndroidManifest.xml"
+          sed -i 's|</manifest>|  <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />\n</manifest>|' "$M"
+          PROVIDER='<provider android:name="androidx.core.content.FileProvider" android:authorities="${applicationId}.fileprovider" android:exported="false" android:grantUriPermissions="true"><meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_paths" /></provider>'
+          sed -i "s|</application>|    $PROVIDER\n  </application>|" "$M"
       - name: Patch build.gradle with signing config
         run: |
           sed -i '/^android {/a\    signingConfigs {\n        debug {\n            storeFile file("../../certs/debug.keystore")\n            storePassword "android"\n            keyAlias "androiddebugkey"\n            keyPassword "android"\n        }\n    }' android/app/build.gradle
@@ -105,6 +119,20 @@ jobs:
           sed -i 's|android:supportsRtl="true"|android:supportsRtl="true"\n        android:banner="@drawable/tv_banner"|' "$M"
           sed -i 's|android:exported="true"|android:exported="true"\n            android:resizeableActivity="true"|' "$M"
           sed -i 's|<category android:name="android.intent.category.LAUNCHER" />|<category android:name="android.intent.category.LAUNCHER" />\n                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />|' "$M"
+      - name: Patch UpdatePlugin and FileProvider for TV
+        run: |
+          mkdir -p android/app/src/main/res/xml
+          cp android-template/res/xml/file_paths.xml android/app/src/main/res/xml/file_paths.xml
+          mkdir -p android/app/src/main/java/com/webphim/tv
+          sed 's/__PACKAGE_NAME__/package com.webphim.tv;/' android-template/UpdatePlugin.java > android/app/src/main/java/com/webphim/tv/UpdatePlugin.java
+          ACT="android/app/src/main/java/com/webphim/tv/MainActivity.java"
+          if [ -f "$ACT" ]; then
+            sed -i 's/public class MainActivity extends BridgeActivity {/public class MainActivity extends BridgeActivity {\n    @Override\n    public void onCreate(android.os.Bundle savedInstanceState) {\n        registerPlugin(UpdatePlugin.class);\n        super.onCreate(savedInstanceState);\n    }/' "$ACT"
+          fi
+          M="android/app/src/main/AndroidManifest.xml"
+          sed -i 's|</manifest>|  <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />\n</manifest>|' "$M"
+          PROVIDER='<provider android:name="androidx.core.content.FileProvider" android:authorities="${applicationId}.fileprovider" android:exported="false" android:grantUriPermissions="true"><meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_paths" /></provider>'
+          sed -i "s|</application>|    $PROVIDER\n  </application>|" "$M"
       - name: Patch build.gradle with signing config
         run: |
           G=android/app/build.gradle

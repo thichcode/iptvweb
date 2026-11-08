@@ -24,11 +24,33 @@ foreach ($dir in @("mipmap-hdpi","mipmap-mdpi","mipmap-xhdpi","mipmap-xxhdpi","m
 }
 Copy-Item assets/tv_banner.png "$res/drawable/tv_banner.png" -Force
 
-# Patch AndroidManifest.xml for Android TV
+# --- UpdatePlugin & FileProvider patches ---
+$xmlDir = "$res/xml"
+if (-not (Test-Path $xmlDir)) { New-Item -ItemType Directory -Path $xmlDir -Force | Out-Null }
+Copy-Item "android-template/res/xml/file_paths.xml" "$xmlDir/file_paths.xml" -Force
+
+$pkgDir = "android/app/src/main/java/com/webphim/app"
+if (-not (Test-Path $pkgDir)) { New-Item -ItemType Directory -Path $pkgDir -Force | Out-Null }
+(Get-Content "android-template/UpdatePlugin.java" -Raw) `
+  -replace '__PACKAGE_NAME__', 'package com.webphim.app;' |
+  Set-Content "$pkgDir/UpdatePlugin.java" -NoNewline
+
+$mainActivity = "$pkgDir/MainActivity.java"
+if (Test-Path $mainActivity) {
+  $actContent = Get-Content $mainActivity -Raw
+  if (-not $actContent.Contains("registerPlugin(UpdatePlugin.class)")) {
+    $actContent = $actContent -replace "public class MainActivity extends BridgeActivity \{", "public class MainActivity extends BridgeActivity {`n    @Override`n    public void onCreate(android.os.Bundle savedInstanceState) {`n        registerPlugin(UpdatePlugin.class);`n        super.onCreate(savedInstanceState);`n    }"
+    Set-Content $mainActivity $actContent -NoNewline
+  }
+}
+
+# Patch AndroidManifest.xml for Android TV & In-App Update
+$providerXml = "        <provider`n            android:name=`"androidx.core.content.FileProvider`"`n            android:authorities=`"`${applicationId}.fileprovider`"`n            android:exported=`"false`"`n            android:grantUriPermissions=`"true`">`n            <meta-data`n                android:name=`"android.support.FILE_PROVIDER_PATHS`"`n                android:resource=`"@xml/file_paths`" />`n        </provider>"
 (Get-Content $manifest -Raw) `
-  -replace '</manifest>', "  <uses-feature android:name=`"android.hardware.touchscreen`" android:required=`"false`" />`n  <uses-feature android:name=`"android.software.leanback`" android:required=`"false`" />`n  <uses-feature android:name=`"android.hardware.screen.landscape`" android:required=`"false`" />`n</manifest>" `
+  -replace '</manifest>', "  <uses-permission android:name=`"android.permission.REQUEST_INSTALL_PACKAGES`" />`n  <uses-feature android:name=`"android.hardware.touchscreen`" android:required=`"false`" />`n  <uses-feature android:name=`"android.software.leanback`" android:required=`"false`" />`n  <uses-feature android:name=`"android.hardware.screen.landscape`" android:required=`"false`" />`n</manifest>" `
   -replace 'android:supportsRtl="true"', "android:supportsRtl=`"true`"`n        android:banner=`"@drawable/tv_banner`"" `
   -replace 'android:exported="true"', "android:exported=`"true`"`n            android:resizeableActivity=`"true`"" `
+  -replace '</application>', "$providerXml`n    </application>" `
   -replace '<category android:name="android.intent.category.LAUNCHER" />', "<category android:name=`"android.intent.category.LAUNCHER`" />`n                <category android:name=`"android.intent.category.LEANBACK_LAUNCHER`" />" |
   Set-Content $manifest -NoNewline
 
