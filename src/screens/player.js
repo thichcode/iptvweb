@@ -81,7 +81,7 @@ export function playEpisode(serverIdx, epIdx) {
   player.onended = () => autoNext()
   player.ontimeupdate = updateProgress
   if (movie) saveHist(movie.slug, movie, data[epIdx].name || 'Tập ' + (epIdx + 1), serverIdx, epIdx)
-  // ponytail: keep open panel in sync when episode changes (auto-next, new pick)
+  // keep open panel in sync when episode changes (auto-next, new pick)
   wpServer = serverIdx
   if (isWatchPanelOpen()) { renderWatchPanel(); resetWatchTimer() }
 }

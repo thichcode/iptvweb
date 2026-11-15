@@ -304,7 +304,7 @@ function handleKey(e) {
 
   if ($('#player-wrap').classList.contains('active')) {
     e.preventDefault()
-    // ponytail: watch-mode panel owns D-pad while open; Back closes player only on 2nd press
+    // watch-mode panel owns D-pad while open; Back closes player only on 2nd press
     if (isWatchPanelOpen()) {
       if (key === 'ArrowDown' || key === 'ArrowRight') watchPanelMove(1)
       else if (key === 'ArrowUp' || key === 'ArrowLeft') watchPanelMove(-1)
@@ -680,7 +680,7 @@ function detectTV() {
 
 function init() {
   initPlatform()
-  // ponytail: images off by default for everyone; a user who toggles them on is saved
+  // images off by default for everyone; a user who toggles them on is saved
   let thumbsOn = false
   try { thumbsOn = localStorage.getItem('wp_thumbs_on') === '1' } catch {}
   store.noThumb = !thumbsOn
@@ -743,7 +743,7 @@ function init() {
     }
   })
 
-  // ponytail: Capacitor backButton — overlays goBack handles, double-press already in goBack
+  // Capacitor backButton — overlays goBack handles, double-press already in goBack
   try { window.Capacitor?.Plugins?.App?.addListener?.('backButton', () => goBack()) } catch {}
   setTimeout(updateApiToggle, 100)
   initUpdateChecker()

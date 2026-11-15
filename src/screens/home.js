@@ -13,7 +13,7 @@ const ROW_LIMIT = 10
 
 let rows = []
 
-// ponytail: watch-mode panel reuses already-loaded home rows, never fetches
+// watch-mode panel reuses already-loaded home rows, never fetches
 export function getHomeRows() { return rows }
 
 function renderPosterCard(m) {
@@ -67,7 +67,7 @@ function itemsForType(type) {
   return r ? r.items : []
 }
 
-// ponytail: only build poster DOM for rows near the viewport; on weak TV this
+// only build poster DOM for rows near the viewport; on weak TV this
 // cuts the initial render from ~70 cards to the first 1-2 screens
 let homeObserver = null
 function mountRowCarousel(carousel) {
@@ -161,15 +161,26 @@ export async function loadHomeData() {
     }))
     if (store.screen === 'home') renderHome()
   }
-  for (const rowDef of HOME_ROWS) {
-    try {
-      const data = await fetchMovies(rowDef.type, 1, '', '', '', ROW_LIMIT)
+
+  // Fetch all rows in parallel instead of slow sequential waterfall
+  const results = await Promise.allSettled(
+    HOME_ROWS.map(rowDef => fetchMovies(rowDef.type, 1, '', '', '', ROW_LIMIT))
+  )
+
+  let updated = false
+  results.forEach((res, idx) => {
+    if (res.status === 'fulfilled') {
+      const data = res.value
       const items = data.items || (data.data && data.data.items) || []
-      if (!items.length) continue
-      const idx = HOME_ROWS.findIndex(row => row.type === rowDef.type)
-      rows[idx] = { type: rowDef.type, label: rowDef.label, items }
-      if (store.screen === 'home') renderHome()
-    } catch { /* keep static data for this row */ }
+      if (items.length) {
+        rows[idx] = { type: HOME_ROWS[idx].type, label: HOME_ROWS[idx].label, items }
+        updated = true
+      }
+    }
+  })
+
+  if (updated && store.screen === 'home') {
+    renderHome()
   }
 }
 

@@ -28,14 +28,13 @@ html { scroll-behavior: smooth; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
 
 /* TV/remote: focus transform appears near-instantly to avoid queued
-   animations when holding the D-pad. ponytail: 0.18s felt laggy on rapid nav */
+   animations when holding the D-pad. 0.18s felt laggy on rapid nav */
 .poster-card, .local-item, .sub-item, .page-btn, .episode-btn, .fav-btn, .home-action, .top-nav-btn {
   transition-duration: 0.06s;
 }
 
-/* Unify focus appearance for TV mode — both main app (body.tv-mode) and standalone tv.html */
-body.tv-mode .focused,
-.fixed-focus { /* ponytail: explicit class for tv.html fallback */
+/* Unify focus appearance for TV mode */
+body.tv-mode .focused {
   outline: 3px solid var(--accent) !important;
   outline-offset: 2px !important;
 }
@@ -127,38 +126,9 @@ body.large-mode .update-msg { font-size: 18px; }
 .update-msg.err { color: var(--danger); }
 .update-msg .dl-link { color: #ffd600; text-decoration: none; font-weight: 600; margin-left: 8px; padding: 6px 14px; border: 1px solid #ffd600; border-radius: 6px; }
 
-/* Home wheel — 3D cylindrical drum */
+/* Home screen container */
 #screen-home { flex-direction: column; padding: 0; overflow: hidden; }
 #screen-home.active { display: flex; }
-.wheel-bg { position: absolute; inset: 0; background: radial-gradient(ellipse 70% 50% at 50% 48%, rgba(255,212,90,0.12) 0%, transparent 68%); pointer-events: none; }
-.wheel-wrap {
-  flex: 1;
-  position: relative;
-  transform: translateY(100px);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  perspective: 900px;
-  overflow: hidden;
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: none;
-}
-.wheel-viewport { position: relative; width: 100%; height: clamp(280px, 55vh, 460px); transform-style: preserve-3d; }
-.no-transition .wheel-item { transition: none !important; }
-
-.wheel-indicator { font-size: 12px; color: #666; letter-spacing: 2px; z-index: 2; }
-.wheel-indicator.top { margin-bottom: -8px; }
-.wheel-indicator.bottom { margin-top: -8px; }
-
-@media (min-width: 900px) {
-  .wheel-item { left: 20%; right: 20%; font-size: 20px; }
-}
-.wheel-item { position: absolute; left: 10%; right: 10%; height: 52px; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 0 20px; background: var(--surface); border: 2px solid rgba(255,255,255,0.08); border-radius: var(--radius-md); color: var(--muted); cursor: pointer; font-size: 16px; white-space: nowrap; backface-visibility: hidden; transition: transform 0.35s ease-out, opacity 0.35s ease-out, border-color 0.2s, background 0.2s, color 0.2s, box-shadow 0.2s; will-change: transform, opacity; }
-.wi-label { overflow: hidden; text-overflow: ellipsis; }
-.wheel-item.focused { border-color: var(--accent); background: var(--surface-strong); color: var(--text); font-weight: 700; box-shadow: var(--shadow-amber), inset 0 0 0 1px rgba(255,255,255,0.08); }
-.wheel-item:active { transform: scale(0.96) !important; }
 
 /* Local List (Movies, Favorites, History) */
 .local-list { display: grid; grid-template-columns: 1fr; gap: 10px; padding-bottom: 16px; }
@@ -454,13 +424,10 @@ body.large-mode .wp-item { font-size: 17px; padding: 12px; }
   .local-item .info .title { font-size: 18px; }
   .local-item .info .meta { font-size: 14px; }
   .sub-item { font-size: 18px; padding: 12px 22px; }
-  .wheel-item { font-size: 22px; height: 64px; left: 14%; right: 14%; }
-  .page-btn { font-size: 17px; }
+    .page-btn { font-size: 17px; }
   .episode-btn { font-size: 17px; }
 
-  .wheel-viewport { height: clamp(340px, 50vh, 520px); }
-  .wheel-indicator { font-size: 16px; }
-}
+    }
 
 /* Chế độ Người già / TV mode — bật trong Settings */
 body.large-mode .header h1 { font-size: 28px; }
@@ -479,8 +446,6 @@ body.large-mode .local-item.focused { transform: scale(1.03); border-width: 3px;
 body.large-mode .sub-item { font-size: 20px; padding: 14px 26px; min-height: 56px; border-width: 2px; }
 body.large-mode .sub-item.focused { transform: scale(1.06); }
 
-body.large-mode .wheel-item { height: 72px; font-size: 26px; border-width: 3px; left: 5%; right: 5%; }
-body.large-mode .wheel-viewport { height: clamp(320px, 60vh, 520px); }
 
 body.large-mode .page-btn { font-size: 20px; padding: 14px 24px; min-height: 56px; }
 body.large-mode .page-info { font-size: 18px; }
@@ -502,7 +467,7 @@ body.large-mode .p-hint { font-size: 16px; }
 body.large-mode .nav-btn .label { font-size: 16px; }
 
 /* ── TV mode ────────────────────────────────────────────── */
-/* ponytail: auto-applied by detectTV() in main.js */
+/* auto-applied by detectTV() in main.js */
 body.tv-mode {
   --overscan: 48px;
   --focus-amber: 0 0 0 3px rgba(255, 196, 66, 0.8), 0 0 20px rgba(255, 196, 66, 0.35);

@@ -9,8 +9,8 @@ const PROXY_BASE = import.meta.env?.VITE_API_PROXY || DEFAULT_PROXY_BASE
 export const API_BASE = import.meta.env?.VITE_API_BASE || PROXY_BASE
 
 export const IMAGE_BASE = import.meta.env?.VITE_IMAGE_BASE || 'https://img.ophim.live/uploads/movies'
-const MAX_RETRIES = 2
-const TIMEOUT_MS = 15000
+const MAX_RETRIES = 1
+const TIMEOUT_MS = 6000
 const MOBILE_LIMIT = 5
 const DEFAULT_LIMIT = 20
 
